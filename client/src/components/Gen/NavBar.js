@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { logoutUser } from "../../actions/authActions";
 import { Container, Navbar, Nav } from "react-bootstrap";
 import logo from "./logo192.png";
+import "./navbar.css";
 
 function NavBar(props) {
     // State Management
@@ -36,8 +37,8 @@ function NavBar(props) {
     };
 
     return (
-        <div className="Navbar shadow-sm">
-            <Navbar collapseOnSelect expand="lg">
+        <div className="Navbar shadow-sm" >
+            <Navbar style={{ "background-color": "#500000" }} collapseOnSelect expand="lg">
                 <Container fluid>
                     <Navbar.Brand href="/">
                         <img
