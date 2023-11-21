@@ -8,7 +8,7 @@ Main branch protected!
 ## NodeJS Set-up
 This project is using NodeJS v16.14.x, so you need to download this version specifically. If you are on mac, this is fairly simple using Homebrew. If you are on Windows you will need to download directly from the NodeJS website
 * If you already have NodeJS installed (or if you want to check if you do), open a terminal and run `node -v`
-* If the version is 16.14.x then you can skip to environment set-up
+* If the version is 16.14.x then you can skip to .env set-up
 * If you already have NodeJS and it is not version 16.14.x, then you need to uninstall it first
 
 ### NodeJS Mac Set-up
@@ -20,6 +20,11 @@ This project is using NodeJS v16.14.x, so you need to download this version spec
 1. Download NodeJS 16.14.0 from the NodeJS website (I think this is the link for it... https://nodejs.org/en/blog/release/v16.14.0)
 2. Open an integrated terminal in VSCode and check Node is installed at the right version (`node -v`)
 3. If you get an error saying node cannot be found or the version is incorrect, restart your computer and then check again
+
+## .env Set-up
+The server requires environment variables to run, which is a secret file that cannot be pushed to Github and has information required to connect to our database. In order to be able to access any data, you need to follow the following steps:
+1. At the base of the project (~/CSCE310), create a new file called `.env`
+2. Inside the file, copy exactly the information I sent to our groupchat, so it looks like the photo
 
 ## Environment Set-up
 **IMPORTANT: Make sure you checkout the development branch from the github. There should never be a direct push to the main branch!**
@@ -34,11 +39,6 @@ This project is using NodeJS v16.14.x, so you need to download this version spec
 9. `cd ../`
 10. `npm build`
 * **IMPORTANT: If you see "High Vulnerability" errors or something similar during the running of the above commands, do not worry! Those are only there because we are using an older version of React (one that is compatible with NodeJS v16.14.x)**
-
-## .env Set-up
-The server requires environment variables to run, which is a secret file that cannot be pushed to Github and has information required to connect to our database. In order to be able to access any data, you need to follow the following steps:
-1. At the base of the project (~/CSCE310), create a new file called `.env`
-2. Inside the file, copy exactly the information I sent to our groupchat, so it looks like the photo
 
 ## Checking to make sure it all works
 Ok, hopefully everything works now, so we need to test and see if you can successfully host the website from your local machine. You should still be in the development branch on the GitHub!
