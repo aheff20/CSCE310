@@ -28,13 +28,13 @@ This project is using NodeJS v16.14.x, so you need to download this version spec
 3. At the base of the project (~/CSCE310), create a new file called `.env`
 4. Inside the file (.env), copy exactly the information I sent to our groupchat, so it looks like the photo
 5. Open the integrated terminal in VSCode, and make sure you are cd'd to the base of the repo (~/CSCE310)
-6. Run the following commands (Steps 8 - 13) in order:
-8. `npm i`
-9. `cd client`
-10. `npm i`
-11. `npm build`
-12. `cd ../`
-13. `npm build`
+6. Run the following commands (Steps 7 - 12) in order:
+7. `npm i`
+8. `cd client`
+9. `npm i`
+10. `npm build`
+11. `cd ../`
+12. `npm build`
 * **IMPORTANT: If you see "High Vulnerability" errors or something similar during the running of the above commands, do not worry! Those are only there because we are using an older version of React (one that is compatible with NodeJS v16.14.x)**
 
 ## Checking to make sure it all works
