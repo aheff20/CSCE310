@@ -35,7 +35,7 @@ This project is using NodeJS v16.14.x, so you need to download this version spec
 10. `npm build`
 * **IMPORTANT: If you see "High Vulnerability" errors or something similar during the running of the above commands, do not worry! Those are only there because we are using an older version of React (one that is compatible with NodeJS v16.14.x)**
 
-## Environment Set-up
+## .env Set-up
 The server requires environment variables to run, which is a secret file that cannot be pushed to Github and has information required to connect to our database. In order to be able to access any data, you need to follow the following steps:
 1. At the base of the project (~/CSCE310), create a new file called `.env`
 2. Inside the file, copy exactly the information I sent to our groupchat, so it looks like the photo
