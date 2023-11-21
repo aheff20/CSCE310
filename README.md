@@ -8,7 +8,7 @@ Main branch protected!
 ## NodeJS Set-up
 This project is using NodeJS v16.14.x, so you need to download this version specifically. If you are on mac, this is fairly simple using Homebrew. If you are on Windows you will need to download directly from the NodeJS website
 * If you already have NodeJS installed (or if you want to check if you do), open a terminal and run `node -v`
-* If the version is 16.14.x then you can skip to .env set-up
+* If the version is 16.14.x then you can skip to Environment Set-up
 * If you already have NodeJS and it is not version 16.14.x, then you need to uninstall it first
 
 ### NodeJS Mac Set-up
@@ -21,23 +21,20 @@ This project is using NodeJS v16.14.x, so you need to download this version spec
 2. Open an integrated terminal in VSCode and check Node is installed at the right version (`node -v`)
 3. If you get an error saying node cannot be found or the version is incorrect, restart your computer and then check again
 
-## .env Set-up
-The server requires environment variables to run, which is a secret file that cannot be pushed to Github and has information required to connect to our database. In order to be able to access any data, you need to follow the following steps:
-1. At the base of the project (~/CSCE310), create a new file called `.env`
-2. Inside the file, copy exactly the information I sent to our groupchat, so it looks like the photo
-
 ## Environment Set-up
 **IMPORTANT: Make sure you checkout the development branch from the github. There should never be a direct push to the main branch!**
 1. Clone the repo to your computer
 2. Open VSCode and checkout the development branch
-3. Open the integrated terminal in VSCode, and make sure you are cd'd to the base of the repo (~/CSCE310)
-4. Run the following commands (Steps 5 - 10) in order:
-5. `npm i`
-6. `cd client`
-7. `npm i`
-8. `npm build`
-9. `cd ../`
-10. `npm build`
+3. At the base of the project (~/CSCE310), create a new file called `.env`
+4. Inside the file (.env), copy exactly the information I sent to our groupchat, so it looks like the photo
+5. Open the integrated terminal in VSCode, and make sure you are cd'd to the base of the repo (~/CSCE310)
+6. Run the following commands (Steps 8 - 13) in order:
+8. `npm i`
+9. `cd client`
+10. `npm i`
+11. `npm build`
+12. `cd ../`
+13. `npm build`
 * **IMPORTANT: If you see "High Vulnerability" errors or something similar during the running of the above commands, do not worry! Those are only there because we are using an older version of React (one that is compatible with NodeJS v16.14.x)**
 
 ## Checking to make sure it all works
