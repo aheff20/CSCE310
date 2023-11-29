@@ -20,7 +20,7 @@ router.post("/login", (req, res) => {
 
     for(let i = 0; i < result.rows.length; i++){
       if(result.rows[i].username === username){
-        bcrypt.compare(password, result.rows[i].password).then((isMatch) => {
+        bcrypt.compare(password, result.rows[i].pass).then((isMatch) => {
 
           if(isMatch){
             const payload = {
