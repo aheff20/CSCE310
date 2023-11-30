@@ -24,7 +24,7 @@ router.post("/login", (req, res) => {
 
           if(isMatch){
             const payload = {
-              id: result.rows[i].uin,
+              uin: result.rows[i].uin,
               first_name: result.rows[i].first_name,
               last_name: result.rows[i].last_name,
               m_initial: result.rows[i].m_initial,
@@ -224,6 +224,32 @@ router.get("/getAllUserData", async (req, res) => {
 
     });
 })
+
+router.get("/getUserData", async(req, res) => {
+  const uin = req.query.uin;
+  const userType = req.query.userType;
+
+  if(userType === "Admin") {
+    pool.query(`SELECT * FROM users WHERE uin=${uin}`, (err, result) => {
+      if(err) {
+        console.log(err);
+        res.status(400).json({message: "Error getting user data!"});
+      }
+      res.status(200).json(result.rows[0])
+    })
+    
+  } else {
+    pool.query(`SELECT * FROM college_student WHERE uin=${uin}`, (err, result) => {
+      if(err) {
+        console.log(err);
+        res.status(400).json({message: "Error getting user data!"});
+      }
+      res.status(200).json(result.rows[0])
+    })
+  }
+  
+
+});
 
 
 module.exports = router;

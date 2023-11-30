@@ -9,6 +9,7 @@ import Landing from "./components/Gen/landing";
 import NavBar from "./components/Gen/NavBar";
 import Management from "./components/Management/management";
 import CreateAccount from "./components/Management/createAccount";
+import Profile from "./components/MyProfile/profile";
 
 import setAuthToken from "./utils/setAuthToken";
 import { setCurrentUser, logoutUser } from "./actions/authActions";
@@ -50,6 +51,7 @@ function App() {
           <Switch>
               <Route exact path="/login" component={Login} />
               <Route exact path="/register" component={Register} />
+              <PrivateUserRoute exact path="/myprofile" component={Profile} />
               <PrivateAdminRoute exact path="/management" component={Management} />          
               <PrivateAdminRoute exact path="/createAccount" component={CreateAccount} />          
           </Switch>
