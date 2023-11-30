@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useHistory, Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { Form, Button, Container, Table, Spinner, Row, Col, Card } from "react-bootstrap";
+import { Form, Button, Container, Table, Spinner, Row, Col, Card, Modal } from "react-bootstrap";
 import classnames from "classnames";
 import axios from "axios";
 import React from "react";
@@ -11,9 +11,37 @@ function Profile(props) {
   const history = useHistory();
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState({});
+  const [showAccountInfo, setShowAccountInfo] = useState(false);
+  
+  const [error, setError] = useState({});
+
+  const [fname, setfName] = useState("");
+  const [lname, setlName] = useState("");
+  const [m_initial, setMInitial] = useState("");
+  const [discord, setDiscord] = useState("");
+  const [uin, setUIN] = useState();
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [password2, setPassword2] = useState("");
+
+  const [gender, setGender] = useState("");
+  const [hispaniclatino, setHispanicLatino] = useState("");
+  const [race, setRace] = useState("");
+  const [citizen, setCitizen] = useState("");
+  const [firstGen, setFirstGen] = useState("");
+  const [dob, setDOB] = useState("");
+  const [gpa, setGPA] = useState();
+  const [major, setMajor] = useState("");
+  const [minor1, setMinor1] = useState("");
+  const [minor2, setMinor2] = useState("");
+  const [gradYear, setGradYear] = useState();
+  const [school, setSchool] = useState("");
+  const [classification, setClassification] = useState("");
+  const [studentType, setStudentType] = useState("");
+  const [phone, setPhone] = useState("");
 
   useEffect(() => {
-    console.log(props.auth.user)
     axios
         .get("/users/getUserData", {
             params: {
@@ -23,15 +51,213 @@ function Profile(props) {
         })
         .then((res) => {
             setUserData(res.data);
+            setUIN(res.data.uin);
+            setEmail(res.data.email);
+            setUsername(res.data.username);
+            setPassword(res.data.pass);
+            setDiscord(res.data.discord);
+            setfName(res.data.first_name);
+            setlName(res.data.last_name);
+            setMInitial(res.data.m_initial);
             setLoading(false);
         })
 
   }, []);
 
-  console.log(userData);
+  const handleShowAccountInfo = () => {
+    setShowAccountInfo(true);
+  }
+
+  const handleCloseAccountInfo = () => {
+    setShowAccountInfo(false);
+  }
+
+  const handleSaveAccountInfo = () => {
+    axios
+        .post("/users/updateUserInfo", {
+            params: {
+                userType: props.auth.user.user_type,
+                uin: props.auth.user.uin,
+                updatedFName: fname,
+                updatedLName: lname,
+                updatedMInitial: m_initial,
+                updatedEmail: email,
+                updatedDiscord: discord,
+                updatedUsername: username
+            }
+        })
+        .then((res) => {
+            if(res.status === 201) {
+                console.log(res.data);
+                setError(res.data);
+            } else {
+                history.go(0);
+                setShowAccountInfo(false);
+            }
+        })
+  }
+
+
+  const handleShowStudentInfo = () => {
+
+  }
 
   return (
     <div className="Profile">
+        <Modal show={showAccountInfo} onHide={handleCloseAccountInfo}>
+            <Modal.Header closeButton>
+            <Modal.Title>
+                Editing Account Information
+            </Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <Row>
+                    <Col sm={3}>
+                        <b>UIN: </b>
+                    </Col>
+                    <Col>
+                    <Form.Control
+                        readOnly
+                        value={uin}
+                        id="uin"
+                        type="text"
+                        />
+                    </Col>
+                </Row>
+                <Row>
+                    <Col sm={3}>
+                        <b>First Name: </b>
+                    </Col>
+                    <Col>
+                        <Form.Group>
+                            <Form.Control
+                            onChange={(e) => setfName(e.target.value)}
+                            required
+                            value={fname}
+                            id="fname"
+                            type="text"
+                            isInvalid={error.first_name}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                {error.first_name}
+                            </Form.Control.Feedback>
+                        </Form.Group>
+                    </Col>
+                    
+                </Row>
+                <Row>
+                    <Col sm={3}>
+                        <b>Last Name: </b>
+                    </Col>
+                    <Col>
+                    <Form.Group>
+                        <Form.Control
+                        onChange={(e) => setlName(e.target.value)}
+                        required
+                        isInvalid={error.last_name}
+                        value={lname}
+                        id="lname"
+                        type="text"
+                        />
+                        <Form.Control.Feedback type="invalid">
+                            {error.last_name}
+                        </Form.Control.Feedback>
+                    </Form.Group>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col sm={3}>
+                        <b>M Initial: </b>
+                    </Col>
+                    <Col>
+                    <Form.Group>
+                        <Form.Control
+                            onChange={(e) => setMInitial(e.target.value)}
+                            required
+                            isInvalid={error.m_initial}
+                            value={m_initial}
+                            id="m_initial"
+                            type="text"
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                {error.m_initial}
+                            </Form.Control.Feedback>
+                    </Form.Group>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col sm={3}>
+                        <b>Email: </b>
+                    </Col>
+                    <Col>
+                    <Form.Group>
+                        <Form.Control
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                            value={email}
+                            id="email"
+                            isInvalid={error.registerEmail}
+                            type="text"
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                {error.registerEmail}
+                            </Form.Control.Feedback>
+                    </Form.Group>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col sm={3}>
+                        <b>Discord: </b>
+                    </Col>
+                    <Col>
+                    <Form.Group>
+                        <Form.Control
+                            onChange={(e) => setDiscord(e.target.value)}
+                            required
+                            value={discord}
+                            id="discord"
+                            isInvalid={error.discord}
+                            type="text"
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                {error.discord}
+                            </Form.Control.Feedback>
+                    </Form.Group>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col sm={3}>
+                        <b>Username: </b>
+                    </Col>
+                    <Col>
+                    <Form.Group>
+                        <Form.Control
+                        onChange={(e) => setUsername(e.target.value)}
+                        required
+                        value={username}
+                        id="username"
+                        isInvalid={error.registerUsername}
+                        type="text"
+                        />
+                        <Form.Control.Feedback type="invalid">
+                            {error.registerUsername}
+                        </Form.Control.Feedback>
+                    </Form.Group>
+                    </Col>
+                </Row>
+
+            
+            </Modal.Body>
+            <Modal.Footer>
+            <Button variant="secondary" onClick={handleCloseAccountInfo}>
+                Close
+            </Button>
+            <Button variant="primary" onClick={handleSaveAccountInfo}>
+                Save Changes
+            </Button>
+            </Modal.Footer>
+        </Modal>
+
       <Container>
         {loading ? (
             <center>
@@ -108,7 +334,13 @@ function Profile(props) {
                                 <Col>
                                     {userData.username}
                                 </Col>
-                            </Row>    
+                            </Row>  
+                            <center>
+                                <br></br>
+                                <Button variant="primary" type="submit" onClick={() => handleShowAccountInfo()}>
+                                    Edit Account Information
+                                </Button>  
+                            </center>
                         </Card.Body>
                         </Card>
                     </Col>
@@ -236,14 +468,21 @@ function Profile(props) {
                                         {userData.student_type}
                                     </Col>
                                     <Row>
-                                    <Col style={{textAlign: "right"}}>
-                                        <b>Phone Number: </b>
-                                    </Col>    
-                                    <Col>
-                                        {userData.phone}
-                                    </Col>
-                                </Row>       
-                                </Row>       
+                                        <Col style={{textAlign: "right"}}>
+                                            <b>Phone Number: </b>
+                                        </Col>    
+                                        <Col>
+                                            {userData.phone}
+                                        </Col>
+                                    </Row>       
+                                </Row>  
+
+                                <center>
+                                    <br></br>
+                                    <Button variant="primary" type="submit" onClick={() => handleShowStudentInfo()}>
+                                        Edit Student Information
+                                    </Button>  
+                                </center>
                             </Card.Body>
                             </Card>
                         </Col>

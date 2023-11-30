@@ -64,100 +64,39 @@ router.post("/login", (req, res) => {
 });
 
 router.post("/register", async (req, res) => {
-    const uin = req.body.uin.trim();
-    const first_name = req.body.first_name.trim();
-    const m_initial = req.body.m_initial.trim();
-    const last_name = req.body.last_name.trim();
-    const username = req.body.username.trim();
-    const discord = req.body.discord.trim();
-    const email = req.body.email.trim();
-    const password = req.body.password.trim();
-    const password2 = req.body.password2.trim();
-    const userType = req.body.userType.trim();
+    const userData = {}
 
-    const gender = req.body.gender;
-    const hispanicLatino = req.body.hispanicLatino;
-    const race = req.body.race;
-    const citizen = req.body.citizen;
-    const firstGen = req.body.firstGen;
-    const dob = req.body.dob;
-    const gpa = req.body.gpa;
-    const major = req.body.major;
-    const minor1 = req.body.minor1;
-    const minor2 = req.body.minor2;
-    const graduation = req.body.graduation;
-    const school = req.body.school;
-    const classification = req.body.classification;
-    const studentType = req.body.studentType;
-    const phone = req.body.phone;
+    userData.uin = req.body.uin.trim();
+    userData.first_name = req.body.first_name.trim();
+    userData.m_initial = req.body.m_initial.trim();
+    userData.last_name = req.body.last_name.trim();
+    userData.username = req.body.username.trim();
+    userData.discord = req.body.discord.trim();
+    userData.email = req.body.email.trim();
+    userData.password = req.body.password.trim();
+    userData.password2 = req.body.password2.trim();
+    userData.userType = req.body.userType.trim();
 
-    if(isNaN(uin) || isNaN(parseFloat(uin))) {
-      return res.status(400).json({uin: "Please enter a valid uin!"})
+    userData.gender = req.body.gender;
+    userData.hispanicLatino = req.body.hispanicLatino;
+    userData.race = req.body.race;
+    userData.citizen = req.body.citizen;
+    userData.firstGen = req.body.firstGen;
+    userData.dob = req.body.dob;
+    userData.gpa = req.body.gpa;
+    userData.major = req.body.major;
+    userData.minor1 = req.body.minor1;
+    userData.minor2 = req.body.minor2;
+    userData.graduation = req.body.graduation;
+    userData.school = req.body.school;
+    userData.classification = req.body.classification;
+    userData.studentType = req.body.studentType;
+    userData.phone = req.body.phone;
+   
+    const isUserDataValid = validateUserInfo(userData)
+    if(isUserDataValid != true) {
+      return res.status(400).json(isUserDataValid);
     }
-    if(first_name == ""){
-      return res.status(400).json({first_name: "Please enter a name!"})
-    }
-    if(last_name == ""){
-      return res.status(400).json({last_name: "Please enter a name!"})
-    }
-    if(m_initial.length > 1){
-      return res.status(400).json({m_initial: "Please only use 1 initial!"})
-    }    
-    if(!email.includes("@")){
-      return res.status(400).json({registerEmail: "Invalid email!"});
-    }
-    if(password != password2){
-      return res.status(400).json({registerPassword2: "Password does not match!"});
-    }
-    if(discord == "") {
-      return res.status(400).json({discord: "Please enter a discord!"});
-    }
-
-    if(userType == "Student") {
-      if(gender == "Choose Gender") {
-        return res.status(400).json({gender: "Please select a gender!"});
-      }
-      if(hispanicLatino == "Select Option") {
-        return res.status(400).json({hispaniclatino: "Please select an option!"});
-      }
-      if(race == "Select Race") {
-        return res.status(400).json({race: "Please select a race!"});
-      }
-      if(citizen == "Select Option") {
-        return res.status(400).json({citizen: "Please select an option!"});
-      }
-      if(firstGen == "Select Option") {
-        return res.status(400).json({firstGen: "Please select an option!"});
-      }
-      if(dob == "") {
-        return res.status(400).json({dob: "Please enter a date of birth!"});
-      }
-      if(!major) {
-        return res.status(400).json({major: "Please enter a Major!"});
-      }
-      if(!gpa) {
-        return res.status(400).json({gpa: "Please enter gpa!"});
-      }
-      if(!graduation) {
-        return res.status(400).json({graduation: "Please enter grad year!"});
-      }
-      if(graduation && parseInt(graduation) < 2020){
-        return res.status(400).json({graduation: "Please enter a valid grad year!"});
-      }
-      if(!school) {
-        return res.status(400).json({school: "Please enter your school!"});
-      }
-      if(classification == "Select Classification") {
-        return res.status(400).json({classification: "Please select a classification!"});
-      }
-      if(studentType == "Select Type") {
-        return res.status(400).json({studentType: "Please select a type!"});
-      }
-      if(!phone) {
-        return res.status(400).json({phone: "Please enter a phone number!"});
-      }
-    }
-    
     
     pool.query('SELECT * FROM users', (err, result) => {
       if(err) {
@@ -165,13 +104,13 @@ router.post("/register", async (req, res) => {
       }
 
       for(let i = 0; i < result.rows.length; i++){
-        if(email == result.rows[i].email){
+        if(userData.email == result.rows[i].email){
           return res.status(400).json({registerEmail: "Email already exists!"});
         }
-        if(username == result.rows[i].username){
+        if(userData.username == result.rows[i].username){
           return res.status(400).json({registerUsername: "Username already exists!"});
         }
-        if(uin == result.rows[i].uin){
+        if(userData.uin == result.rows[i].uin){
             return res.status(400).json({uin: "UIN already exists!"});
           }
       }
@@ -179,24 +118,26 @@ router.post("/register", async (req, res) => {
       let password_hashed = "";
 
       bcrypt.genSalt(10, (err, salt) => {
-        bcrypt.hash(password, salt, (err, hash) => {
+        bcrypt.hash(userData.password, salt, (err, hash) => {
           if(err){
             console.log(err);
             res.status(400).json({message: "Error creating account!"});
           };
           password_hashed = hash;
 
-          if(userType == "Admin") {
-            pool.query(`INSERT INTO users VALUES (${uin}, '${first_name}', '${last_name}', '${m_initial}', '${email}', '${discord}', '${username}', '${password_hashed}', '${userType}')`, (err, result) => {
+          if(userData.userType == "Admin") {
+            pool.query(`INSERT INTO users VALUES (${userData.uin}, '${userData.first_name}', '${userData.last_name}', '${userData.m_initial}', '${userData.email}', '${userData.discord}', 
+            '${userData.username}', '${userData.password_hashed}', '${userData.userType}')`, (err, result) => {
               if(err) {
                 return console.log('Error executing query', err.stack)
               }
               res.status(200).json(result);
             })
           } else {
-            pool.query(`INSERT INTO college_student VALUES (${uin}, '${first_name}', '${last_name}', '${m_initial}', '${email}', '${discord}', '${username}', '${password_hashed}', '${userType}',
-             '${gender}', ${hispanicLatino=="Yes"}, '${race}', ${citizen=="Yes"}, ${firstGen=="Yes"}, '${dob}', ${gpa}, '${major}', '${minor1}', '${minor2}', ${graduation}, '${school}', '${classification}',
-             '${studentType}', '${phone}' )`, (err, result) => {
+            pool.query(`INSERT INTO college_student VALUES (${userData.uin}, '${userData.first_name}', '${userData.last_name}', '${userData.m_initial}', '${userData.email}', 
+            '${userData.discord}', '${userData.username}', '${userData.password_hashed}', '${userData.userType}', '${userData.gender}', ${userData.hispanicLatino=="Yes"}, 
+            '${userData.race}', ${userData.citizen=="Yes"}, ${userData.firstGen=="Yes"}, '${userData.dob}', ${userData.gpa}, '${userData.major}', '${userData.minor1}', '${userData.minor2}',
+             ${userData.graduation}, '${userData.school}', '${userData.classification}', '${userData.studentType}', '${userData.phone}' )`, (err, result) => {
               if(err) {
                 return console.log('Error executing query', err.stack)
               }
@@ -251,5 +192,116 @@ router.get("/getUserData", async(req, res) => {
 
 });
 
+router.post("/updateUserInfo", async(req, res) => {
+  const userData = {}
+
+  userData.userType = req.body.params.userType;
+  userData.uin = req.body.params.uin;
+  userData.first_name = req.body.params.updatedFName;
+  userData.last_name = req.body.params.updatedLName;
+  userData.m_initial = req.body.params.updatedMInitial;
+  userData.email = req.body.params.updatedEmail;
+  userData.discord = req.body.params.updatedDiscord;
+  userData.username = req.body.params.updatedUsername;
+
+  const isUserDataValid = validateUserInfo(userData)
+    if(isUserDataValid != true) {
+      return res.status(201).json(isUserDataValid);
+    }
+    
+  if(userData.userType == "Admin") {
+    pool.query(`UPDATE users SET first_name='${userData.first_name}', last_name='${userData.last_name}', m_initial='${userData.m_initial}', 
+    email='${userData.email}', discord='${userData.discord}', username='${userData.username}' WHERE uin=${userData.uin}`, (err, result) => {
+      if(err) {
+        console.log(err);
+        res.status(400).json({message: "Error updating user!"})
+      }
+
+      res.status(200).json({message: "Success!"})
+
+    })
+  }
+
+});
+
+
+
+const validateUserInfo = (userData) => {
+  if(isNaN(userData.uin) || isNaN(parseFloat(userData.uin))) {
+    return {uin: "Please enter a valid uin!"}
+  }
+  if(userData.first_name == ""){
+    return {first_name: "Please enter a name!"}
+  }
+  if(userData.last_name == ""){
+    return {last_name: "Please enter a name!"}
+  }
+  if(userData.m_initial && userData.m_initial.length > 1){
+    return {m_initial: "Please only use 1 initial!"}
+  }    
+  if(!userData.email.includes("@")){
+    return {registerEmail: "Invalid email!"}
+  }
+  if(userData.password != userData.password2){
+    return {registerPassword2: "Password does not match!"}
+  }
+  if(userData.username == "") {
+    return {registerUsername: "Please enter a username!"}
+  }
+  if(userData.password == "") {
+    return {registerPassword: "Please enter a password!"}
+  }
+  if(userData.discord == "") {
+    return {discord: "Please enter a discord!"}
+  }
+
+  if(userData.userType == "Student") {
+    if(userData.gender == "Choose Gender") {
+      return {gender: "Please select a gender!"}
+    }
+    if(userData.hispanicLatino == "Select Option") {
+      return {hispaniclatino: "Please select an option!"}
+    }
+    if(userData.race == "Select Race") {
+      return {race: "Please select a race!"}
+    }
+    if(userData.citizen == "Select Option") {
+      return {citizen: "Please select an option!"}
+    }
+    if(userData.firstGen == "Select Option") {
+      return {firstGen: "Please select an option!"}
+    }
+    if(userData.dob == "") {
+      return {dob: "Please enter a date of birth!"}
+    }
+    if(!userData.major) {
+      return {major: "Please enter a Major!"}
+    }
+    if(!userData.gpa) {
+      return {gpa: "Please enter gpa!"}
+    }
+    if(!userData.graduation) {
+      return {graduation: "Please enter grad year!"}
+    }
+    if(userData.graduation && parseInt(userData.graduation) < 2020){
+      return {graduation: "Please enter a valid grad year!"}
+    }
+    if(!userData.school) {
+      return {school: "Please enter your school!"}
+    }
+    if(userData.classification == "Select Classification") {
+      return {classification: "Please select a classification!"}
+    }
+    if(userData.studentType == "Select Type") {
+      return {studentType: "Please select a type!"}
+    }
+    if(!userData.phone) {
+      return {phone: "Please enter a phone number!"}
+    }
+  }
+
+
+  return true;
+}
 
 module.exports = router;
