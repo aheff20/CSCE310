@@ -14,7 +14,7 @@ CREATE TABLE users(
 
 CREATE TABLE college_student(
     gender VARCHAR,
-    hispanic_lation BOOLEAN,
+    hispanic_latino BOOLEAN,
     race VARCHAR,
     citizen BOOLEAN,
     first_gen BOOLEAN,

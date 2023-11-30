@@ -51,14 +51,13 @@ function Login(props) {
               onChange={(e) => setUsername(e.target.value)}
               value={username}
               tabIndex={1}
-              isInvalid={!!error.username || !!error.usernamenotfound}
+              isInvalid={error.invalidLogin}
               className={classnames("", {
-                invalid: error.username || error.usernamenotfound,
+                invalid: error.invalidLogin,
               })}
             />
             <Form.Control.Feedback type="invalid">
-              {error.username}
-              {error.usernamenotfound}
+              {error.invalidLogin}
             </Form.Control.Feedback>
           </Form.Group>
           <Form.Group className="mb-3">
@@ -74,14 +73,13 @@ function Login(props) {
               onChange={(e) => setPassword(e.target.value)}
               value={password}
               tabIndex={2}
-              isInvalid={!!error.password || !!error.passwordincorrect}
+              isInvalid={error.invalidLogin}
               className={classnames("", {
-                invalid: error.password || error.passwordincorrect,
+                invalid: error.invalidLogin
               })}
             />
             <Form.Control.Feedback type="invalid">
-              {error.password}
-              {error.passwordincorrect}
+              {error.invalidLogin}
             </Form.Control.Feedback>
           </Form.Group>
           <Button variant="primary" type="submit">

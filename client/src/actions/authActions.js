@@ -17,6 +17,18 @@ export const registerUser = (userData, history) => (dispatch) => {
 };
 
 
+export const createUser = (userData, history) => (dispatch) => {
+  axios
+    .post("/users/register", userData)
+    .then((res) => history.push("/management")) // re-direct to management on successful register
+    .catch((err) =>
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data,
+      })
+    );
+};
+
 export const loginUser = (userData) => (dispatch) => {
   axios
     .post("/users/login", userData)

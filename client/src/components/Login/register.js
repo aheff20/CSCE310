@@ -16,6 +16,23 @@ function Register(props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
+
+  const [gender, setGender] = useState("Choose Gender");
+  const [hispaniclatino, setHispanicLatino] = useState("Select Option");
+  const [race, setRace] = useState("Select Race");
+  const [citizen, setCitizen] = useState("Select Option");
+  const [firstGen, setFirstGen] = useState("Select Option");
+  const [dob, setDOB] = useState("");
+  const [gpa, setGPA] = useState();
+  const [major, setMajor] = useState("");
+  const [minor1, setMinor1] = useState("");
+  const [minor2, setMinor2] = useState("");
+  const [gradYear, setGradYear] = useState();
+  const [school, setSchool] = useState("");
+  const [classification, setClassification] = useState("Select Classification");
+  const [studentType, setStudentType] = useState("Select Type");
+  const [phone, setPhone] = useState("");
+
   const [error, setError] = useState({});
   const history = useHistory();
 
@@ -41,6 +58,22 @@ function Register(props) {
       password2: password2,
       discord: discord,
       uin: uin,
+      userType: "Student",
+      gender: gender,
+      hispanicLatino: hispaniclatino,
+      race: race,
+      citizen: citizen,
+      firstGen: firstGen,
+      dob: dob,
+      gpa: gpa,
+      major: major,
+      minor1: minor1,
+      minor2: minor2,
+      graduation: gradYear,
+      school: school,
+      classification: classification,
+      studentType: studentType,
+      phone: phone
     };
     props.registerUser(newUser, history);
   };
@@ -48,7 +81,7 @@ function Register(props) {
   return (
     <div className="Register">
       <Container>
-        <h2 className="display-2 text-center">Register</h2>
+        <h2 className="display-2 text-center">Register a Student Account</h2>
         <Form noValidate onSubmit={onSubmit}>
           <Row>
             <Col>
@@ -225,6 +258,378 @@ function Register(props) {
               {error.discord}
             </Form.Control.Feedback>
           </Form.Group>
+
+          <Row>
+            <Col>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <b>Gender</b>
+                </Form.Label>
+                <Form.Select
+                  aria-label="Gender"
+                  value={gender}
+                  isInvalid={!!error.gender}
+                  onChange={(e) => {
+                    if(e.target.value !== "Choose Gender"){
+                      setGender(e.target.value);
+                    }
+                  }}
+                  >
+                  <option>Choose Gender</option>
+                  <option>Male</option>
+                  <option>Female</option>
+                  <option>Other</option>
+                </Form.Select>
+                <Form.Control.Feedback type="invalid">
+                  {error.gender}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+
+            <Col>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <b>Hispanic/Latino?</b>
+                </Form.Label>
+                <Form.Select
+                  aria-label="Hispanic/Latino"
+                  value={hispaniclatino}
+                  isInvalid={!!error.hispaniclatino}
+                  onChange={(e) => {
+                    if(e.target.value !== "Select Option"){
+                      setHispanicLatino(e.target.value);
+                    }
+                  }}
+                  >
+                  <option>Select Option</option>
+                  <option>Yes</option>
+                  <option>No</option>
+                </Form.Select>
+                <Form.Control.Feedback type="invalid">
+                  {error.hispaniclatino}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+
+            <Col>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <b>Race</b>
+                </Form.Label>
+                <Form.Select
+                  aria-label="Race"
+                  value={race}
+                  isInvalid={!!error.race}
+                  onChange={(e) => {
+                    if(e.target.value !== "Select Race"){
+                      setRace(e.target.value);
+                    }
+                  }}
+                  >
+                  <option>Select Race</option>
+                  <option>American Indian or Alaskan Native</option>
+                  <option>Asian</option>
+                  <option>Black or African American</option>
+                  <option>Native Hawaiian or Other Pacific Islander</option>
+                  <option>White</option>
+                  
+                </Form.Select>
+                <Form.Control.Feedback type="invalid">
+                  {error.race}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+
+            <Col>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <b>US Citizen?</b>
+                </Form.Label>
+                <Form.Select
+                  aria-label="Citizen"
+                  value={citizen}
+                  isInvalid={!!error.citizen}
+                  onChange={(e) => {
+                    if(e.target.value !== "Select Option"){
+                      setCitizen(e.target.value);
+                    }
+                  }}
+                  >
+                  <option>Select Option</option>
+                  <option>Yes</option>
+                  <option>No</option>
+                </Form.Select>
+                <Form.Control.Feedback type="invalid">
+                  {error.citizen}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+
+            <Col>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <b>First-Gen College Student?</b>
+                </Form.Label>
+                <Form.Select
+                  aria-label="Citizen"
+                  value={firstGen}
+                  isInvalid={!!error.firstGen}
+                  onChange={(e) => {
+                    if(e.target.value !== "Select Option"){
+                      setFirstGen(e.target.value);
+                    }
+                  }}
+                  >
+                  <option>Select Option</option>
+                  <option>Yes</option>
+                  <option>No</option>
+                </Form.Select>
+                <Form.Control.Feedback type="invalid">
+                  {error.firstGen}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col sm={2}>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <b>Date of Birth</b>
+                </Form.Label>
+                <Form.Control
+                  type="date"
+                  aria-label="Dob"
+                  value={dob}
+                  isInvalid={!!error.dob}
+                  onChange={(e) => {
+                      setDOB(e.target.value);
+                  }}
+                  >
+                </Form.Control>
+                <Form.Control.Feedback type="invalid">
+                  {error.dob}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <b>Major</b>
+                </Form.Label>
+                <Form.Control
+                  onChange={(e) => setMajor(e.target.value)}
+                  required
+                  value={major}
+                  isInvalid={!!error.major}
+                  id="major"
+                  type="text"
+                  className={classnames("", {
+                    invalid: error.major,
+                  })}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {error.major}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <b>Minor 1</b>
+                </Form.Label>
+                <Form.Control
+                  onChange={(e) => setMinor1(e.target.value)}
+                  required
+                  value={minor1}
+                  isInvalid={!!error.minor1}
+                  id="minor1"
+                  type="text"
+                  className={classnames("", {
+                    invalid: error.minor1,
+                  })}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {error.minor1}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <b>Minor 2</b>
+                </Form.Label>
+                <Form.Control
+                  onChange={(e) => setMinor2(e.target.value)}
+                  required
+                  value={minor2}
+                  isInvalid={!!error.minor2}
+                  id="minor2"
+                  type="text"
+                  className={classnames("", {
+                    invalid: error.minor2,
+                  })}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {error.minor2}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col sm={2}>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <b>GPA</b>
+                </Form.Label>
+                <Form.Control
+                  type="number"
+                  aria-label="gpa"
+                  placeholder="GPA"
+                  value={gpa}
+                  isInvalid={!!error.gpa}
+                  onChange={(e) => {
+                    if(e.target.value >= 0.0 && e.target.value <= 4.0) {
+                      setGPA(e.target.value);
+                    }
+                  }}
+                  >
+                </Form.Control>
+                <Form.Control.Feedback type="invalid">
+                  {error.gpa}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <b>Expected Graduation Year</b>
+                </Form.Label>
+                <Form.Control
+                  type="number"
+                  aria-label="grad"
+                  placeholder="i.e. 2024"
+                  value={gradYear}
+                  isInvalid={!!error.graduation}
+                  onChange={(e) => {
+                    setGradYear(e.target.value);
+                  }}
+                  >
+                </Form.Control>
+                <Form.Control.Feedback type="invalid">
+                  {error.graduation}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <b>School</b>
+                </Form.Label>
+                <Form.Control
+                  onChange={(e) => setSchool(e.target.value)}
+                  placeholder="i.e. Texas A&M University"
+                  required
+                  value={school}
+                  isInvalid={!!error.school}
+                  id="school"
+                  type="text"
+                  className={classnames("", {
+                    invalid: error.school,
+                  })}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {error.school}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            
+            <Col>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <b>Classification</b>
+                </Form.Label>
+                <Form.Select
+                  aria-label="classification"
+                  value={classification}
+                  isInvalid={!!error.classification}
+                  onChange={(e) => {
+                    if(e.target.value !== "Select Classification"){
+                      setClassification(e.target.value);
+                    }
+                  }}
+                  >
+                  <option>Select Classification</option>
+                  <option>Freshman</option>
+                  <option>Sophomore</option>
+                  <option>Junior</option>
+                  <option>Senior</option>
+                </Form.Select>
+                <Form.Control.Feedback type="invalid">
+                  {error.classification}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+
+            <Col>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <b>Student Type</b>
+                </Form.Label>
+                <Form.Select
+                  aria-label="studentType"
+                  value={studentType}
+                  isInvalid={!!error.studentType}
+                  onChange={(e) => {
+                    if(e.target.value !== "Select Type"){
+                      setStudentType(e.target.value);
+                    }
+                  }}
+                  >
+                  <option>Select Type</option>
+                  <option>Part-time</option>
+                  <option>Full-time</option>
+                </Form.Select>
+                <Form.Control.Feedback type="invalid">
+                  {error.studentType}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <b>Phone Number</b>
+                </Form.Label>
+                <Form.Control
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="i.e. (123)456-7890"
+                  required
+                  value={phone}
+                  isInvalid={!!error.phone}
+                  id="phone"
+                  type="text"
+                  className={classnames("", {
+                    invalid: error.phone,
+                  })}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {error.phone}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+
+          </Row>
+
           <Button variant="primary" type="submit">
             Register
           </Button>
