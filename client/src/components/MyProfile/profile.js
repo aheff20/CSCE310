@@ -6,6 +6,7 @@ import { Form, Button, Container, Table, Spinner, Row, Col, Card, Modal } from "
 import classnames from "classnames";
 import axios from "axios";
 import React from "react";
+import jwt_decode from "jwt-decode";
 
 function Profile(props) {
   const history = useHistory();
@@ -57,8 +58,6 @@ function Profile(props) {
 
   }, []);
 
-  console.log(userData);
-
   const maintainRecency = () => {
     setUIN(userData.uin);
     setEmail(userData.email);
@@ -68,21 +67,25 @@ function Profile(props) {
     setfName(userData.first_name);
     setlName(userData.last_name);
     setMInitial(userData.m_initial);
-    setGender(userData.gender);
-    setHispanicLatino(userData.hispanic_latino ? "Yes" : "No");
-    setRace(userData.race);
-    setCitizen(userData.citizen ? "Yes" : "No");
-    setFirstGen(userData.first_gen ? "Yes" : "No");
-    setDOB(userData.dob.substring(0, 10));
-    setGPA(userData.gpa);
-    setMajor(userData.major);
-    setMinor1(userData.minor_1);
-    setMinor2(userData.minor_2);
-    setGradYear(userData.expected_graduation);
-    setSchool(userData.school);
-    setClassification(userData.classification);
-    setStudentType(userData.student_type);
-    setPhone(userData.phone);
+
+    if(props.auth.user.user_type == "Student")  {
+        setGender(userData.gender);
+        setHispanicLatino(userData.hispanic_latino ? "Yes" : "No");
+        setRace(userData.race);
+        setCitizen(userData.citizen ? "Yes" : "No");
+        setFirstGen(userData.first_gen ? "Yes" : "No");
+        setDOB(userData.dob.substring(0, 10));
+        setGPA(userData.gpa);
+        setMajor(userData.major);
+        setMinor1(userData.minor_1);
+        setMinor2(userData.minor_2);
+        setGradYear(userData.expected_graduation);
+        setSchool(userData.school);
+        setClassification(userData.classification);
+        setStudentType(userData.student_type);
+        setPhone(userData.phone);
+    }
+    
   }
 
   const handleShowAccountInfo = () => {
@@ -101,8 +104,6 @@ function Profile(props) {
     setShowAccountInfo(false);
     setShowStudentInfo(false);
   }
-
-  console.log(userData);
 
   const handleSaveAccountInfo = () => {
     if(props.auth.user.user_type == "Admin") {

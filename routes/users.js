@@ -135,7 +135,7 @@ router.post("/register", async (req, res) => {
             })
           } else {
             pool.query(`INSERT INTO college_student VALUES (${userData.uin}, '${userData.first_name}', '${userData.last_name}', '${userData.m_initial}', '${userData.email}', 
-            '${userData.discord}', '${userData.username}', '${userData.password_hashed}', '${userData.userType}', '${userData.gender}', ${userData.hispanicLatino=="Yes"}, 
+            '${userData.discord}', '${userData.username}', '${password_hashed}', '${userData.userType}', '${userData.gender}', ${userData.hispanicLatino=="Yes"}, 
             '${userData.race}', ${userData.citizen=="Yes"}, ${userData.firstGen=="Yes"}, '${userData.dob}', ${userData.gpa}, '${userData.major}', '${userData.minor1}', '${userData.minor2}',
              ${userData.graduation}, '${userData.school}', '${userData.classification}', '${userData.studentType}', '${userData.phone}' )`, (err, result) => {
               if(err) {
@@ -232,7 +232,31 @@ router.post("/updateUserInfo", async(req, res) => {
         console.log(err);
         res.status(400).json({message: "Error updating user!"})
       }
-      res.status(200).json({message: "Success!"})
+      const payload = {
+        uin: userData.uin,
+        first_name: userData.first_name,
+        last_name: userData.last_name,
+        m_initial: userData.m_initial,
+        username: userData.username,
+        user_type: userData.user_type,
+        email: userData.email,
+        discord: userData.discord,
+      };
+
+      // Sign token
+      jwt.sign(
+        payload,
+        keys.secretOrKey,
+        {
+          expiresIn: 604800, // 7 days in seconds
+        },
+        (err, token) => {
+          res.status(200).json({
+            success: true,
+            token: "Bearer " + token,
+          });
+        }
+      );
 
     })
   } else {
@@ -243,7 +267,32 @@ router.post("/updateUserInfo", async(req, res) => {
         if(err) {
           return console.log('Error executing query', err.stack)
         }
-        res.status(200).json({message: "Success!"});
+
+        const payload = {
+          uin: userData.uin,
+          first_name: userData.first_name,
+          last_name: userData.last_name,
+          m_initial: userData.m_initial,
+          username: userData.username,
+          user_type: userData.user_type,
+          email: userData.email,
+          discord: userData.discord,
+        };
+  
+        // Sign token
+        jwt.sign(
+          payload,
+          keys.secretOrKey,
+          {
+            expiresIn: 604800, // 7 days in seconds
+          },
+          (err, token) => {
+            res.status(200).json({
+              success: true,
+              token: "Bearer " + token,
+            });
+          }
+        );
       })
 
   }
