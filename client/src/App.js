@@ -10,6 +10,8 @@ import NavBar from "./components/Gen/NavBar";
 import Management from "./components/Management/management";
 import CreateAccount from "./components/Management/createAccount";
 import Profile from "./components/MyProfile/profile";
+import Programs from "./components/Programs/programs";
+import Events from "./components/Events/events";
 
 import setAuthToken from "./utils/setAuthToken";
 import { setCurrentUser, logoutUser } from "./actions/authActions";
@@ -52,6 +54,8 @@ function App() {
               <Route exact path="/login" component={Login} />
               <Route exact path="/register" component={Register} />
               <PrivateUserRoute exact path="/myprofile" component={Profile} />
+              <PrivateUserRoute exact path="/programs" component={Programs} />
+              <PrivateUserRoute exact path="/events" component={Events} />
               <PrivateAdminRoute exact path="/management" component={Management} />          
               <PrivateAdminRoute exact path="/createAccount" component={CreateAccount} />          
           </Switch>
