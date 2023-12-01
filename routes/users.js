@@ -204,6 +204,22 @@ router.post("/updateUserInfo", async(req, res) => {
   userData.discord = req.body.params.updatedDiscord;
   userData.username = req.body.params.updatedUsername;
 
+  userData.gender = req.body.params.updatedGender;
+  userData.hispanicLatino = req.body.params.updatedHispanicLatino;
+  userData.race = req.body.params.updatedRace;
+  userData.citizen = req.body.params.updatedCitizen;
+  userData.firstGen = req.body.params.updatedFirstGen;
+  userData.dob = req.body.params.updatedDOB;
+  userData.gpa = req.body.params.updatedGPA;
+  userData.major = req.body.params.updatedMajor;
+  userData.minor1 = req.body.params.updatedMinor1;
+  userData.minor2 = req.body.params.updatedMinor2;
+  userData.graduation = req.body.params.updatedGraduation;
+  userData.school = req.body.params.updatedSchool;
+  userData.classification = req.body.params.updatedClassification;
+  userData.studentType = req.body.params.updatedStudentType;
+  userData.phone = req.body.params.updatedPhone;
+
   const isUserDataValid = validateUserInfo(userData)
     if(isUserDataValid != true) {
       return res.status(201).json(isUserDataValid);
@@ -216,10 +232,20 @@ router.post("/updateUserInfo", async(req, res) => {
         console.log(err);
         res.status(400).json({message: "Error updating user!"})
       }
-
       res.status(200).json({message: "Success!"})
 
     })
+  } else {
+    pool.query(`UPDATE college_student SET first_name='${userData.first_name}', last_name='${userData.last_name}', m_initial='${userData.m_initial}', email='${userData.email}', 
+        discord='${userData.discord}', username='${userData.username}', gender='${userData.gender}', hispanic_latino=${userData.hispanicLatino=="Yes"}, 
+        race='${userData.race}', citizen=${userData.citizen=="Yes"}, first_gen=${userData.firstGen=="Yes"}, dob='${userData.dob}', gpa=${userData.gpa}, major='${userData.major}', minor_1='${userData.minor1}', minor_2='${userData.minor2}',
+        expected_graduation=${userData.graduation}, school='${userData.school}', classification='${userData.classification}', student_type='${userData.studentType}', phone='${userData.phone}' WHERE uin=${userData.uin}`, (err, result) => {
+        if(err) {
+          return console.log('Error executing query', err.stack)
+        }
+        res.status(200).json({message: "Success!"});
+      })
+
   }
 
 });

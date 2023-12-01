@@ -12,6 +12,7 @@ function Profile(props) {
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState({});
   const [showAccountInfo, setShowAccountInfo] = useState(false);
+  const [showStudentInfo, setShowStudentInfo] = useState(false);
   
   const [error, setError] = useState({});
 
@@ -51,29 +52,61 @@ function Profile(props) {
         })
         .then((res) => {
             setUserData(res.data);
-            setUIN(res.data.uin);
-            setEmail(res.data.email);
-            setUsername(res.data.username);
-            setPassword(res.data.pass);
-            setDiscord(res.data.discord);
-            setfName(res.data.first_name);
-            setlName(res.data.last_name);
-            setMInitial(res.data.m_initial);
             setLoading(false);
         })
 
   }, []);
 
+  console.log(userData);
+
+  const maintainRecency = () => {
+    setUIN(userData.uin);
+    setEmail(userData.email);
+    setUsername(userData.username);
+    setPassword(userData.pass);
+    setDiscord(userData.discord);
+    setfName(userData.first_name);
+    setlName(userData.last_name);
+    setMInitial(userData.m_initial);
+    setGender(userData.gender);
+    setHispanicLatino(userData.hispanic_latino ? "Yes" : "No");
+    setRace(userData.race);
+    setCitizen(userData.citizen ? "Yes" : "No");
+    setFirstGen(userData.first_gen ? "Yes" : "No");
+    setDOB(userData.dob.substring(0, 10));
+    setGPA(userData.gpa);
+    setMajor(userData.major);
+    setMinor1(userData.minor_1);
+    setMinor2(userData.minor_2);
+    setGradYear(userData.expected_graduation);
+    setSchool(userData.school);
+    setClassification(userData.classification);
+    setStudentType(userData.student_type);
+    setPhone(userData.phone);
+  }
+
   const handleShowAccountInfo = () => {
+    maintainRecency();
+    setShowAccountInfo(true);
+    setShowStudentInfo(false);
+  }
+
+  const handleShowStudentInfo = () => {
+    maintainRecency();
+    setShowStudentInfo(true);
     setShowAccountInfo(true);
   }
 
   const handleCloseAccountInfo = () => {
     setShowAccountInfo(false);
+    setShowStudentInfo(false);
   }
 
+  console.log(userData);
+
   const handleSaveAccountInfo = () => {
-    axios
+    if(props.auth.user.user_type == "Admin") {
+        axios
         .post("/users/updateUserInfo", {
             params: {
                 userType: props.auth.user.user_type,
@@ -88,18 +121,53 @@ function Profile(props) {
         })
         .then((res) => {
             if(res.status === 201) {
-                console.log(res.data);
                 setError(res.data);
             } else {
                 history.go(0);
                 setShowAccountInfo(false);
+                setShowStudentInfo(false);
             }
         })
-  }
-
-
-  const handleShowStudentInfo = () => {
-
+    } else {
+        axios
+        .post("/users/updateUserInfo", {
+            params: {
+                userType: props.auth.user.user_type,
+                uin: props.auth.user.uin,
+                updatedFName: fname,
+                updatedLName: lname,
+                updatedMInitial: m_initial,
+                updatedEmail: email,
+                updatedDiscord: discord,
+                updatedUsername: username,
+                updatedGender: gender,
+                updatedHispanicLatino: hispaniclatino,
+                updatedRace: race,
+                updatedCitizen: citizen,
+                updatedFirstGen: firstGen,
+                updatedDOB: dob,
+                updatedGPA: gpa,
+                updatedMajor: major,
+                updatedMinor1: minor1,
+                updatedMinor2: minor2,
+                updatedGraduation: gradYear,
+                updatedSchool: school,
+                updatedClassification: classification,
+                updatedStudentType: studentType,
+                updatedPhone: phone
+            }
+        })
+        .then((res) => {
+            if(res.status === 201) {
+                setError(res.data);
+            } else {
+                history.go(0);
+                setShowAccountInfo(false);
+                setShowStudentInfo(false);
+            }
+        })
+    }
+    
   }
 
   return (
@@ -112,7 +180,7 @@ function Profile(props) {
             </Modal.Header>
             <Modal.Body>
                 <Row>
-                    <Col sm={3}>
+                    <Col sm={4}>
                         <b>UIN: </b>
                     </Col>
                     <Col>
@@ -125,7 +193,7 @@ function Profile(props) {
                     </Col>
                 </Row>
                 <Row>
-                    <Col sm={3}>
+                    <Col sm={4}>
                         <b>First Name: </b>
                     </Col>
                     <Col>
@@ -146,7 +214,7 @@ function Profile(props) {
                     
                 </Row>
                 <Row>
-                    <Col sm={3}>
+                    <Col sm={4}>
                         <b>Last Name: </b>
                     </Col>
                     <Col>
@@ -166,7 +234,7 @@ function Profile(props) {
                     </Col>
                 </Row>
                 <Row>
-                    <Col sm={3}>
+                    <Col sm={4}>
                         <b>M Initial: </b>
                     </Col>
                     <Col>
@@ -186,7 +254,7 @@ function Profile(props) {
                     </Col>
                 </Row>
                 <Row>
-                    <Col sm={3}>
+                    <Col sm={4}>
                         <b>Email: </b>
                     </Col>
                     <Col>
@@ -206,7 +274,7 @@ function Profile(props) {
                     </Col>
                 </Row>
                 <Row>
-                    <Col sm={3}>
+                    <Col sm={4}>
                         <b>Discord: </b>
                     </Col>
                     <Col>
@@ -226,8 +294,8 @@ function Profile(props) {
                     </Col>
                 </Row>
                 <Row>
-                    <Col sm={3}>
-                        <b>Username: </b>
+                    <Col sm={4}>
+                        <b>Username:</b>
                     </Col>
                     <Col>
                     <Form.Group>
@@ -245,6 +313,417 @@ function Profile(props) {
                     </Form.Group>
                     </Col>
                 </Row>
+
+                {showStudentInfo && 
+                    <React.Fragment>
+                        <Row>
+                            <Col sm={4}>
+                                <b>Gender:</b>
+                            </Col>
+                            <Col>
+                                <Form.Group className="mb-3">
+                                    <Form.Select
+                                    aria-label="Gender"
+                                    value={gender}
+                                    isInvalid={!!error.gender}
+                                    onChange={(e) => {
+                                        if(e.target.value !== "Choose Gender"){
+                                        setGender(e.target.value);
+                                        }
+                                    }}
+                                    >
+                                    <option>Choose Gender</option>
+                                    <option>Male</option>
+                                    <option>Female</option>
+                                    <option>Other</option>
+                                    </Form.Select>
+                                    <Form.Control.Feedback type="invalid">
+                                    {error.gender}
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                            </Col>
+                        </Row>
+
+                        <Row>
+                            <Col sm={4}>
+                                <b>Hispanic/Latino:</b>
+                            </Col>
+                            <Col>
+                            <Form.Group className="mb-3">
+                                <Form.Select
+                                aria-label="Hispanic/Latino"
+                                value={hispaniclatino}
+                                isInvalid={!!error.hispaniclatino}
+                                onChange={(e) => {
+                                    if(e.target.value !== "Select Option"){
+                                    setHispanicLatino(e.target.value);
+                                    }
+                                }}
+                                >
+                                <option>Select Option</option>
+                                <option>Yes</option>
+                                <option>No</option>
+                                </Form.Select>
+                                <Form.Control.Feedback type="invalid">
+                                {error.hispaniclatino}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            
+                            </Col>
+                        </Row>
+
+                        <Row>
+                            <Col sm={4}>
+                                <b>Race:</b>
+                            </Col>
+                            <Col>
+                            <Form.Group className="mb-3">
+                                <Form.Select
+                                aria-label="Race"
+                                value={race}
+                                isInvalid={!!error.race}
+                                onChange={(e) => {
+                                    if(e.target.value !== "Select Race"){
+                                    setRace(e.target.value);
+                                    }
+                                }}
+                                >
+                                <option>Select Race</option>
+                                <option>American Indian or Alaskan Native</option>
+                                <option>Asian</option>
+                                <option>Black or African American</option>
+                                <option>Native Hawaiian or Other Pacific Islander</option>
+                                <option>White</option>
+                                
+                                </Form.Select>
+                                <Form.Control.Feedback type="invalid">
+                                {error.race}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            
+                            </Col>
+                        </Row>
+
+                        <Row>
+                            <Col sm={4}>
+                                <b>US Citizen:</b>
+                            </Col>
+                            <Col>
+                            <Form.Group className="mb-3">
+                                <Form.Select
+                                aria-label="Citizen"
+                                value={citizen}
+                                isInvalid={!!error.citizen}
+                                onChange={(e) => {
+                                    if(e.target.value !== "Select Option"){
+                                    setCitizen(e.target.value);
+                                    }
+                                }}
+                                >
+                                <option>Select Option</option>
+                                <option>Yes</option>
+                                <option>No</option>
+                                </Form.Select>
+                                <Form.Control.Feedback type="invalid">
+                                {error.citizen}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            
+                            </Col>
+                        </Row>
+
+                        <Row>
+                            <Col sm={4}>
+                                <b>First Gen Student:</b>
+                            </Col>
+                            <Col>
+                            <Form.Group className="mb-3">
+                                <Form.Select
+                                aria-label="Citizen"
+                                value={firstGen}
+                                isInvalid={!!error.firstGen}
+                                onChange={(e) => {
+                                    if(e.target.value !== "Select Option"){
+                                    setFirstGen(e.target.value);
+                                    }
+                                }}
+                                >
+                                <option>Select Option</option>
+                                <option>Yes</option>
+                                <option>No</option>
+                                </Form.Select>
+                                <Form.Control.Feedback type="invalid">
+                                {error.firstGen}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            
+                            </Col>
+                        </Row>
+
+                        <Row>
+                            <Col sm={4}>
+                                <b>Date of Birth:</b>
+                            </Col>
+                            <Col>
+                            <Form.Group className="mb-3">
+                                <Form.Control
+                                type="date"
+                                aria-label="Dob"
+                                value={dob}
+                                isInvalid={!!error.dob}
+                                onChange={(e) => {
+                                    setDOB(e.target.value);
+                                }}
+                                >
+                                </Form.Control>
+                                <Form.Control.Feedback type="invalid">
+                                {error.dob}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            
+                            </Col>
+                        </Row>
+
+                        <Row>
+                            <Col sm={4}>
+                                <b>GPA:</b>
+                            </Col>
+                            <Col>
+                            <Form.Group className="mb-3">
+                                <Form.Control
+                                type="number"
+                                aria-label="gpa"
+                                placeholder="GPA"
+                                value={gpa}
+                                isInvalid={!!error.gpa}
+                                onChange={(e) => {
+                                    if(e.target.value >= 0.0 && e.target.value <= 4.0) {
+                                    setGPA(e.target.value);
+                                    }
+                                }}
+                                >
+                                </Form.Control>
+                                <Form.Control.Feedback type="invalid">
+                                {error.gpa}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            
+                            </Col>
+                        </Row>
+
+                        <Row>
+                            <Col sm={4}>
+                                <b>Major:</b>
+                            </Col>
+                            <Col>
+                            <Form.Group className="mb-3">
+                                <Form.Control
+                                onChange={(e) => setMajor(e.target.value)}
+                                required
+                                value={major}
+                                isInvalid={!!error.major}
+                                id="major"
+                                type="text"
+                                className={classnames("", {
+                                    invalid: error.major,
+                                })}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                {error.major}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            
+                            </Col>
+                        </Row>
+
+                        <Row>
+                            <Col sm={4}>
+                                <b>Minor 1:</b>
+                            </Col>
+                            <Col>
+                            <Form.Group className="mb-3">
+                                <Form.Control
+                                onChange={(e) => setMinor1(e.target.value)}
+                                required
+                                value={minor1}
+                                isInvalid={!!error.minor1}
+                                id="minor1"
+                                type="text"
+                                className={classnames("", {
+                                    invalid: error.minor1,
+                                })}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                {error.minor1}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            
+                            </Col>
+                        </Row>
+
+                        <Row>
+                            <Col sm={4}>
+                                <b>Minor 2:</b>
+                            </Col>
+                            <Col>
+                            <Form.Group className="mb-3">
+                                <Form.Control
+                                onChange={(e) => setMinor2(e.target.value)}
+                                required
+                                value={minor2}
+                                isInvalid={!!error.minor2}
+                                id="minor2"
+                                type="text"
+                                className={classnames("", {
+                                    invalid: error.minor2,
+                                })}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                {error.minor2}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            
+                            </Col>
+                        </Row>
+
+                        <Row>
+                            <Col sm={4}>
+                                <b>Exp. Grad Year:</b>
+                            </Col>
+                            <Col>
+                            <Form.Group className="mb-3">
+                                <Form.Control
+                                type="number"
+                                aria-label="grad"
+                                placeholder="i.e. 2024"
+                                value={gradYear}
+                                isInvalid={!!error.graduation}
+                                onChange={(e) => {
+                                    setGradYear(e.target.value);
+                                }}
+                                >
+                                </Form.Control>
+                                <Form.Control.Feedback type="invalid">
+                                {error.graduation}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            
+                            </Col>
+                        </Row>
+
+                        <Row>
+                            <Col sm={4}>
+                                <b>School:</b>
+                            </Col>
+                            <Col>
+                            <Form.Group className="mb-3">
+                                <Form.Control
+                                onChange={(e) => setSchool(e.target.value)}
+                                placeholder="i.e. Texas A&M University"
+                                required
+                                value={school}
+                                isInvalid={!!error.school}
+                                id="school"
+                                type="text"
+                                className={classnames("", {
+                                    invalid: error.school,
+                                })}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                {error.school}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            
+                            </Col>
+                        </Row>
+
+                        <Row>
+                            <Col sm={4}>
+                                <b>Classification:</b>
+                            </Col>
+                            <Col>
+                            <Form.Group className="mb-3">
+                                <Form.Select
+                                aria-label="classification"
+                                value={classification}
+                                isInvalid={!!error.classification}
+                                onChange={(e) => {
+                                    if(e.target.value !== "Select Classification"){
+                                    setClassification(e.target.value);
+                                    }
+                                }}
+                                >
+                                <option>Select Classification</option>
+                                <option>Freshman</option>
+                                <option>Sophomore</option>
+                                <option>Junior</option>
+                                <option>Senior</option>
+                                </Form.Select>
+                                <Form.Control.Feedback type="invalid">
+                                {error.classification}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            
+                            </Col>
+                        </Row>
+                        
+                        <Row>
+                            <Col sm={4}>
+                                <b>Student Type:</b>
+                            </Col>
+                            <Col>
+
+                            <Form.Group className="mb-3">
+                                <Form.Select
+                                aria-label="studentType"
+                                value={studentType}
+                                isInvalid={!!error.studentType}
+                                onChange={(e) => {
+                                    if(e.target.value !== "Select Type"){
+                                    setStudentType(e.target.value);
+                                    }
+                                }}
+                                >
+                                <option>Select Type</option>
+                                <option>Part-time</option>
+                                <option>Full-time</option>
+                                </Form.Select>
+                                <Form.Control.Feedback type="invalid">
+                                {error.studentType}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            
+                            </Col>
+                        </Row>
+
+                        <Row>
+                            <Col sm={4}>
+                                <b>Phone:</b>
+                            </Col>
+                            <Col>
+                            <Form.Group className="mb-3">
+                                <Form.Control
+                                onChange={(e) => setPhone(e.target.value)}
+                                placeholder="i.e. (123)456-7890"
+                                required
+                                value={phone}
+                                isInvalid={!!error.phone}
+                                id="phone"
+                                type="text"
+                                className={classnames("", {
+                                    invalid: error.phone,
+                                })}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                {error.phone}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            
+                            </Col>
+                        </Row>
+
+                    </React.Fragment>
+                }
 
             
             </Modal.Body>
@@ -401,7 +880,7 @@ function Profile(props) {
                                         <b>Date of Birth:</b>
                                     </Col>    
                                     <Col>
-                                        {userData.dob}
+                                        {userData.dob.substring(0,10)}
                                     </Col>
                                 </Row>          
                                 <Row>
