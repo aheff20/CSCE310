@@ -905,7 +905,7 @@ function Profile(props) {
                                         <b>Minor 1:</b>
                                     </Col>    
                                     <Col>
-                                        {userData.minor1}
+                                        {userData.minor_1}
                                     </Col>
                                 </Row>          
                                 <Row>
@@ -913,7 +913,7 @@ function Profile(props) {
                                         <b>Minor 2: </b>
                                     </Col>    
                                     <Col>
-                                        {userData.minor2}
+                                        {userData.minor_2}
                                     </Col>
                                 </Row>         
                                 <Row>
