@@ -23,7 +23,7 @@ function NavBar(props) {
             setAdminNav(true);
             setUserNav(false);
         }
-        if (props.auth.user.user_type === "Student"){
+        if (props.auth.user.user_type === "Student") {
             setUserNav(true);
             setAdminNav(false);
         }
@@ -53,18 +53,19 @@ function NavBar(props) {
                     <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                     <Navbar.Collapse id="responsive-navbar-nav">
                         <Nav className="me-auto">
-                        {user && 
-                        <React.Fragment>
-                            
-                        </React.Fragment>
-                        }
-                        {admin &&
-                        <React.Fragment>
-                            {loggedIn && <Nav.Link href="/programs">Programs</Nav.Link>}
-                            {loggedIn && <Nav.Link href="/events">Events</Nav.Link>}
-                            {loggedIn && <Nav.Link href="/management">Manage Users</Nav.Link>}
-                        </React.Fragment>
-                        }                            
+                            {user &&
+                                <React.Fragment>
+                                    {loggedIn && <Nav.Link href="/programs">Programs</Nav.Link>}
+                                    {loggedIn && <Nav.Link href="/events">Events</Nav.Link>}
+                                </React.Fragment>
+                            }
+                            {admin &&
+                                <React.Fragment>
+                                    {loggedIn && <Nav.Link href="/programs">Programs</Nav.Link>}
+                                    {loggedIn && <Nav.Link href="/events">Events</Nav.Link>}
+                                    {loggedIn && <Nav.Link href="/management">Manage Users</Nav.Link>}
+                                </React.Fragment>
+                            }
                         </Nav>
                         <Nav>
                             {!loggedIn && <Nav.Link href="/login">Login</Nav.Link>}
