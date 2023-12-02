@@ -25,30 +25,27 @@ function Management(props) {
 
   }, []);  
 
-  const adminTable = () => {
-    const list = [];
-    for(let k = 0; k < allUserData.length; k++) {
-        if(allUserData[k].user_type != "Admin") {
-            continue;
-        }
+  const editAccount = (userUIN) => {
 
-        const temp = <tr key={k}>
-                        <td>{allUserData[k].first_name} {allUserData[k].last_name}</td>
-                    </tr>
-        list.push(temp);
-    }
-    return list;
   }
 
-  const userTable = () => {
+  const getTable = (tableKey) => {
     const list = [];
     for(let k = 0; k < allUserData.length; k++) {
-        if(allUserData[k].user_type != "Student") {
+        if(allUserData[k].user_type != tableKey) {
             continue;
         }
 
         const temp = <tr key={k}>
-                        <td>{allUserData[k].first_name} {allUserData[k].last_name}</td>
+                        <td>{allUserData[k].first_name} {allUserData[k].m_initial}. {allUserData[k].last_name}</td>
+                        <td>{allUserData[k].email}</td>
+                        <td>{allUserData[k].username}</td>
+                        <td>{allUserData[k].discord}</td>
+                        <td>
+                            <Button variant="success btn-sm" onClick={() => editAccount(allUserData[k].uin)}>
+                                Edit
+                            </Button>
+                        </td>
                     </tr>
         list.push(temp);
     }
@@ -58,6 +55,7 @@ function Management(props) {
   const createAccount = (type) => {
     history.push("/createAccount", {type: type})
   }
+
 
   return (
     <div className="Management">
@@ -87,32 +85,26 @@ function Management(props) {
                 </div>
 
                 <br></br>
-                <div className="Admin Table">
-                    <h2 className="display-5 text-center">Admins</h2>
-                    <Table striped bordered hover className="text-center">
-                        <thead>
-                            <tr>
-                                <th class="col-md-5">Name</th>
-                                <th class="col-md-2">Edit</th>
-                            </tr>
-                        </thead>
-                        <tbody>{adminTable()}</tbody>
-                    </Table>
-                </div>
-
-                <br></br>
-                <div className="User Table">
-                    <h2 className="display-5 text-center">Users</h2>
-                    <Table striped bordered hover className="text-center">
-                        <thead>
-                            <tr>
-                                <th class="col-md-5">Name</th>
-                                <th class="col-md-2">Edit</th>
-                            </tr>
-                        </thead>
-                        <tbody>{userTable()}</tbody>
-                    </Table>
-                </div>
+                {["Admin", "Student", "Deactivated"].map((tableKey) => {
+                    return <React.Fragment>
+                    <div className="Admin Table">
+                        <h2 className="display-5 text-center">{tableKey} Accounts</h2>
+                        <Table striped bordered hover className="text-center">
+                            <thead>
+                                <tr>
+                                    <th class="col-md-2">Name</th>
+                                    <th class="col-md-2">Email</th>
+                                    <th class="col-md-2">Username</th>
+                                    <th class="col-md-2">Discord</th>
+                                    <th class="col-md-1">Edit</th>
+                                </tr>
+                            </thead>
+                            <tbody>{getTable(tableKey)}</tbody>
+                        </Table>
+                        <br></br>
+                    </div>
+                    </React.Fragment>
+                })}
 
             </React.Fragment>
         )}
