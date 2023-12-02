@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useHistory, Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
+import { logoutUser } from "../../actions/authActions";
 import { Form, Button, Container, Table, Spinner, Row, Col, Card, Modal } from "react-bootstrap";
 import classnames from "classnames";
 import axios from "axios";
@@ -156,6 +157,20 @@ function Profile(props) {
                 setShowAccountInfo(false);
                 setShowStudentInfo(false);
             }
+        })
+  }
+
+
+  const deactivateAccount = () => {
+    let confirm = window.confirm("Are you sure you want to deactivate your account?");
+    if(!confirm) {
+        return;
+    }
+    axios
+        .post("/users/deactivateUser", {uin: props.auth.user.uin})
+        .then((res) => {
+            props.logoutUser();
+            history.push("/");
         })
   }
 
@@ -1004,11 +1019,15 @@ function Profile(props) {
                         </Col>
                     
                     }
-                    
-
 
                 </Row>
-
+                <center>
+                    <br></br>
+                    <Button variant="danger btn-lg" onClick={() => deactivateAccount()}>
+                        Deactivate Account
+                    </Button>
+                </center>
+                <br></br><br></br>
                 
 
                 
@@ -1021,6 +1040,7 @@ function Profile(props) {
 }
 
 Profile.propTypes = {
+  logoutUser: PropTypes.func.isRequired,
   auth: PropTypes.object.isRequired,
 };
 
@@ -1028,4 +1048,4 @@ const mapStateToProps = (state) => ({
   auth: state.auth,
 });
 
-export default connect(mapStateToProps)(Profile);
+export default connect(mapStateToProps, { logoutUser })(Profile);

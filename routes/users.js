@@ -22,6 +22,10 @@ router.post("/login", (req, res) => {
       if(result.rows[i].username === username){
         bcrypt.compare(password, result.rows[i].pass).then((isMatch) => {
 
+          if(result.rows[i].user_type == "Deactivated") {
+            return res.status(400).json({ invalidLogin: "This account has been deactivated!" })
+          }
+
           if(isMatch){
             const payload = {
               uin: result.rows[i].uin,
@@ -294,6 +298,20 @@ router.post("/updateUserInfo", async(req, res) => {
     );
     
 
+  })
+
+});
+
+
+router.post("/deactivateUser", async(req, res) => {
+  const uin = req.body.uin;
+  
+  pool.query(`UPDATE users SET user_type='Deactivated' WHERE uin=${uin}`, (err, result) => {
+    if(err) {
+      console.log(err);
+      res.status(400).json({message: "Error deactivating account!"})
+    }
+    res.status(200).json({message: "Success!"})
   })
 
 });
