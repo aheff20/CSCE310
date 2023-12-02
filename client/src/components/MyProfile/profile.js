@@ -7,6 +7,7 @@ import classnames from "classnames";
 import axios from "axios";
 import React from "react";
 import jwt_decode from "jwt-decode";
+import setAuthToken from "../../utils/setAuthToken";
 
 function Profile(props) {
   const history = useHistory();
@@ -62,7 +63,6 @@ function Profile(props) {
     setUIN(userData.uin);
     setEmail(userData.email);
     setUsername(userData.username);
-    setPassword(userData.pass);
     setDiscord(userData.discord);
     setfName(userData.first_name);
     setlName(userData.last_name);
@@ -106,69 +106,57 @@ function Profile(props) {
   }
 
   const handleSaveAccountInfo = () => {
-    if(props.auth.user.user_type == "Admin") {
-        axios
-        .post("/users/updateUserInfo", {
-            params: {
-                userType: props.auth.user.user_type,
-                uin: props.auth.user.uin,
-                updatedFName: fname,
-                updatedLName: lname,
-                updatedMInitial: m_initial,
-                updatedEmail: email,
-                updatedDiscord: discord,
-                updatedUsername: username
-            }
-        })
-        .then((res) => {
-            if(res.status === 201) {
-                setError(res.data);
-            } else {
-                history.go(0);
-                setShowAccountInfo(false);
-                setShowStudentInfo(false);
-            }
-        })
-    } else {
-        axios
-        .post("/users/updateUserInfo", {
-            params: {
-                userType: props.auth.user.user_type,
-                uin: props.auth.user.uin,
-                updatedFName: fname,
-                updatedLName: lname,
-                updatedMInitial: m_initial,
-                updatedEmail: email,
-                updatedDiscord: discord,
-                updatedUsername: username,
-                updatedGender: gender,
-                updatedHispanicLatino: hispaniclatino,
-                updatedRace: race,
-                updatedCitizen: citizen,
-                updatedFirstGen: firstGen,
-                updatedDOB: dob,
-                updatedGPA: gpa,
-                updatedMajor: major,
-                updatedMinor1: minor1,
-                updatedMinor2: minor2,
-                updatedGraduation: gradYear,
-                updatedSchool: school,
-                updatedClassification: classification,
-                updatedStudentType: studentType,
-                updatedPhone: phone
-            }
-        })
-        .then((res) => {
-            if(res.status === 201) {
-                setError(res.data);
-            } else {
-                history.go(0);
-                setShowAccountInfo(false);
-                setShowStudentInfo(false);
-            }
-        })
+    let updateParams = {};
+
+    updateParams["userType"] = props.auth.user.user_type;
+    updateParams["uin"] = props.auth.user.uin;
+    updateParams["updatedFName"] = fname;
+    updateParams["updatedLName"] = lname;
+    updateParams["updatedMInitial"] = m_initial;
+    updateParams["updatedEmail"] = email;
+    updateParams["updatedDiscord"] = discord;
+    updateParams["updatedUsername"] = username;
+
+    if(password != "") {
+        updateParams["updatedPassword"] = password;
+        updateParams["updatedPassword2"] = password2;
     }
-    
+
+    if(props.auth.user.user_type == "Student") {
+        updateParams["updatedGender"] = gender,
+        updateParams["updatedHispanicLatino"] = hispaniclatino,
+        updateParams["updatedRace"] = race,
+        updateParams["updatedCitizen"] = citizen,
+        updateParams["updatedFirstGen"] = firstGen,
+        updateParams["updatedDOB"] = dob,
+        updateParams["updatedGPA"] = gpa,
+        updateParams["updatedMajor"] = major,
+        updateParams["updatedMinor1"] = minor1,
+        updateParams["updatedMinor2"] = minor2,
+        updateParams["updatedGraduation"] = gradYear,
+        updateParams["updatedSchool"] = school,
+        updateParams["updatedClassification"] = classification,
+        updateParams["updatedStudentType"] = studentType,
+        updateParams["updatedPhone"] = phone
+    }
+
+    axios
+        .post("/users/updateUserInfo", updateParams)
+        .then((res) => {
+            if(res.status === 201) {
+                console.log(res.data)
+                setError(res.data);
+            } else {
+                
+                const { token } = res.data;
+                localStorage.setItem("jwtToken", token);
+                setAuthToken(token);
+
+                history.go(0);
+                setShowAccountInfo(false);
+                setShowStudentInfo(false);
+            }
+        })
   }
 
   return (
@@ -310,6 +298,54 @@ function Profile(props) {
                         />
                         <Form.Control.Feedback type="invalid">
                             {error.registerUsername}
+                        </Form.Control.Feedback>
+                    </Form.Group>
+                    </Col>
+                </Row>
+
+                <hr></hr>
+                <Modal.Title>
+                    Change Password
+                </Modal.Title>
+                <br></br>
+
+                <Row>
+                    <Col sm={4}>
+                        <b>New Password:</b>
+                    </Col>
+                    <Col>
+                    <Form.Group>
+                        <Form.Control
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        value={password}
+                        id="password"
+                        isInvalid={error.registerPassword}
+                        type="password"
+                        />
+                        <Form.Control.Feedback type="invalid">
+                            {error.registerPassword}
+                        </Form.Control.Feedback>
+                    </Form.Group>
+                    </Col>
+                </Row>
+
+                <Row>
+                    <Col sm={4}>
+                        <b>Confirm Password:</b>
+                    </Col>
+                    <Col>
+                    <Form.Group>
+                        <Form.Control
+                        onChange={(e) => setPassword2(e.target.value)}
+                        required
+                        value={password2}
+                        id="password2"
+                        isInvalid={error.registerPassword2}
+                        type="password"
+                        />
+                        <Form.Control.Feedback type="invalid">
+                            {error.registerPassword2}
                         </Form.Control.Feedback>
                     </Form.Group>
                     </Col>

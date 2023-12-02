@@ -195,111 +195,108 @@ router.get("/getUserData", async(req, res) => {
 router.post("/updateUserInfo", async(req, res) => {
   const userData = {}
 
-  userData.userType = req.body.params.userType;
-  userData.uin = req.body.params.uin;
-  userData.first_name = req.body.params.updatedFName;
-  userData.last_name = req.body.params.updatedLName;
-  userData.m_initial = req.body.params.updatedMInitial;
-  userData.email = req.body.params.updatedEmail;
-  userData.discord = req.body.params.updatedDiscord;
-  userData.username = req.body.params.updatedUsername;
+  userData.userType = req.body.userType;
+  userData.uin = req.body.uin;
+  userData.first_name = req.body.updatedFName;
+  userData.last_name = req.body.updatedLName;
+  userData.m_initial = req.body.updatedMInitial;
+  userData.email = req.body.updatedEmail;
+  userData.discord = req.body.updatedDiscord;
+  userData.username = req.body.updatedUsername;
+  userData.password = req.body.updatedPassword;
+  userData.password2 = req.body.updatedPassword2;
 
-  userData.gender = req.body.params.updatedGender;
-  userData.hispanicLatino = req.body.params.updatedHispanicLatino;
-  userData.race = req.body.params.updatedRace;
-  userData.citizen = req.body.params.updatedCitizen;
-  userData.firstGen = req.body.params.updatedFirstGen;
-  userData.dob = req.body.params.updatedDOB;
-  userData.gpa = req.body.params.updatedGPA;
-  userData.major = req.body.params.updatedMajor;
-  userData.minor1 = req.body.params.updatedMinor1;
-  userData.minor2 = req.body.params.updatedMinor2;
-  userData.graduation = req.body.params.updatedGraduation;
-  userData.school = req.body.params.updatedSchool;
-  userData.classification = req.body.params.updatedClassification;
-  userData.studentType = req.body.params.updatedStudentType;
-  userData.phone = req.body.params.updatedPhone;
+  userData.gender = req.body.updatedGender;
+  userData.hispanicLatino = req.body.updatedHispanicLatino;
+  userData.race = req.body.updatedRace;
+  userData.citizen = req.body.updatedCitizen;
+  userData.firstGen = req.body.updatedFirstGen;
+  userData.dob = req.body.updatedDOB;
+  userData.gpa = req.body.updatedGPA;
+  userData.major = req.body.updatedMajor;
+  userData.minor1 = req.body.updatedMinor1;
+  userData.minor2 = req.body.updatedMinor2;
+  userData.graduation = req.body.updatedGraduation;
+  userData.school = req.body.updatedSchool;
+  userData.classification = req.body.updatedClassification;
+  userData.studentType = req.body.updatedStudentType;
+  userData.phone = req.body.updatedPhone;
 
   const isUserDataValid = validateUserInfo(userData)
     if(isUserDataValid != true) {
       return res.status(201).json(isUserDataValid);
     }
-    
-  if(userData.userType == "Admin") {
-    pool.query(`UPDATE users SET first_name='${userData.first_name}', last_name='${userData.last_name}', m_initial='${userData.m_initial}', 
-    email='${userData.email}', discord='${userData.discord}', username='${userData.username}' WHERE uin=${userData.uin}`, (err, result) => {
-      if(err) {
-        console.log(err);
-        res.status(400).json({message: "Error updating user!"})
-      }
-      const payload = {
-        uin: userData.uin,
-        first_name: userData.first_name,
-        last_name: userData.last_name,
-        m_initial: userData.m_initial,
-        username: userData.username,
-        user_type: userData.user_type,
-        email: userData.email,
-        discord: userData.discord,
-      };
-
-      // Sign token
-      jwt.sign(
-        payload,
-        keys.secretOrKey,
-        {
-          expiresIn: 604800, // 7 days in seconds
-        },
-        (err, token) => {
-          res.status(200).json({
-            success: true,
-            token: "Bearer " + token,
-          });
-        }
-      );
-
-    })
-  } else {
-    pool.query(`UPDATE college_student SET first_name='${userData.first_name}', last_name='${userData.last_name}', m_initial='${userData.m_initial}', email='${userData.email}', 
-        discord='${userData.discord}', username='${userData.username}', gender='${userData.gender}', hispanic_latino=${userData.hispanicLatino=="Yes"}, 
-        race='${userData.race}', citizen=${userData.citizen=="Yes"}, first_gen=${userData.firstGen=="Yes"}, dob='${userData.dob}', gpa=${userData.gpa}, major='${userData.major}', minor_1='${userData.minor1}', minor_2='${userData.minor2}',
-        expected_graduation=${userData.graduation}, school='${userData.school}', classification='${userData.classification}', student_type='${userData.studentType}', phone='${userData.phone}' WHERE uin=${userData.uin}`, (err, result) => {
-        if(err) {
-          return console.log('Error executing query', err.stack)
-        }
-
-        const payload = {
-          uin: userData.uin,
-          first_name: userData.first_name,
-          last_name: userData.last_name,
-          m_initial: userData.m_initial,
-          username: userData.username,
-          user_type: userData.user_type,
-          email: userData.email,
-          discord: userData.discord,
-        };
   
-        // Sign token
-        jwt.sign(
-          payload,
-          keys.secretOrKey,
-          {
-            expiresIn: 604800, // 7 days in seconds
-          },
-          (err, token) => {
-            res.status(200).json({
-              success: true,
-              token: "Bearer " + token,
-            });
-          }
-        );
+  let updatedHashedPassword;
+  
+  if(userData.password) {
+    updatedHashedPassword = await new Promise((resolve, reject) => {
+      bcrypt.hash(userData.password, 10, (err, hash) => {
+        if(err) reject(err)
+        resolve(hash)
       })
-
+    })
   }
 
+  let queryString = "UPDATE ";
+
+  if(userData.userType == "Admin") {
+    queryString += "users "
+  } else{
+    queryString += "college_student "
+  }
+
+  queryString += `SET first_name='${userData.first_name}', last_name='${userData.last_name}', m_initial='${userData.m_initial}', email='${userData.email}', discord='${userData.discord}', username='${userData.username}'`;
+
+  if(userData.password) {
+    queryString += `, pass='${updatedHashedPassword}'`;
+  }
+
+  if(userData.userType == "Admin") {
+    queryString += ` WHERE uin=${userData.uin}`
+
+  } else {
+    queryString += `, gender='${userData.gender}', hispanic_latino=${userData.hispanicLatino=="Yes"}, race='${userData.race}', citizen=${userData.citizen=="Yes"}, first_gen=${userData.firstGen=="Yes"}, dob='${userData.dob}', 
+    gpa=${userData.gpa}, major='${userData.major}', minor_1='${userData.minor1}', minor_2='${userData.minor2}', expected_graduation=${userData.graduation}, school='${userData.school}',
+    classification='${userData.classification}', student_type='${userData.studentType}', phone='${userData.phone}' WHERE uin=${userData.uin}`;
+  }
+
+
+  pool.query( queryString, (err, result) => {
+    if(err) {
+      console.log(err);
+      res.status(400).json({message: "Error updating user!"})
+    }
+    const payload = {
+      uin: userData.uin,
+      first_name: userData.first_name,
+      last_name: userData.last_name,
+      m_initial: userData.m_initial,
+      username: userData.username,
+      user_type: userData.userType,
+      email: userData.email,
+      discord: userData.discord,
+    };
+
+    // Sign token
+    jwt.sign(
+      payload,
+      keys.secretOrKey,
+      {
+        expiresIn: 604800, // 7 days in seconds
+      },
+      (err, token) => {
+        res.status(200).json({
+          success: true,
+          token: "Bearer " + token,
+        });
+      }
+    );
+    
+
+  })
+
 });
-
-
 
 const validateUserInfo = (userData) => {
   if(isNaN(userData.uin) || isNaN(parseFloat(userData.uin))) {
