@@ -172,26 +172,27 @@ router.get("/getAllUserData", async (req, res) => {
 
 router.get("/getUserData", async(req, res) => {
   const uin = req.query.uin;
-  const userType = req.query.userType;
 
-  if(userType === "Admin") {
-    pool.query(`SELECT * FROM users WHERE uin=${uin}`, (err, result) => {
-      if(err) {
-        console.log(err);
-        res.status(400).json({message: "Error getting user data!"});
-      }
+  pool.query(`SELECT * FROM college_student WHERE uin=${uin}`, (err, result) => {
+    if(err) {
+      console.log(err);
+      res.status(400).json({message: "Error getting user data!"});
+    }
+
+    if(result.rows.length == 0) {
+      pool.query(`SELECT * FROM users WHERE uin=${uin}`, (err, result) => {
+        if(err) {
+          console.log(err);
+          res.status(400).json({message: "Error getting user data!"});
+        }
+        res.status(200).json(result.rows[0])
+      })
+    } else {
       res.status(200).json(result.rows[0])
-    })
+    }
+      
     
-  } else {
-    pool.query(`SELECT * FROM college_student WHERE uin=${uin}`, (err, result) => {
-      if(err) {
-        console.log(err);
-        res.status(400).json({message: "Error getting user data!"});
-      }
-      res.status(200).json(result.rows[0])
-    })
-  }
+  })
   
 
 });
@@ -250,7 +251,7 @@ router.post("/updateUserInfo", async(req, res) => {
     queryString += "college_student "
   }
 
-  queryString += `SET first_name='${userData.first_name}', last_name='${userData.last_name}', m_initial='${userData.m_initial}', email='${userData.email}', discord='${userData.discord}', username='${userData.username}'`;
+  queryString += `SET user_type='${userData.userType}', first_name='${userData.first_name}', last_name='${userData.last_name}', m_initial='${userData.m_initial}', email='${userData.email}', discord='${userData.discord}', username='${userData.username}'`;
 
   if(userData.password) {
     queryString += `, pass='${updatedHashedPassword}'`;
@@ -310,6 +311,19 @@ router.post("/deactivateUser", async(req, res) => {
     if(err) {
       console.log(err);
       res.status(400).json({message: "Error deactivating account!"})
+    }
+    res.status(200).json({message: "Success!"})
+  })
+
+});
+
+router.post("/deleteUser", async(req, res) => {
+  const uin = req.body.uin;
+  
+  pool.query(`DELETE FROM users WHERE uin=${uin}`, (err, result) => {
+    if(err) {
+      console.log(err);
+      res.status(400).json({message: "Error deleting account!"})
     }
     res.status(200).json({message: "Success!"})
   })
