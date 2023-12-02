@@ -6,23 +6,31 @@ import { Form, Button, Container, Table, Spinner, Row, Col } from "react-bootstr
 import classnames from "classnames";
 import axios from "axios";
 import React from "react";
+import ProgramCard from './programCard';
 
 function Programs(props) {
   const history = useHistory();
   const [loading, setLoading] = useState(true);
   const [allUserData, setAllUserData] = useState([]);
+  const [allProgramData, setAllProgramData] = useState([]);
 
 
   useEffect(() => {
-    setLoading(false);
     axios
-      .get("/users/getAllUserData")
+      .get("/programs/getAllProgramData")
       .then((res) => {
-        setAllUserData(res.data);
+        setAllProgramData(res.data);
         setLoading(false);
-      })
+      });
 
   }, []);
+
+  const handleCreateNewProgram = () => {
+    console.log(`Creating new program`);
+  }
+  const handleEditProgram = (programNum) => {
+    console.log(`Editing program ${programNum}`);
+  };
 
   return (
     <div className="Programs">
@@ -35,7 +43,26 @@ function Programs(props) {
         ) : (
           <React.Fragment>
             <br></br>
-            Welcome to programs page bub.
+            <h2>Program Data</h2>
+            {props.auth.user.user_type === "Admin" &&
+              <Button
+                variant="primary"
+                type="submit"
+                onClick={() => handleCreateNewProgram()}>
+                Create New Program
+              </Button>
+            }
+
+            <br></br>
+            <div className="program-cards">
+              {allProgramData.map((program) => (
+                <ProgramCard
+                  key={program.program_num}
+                  isAdmin={props.auth.user.user_type === "Admin"}
+                  programData={program}
+                  editProgramHandler={() => handleEditProgram(program.program_num)} />
+              ))}
+            </div>
 
           </React.Fragment>
         )}
