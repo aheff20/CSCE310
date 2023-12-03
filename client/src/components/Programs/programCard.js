@@ -1,20 +1,51 @@
 import React from 'react';
-import { Button } from "react-bootstrap";
+import { Button, Card } from "react-bootstrap";
 
 const ProgramCard = (props) => {
-    const { isAdmin, programData, editProgramHandler } = props;
+    const { isAdmin, programData, editProgramHandler, applyToProgram, deleteProgramHandler } = props;
+
     return (
         <div className="program-card">
-            <h3>{programData.program_name}</h3>
-            <p>{programData.program_description}</p>
-            {isAdmin &&
-                <Button
-                    variant="secondary"
-                    type="submit"
-                    onClick={() => editProgramHandler(programData.program_num)}>
-                    Edit Program
-                </Button>
-            }
+            <Card
+                border={"secondary"}
+                style={{borderWidth: "5px", width:"20rem"}}
+                className="p-3 m-4 rounded shadow"
+            >
+                <Card.Body>
+                    <Card.Title>
+                        <h3 className="display-6 text-center">{programData.program_name}</h3>
+                    </Card.Title>
+
+                </Card.Body>
+                
+                <p>{programData.program_description}</p>
+
+                {isAdmin ? (
+                    <React.Fragment>
+                        <Button
+                            variant="secondary"
+                            type="submit"
+                            onClick={() => editProgramHandler(programData.program_num)}>
+                            Edit Program
+                        </Button>
+                        <br></br>
+                        <Button
+                            variant="danger"
+                            type="submit"
+                            onClick={() => deleteProgramHandler(programData.program_num)}>
+                            Delete Program
+                        </Button>
+                    </React.Fragment>
+
+                ) : (
+                    <Button
+                        variant="success"
+                        type="submit"
+                        onClick={() => applyToProgram(programData.program_num)}>
+                        Apply for Program!
+                    </Button>
+                )}
+            </Card>
         </div>
     );
 };

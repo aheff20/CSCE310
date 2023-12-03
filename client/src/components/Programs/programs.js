@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useHistory, Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { Form, Button, Container, Table, Spinner, Row, Col } from "react-bootstrap";
+import { Form, Button, Container, Table, Spinner, Row, Col, CardGroup } from "react-bootstrap";
 import classnames from "classnames";
 import axios from "axios";
 import React from "react";
@@ -32,6 +32,24 @@ function Programs(props) {
     console.log(`Editing program ${programNum}`);
   };
 
+  const applyToProgram = () => {
+
+  }
+
+  const deleteProgramHandler = () => {
+
+  }
+
+  const programsForUser = allProgramData.map((program) => (
+                            <ProgramCard
+                              key={program.program_num}
+                              isAdmin={props.auth.user.user_type === "Admin"}
+                              programData={program}
+                              editProgramHandler={() => handleEditProgram(program.program_num)}
+                              applyToProgram={() => applyToProgram(program.program_num)} 
+                              deleteProgramHandler={() => deleteProgramHandler(program.program_num)} />
+                          ))
+
   return (
     <div className="Programs">
       <Container>
@@ -43,26 +61,20 @@ function Programs(props) {
         ) : (
           <React.Fragment>
             <br></br>
-            <h2>Program Data</h2>
+            <h2 className="display-5 text-center">Program Data</h2>
             {props.auth.user.user_type === "Admin" &&
-              <Button
-                variant="primary"
-                type="submit"
-                onClick={() => handleCreateNewProgram()}>
-                Create New Program
-              </Button>
+              <center>
+                  <Button
+                    variant="primary btn-lg"
+                    type="submit"
+                    onClick={() => handleCreateNewProgram()}>
+                    Create New Program
+                  </Button>
+                </center>
             }
 
             <br></br>
-            <div className="program-cards">
-              {allProgramData.map((program) => (
-                <ProgramCard
-                  key={program.program_num}
-                  isAdmin={props.auth.user.user_type === "Admin"}
-                  programData={program}
-                  editProgramHandler={() => handleEditProgram(program.program_num)} />
-              ))}
-            </div>
+            <CardGroup>{programsForUser}</CardGroup>
 
           </React.Fragment>
         )}
