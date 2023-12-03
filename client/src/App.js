@@ -11,6 +11,7 @@ import Management from "./components/Management/management";
 import CreateAccount from "./components/Management/createAccount";
 import Profile from "./components/MyProfile/profile";
 import Programs from "./components/Programs/programs";
+import ProgramDetails from "./components/Programs/programDetails";
 import Events from "./components/Events/events";
 
 import setAuthToken from "./utils/setAuthToken";
@@ -56,6 +57,7 @@ function App() {
               <PrivateUserRoute exact path="/myprofile" component={Profile} />
               <PrivateUserRoute exact path="/programs" component={Programs} />
               <PrivateUserRoute exact path="/events" component={Events} />
+              <PrivateUserRoute exact path="/programs/:programNum" component={ProgramDetails} />
               <PrivateAdminRoute exact path="/management" component={Management} />          
               <PrivateAdminRoute exact path="/createAccount" component={CreateAccount} />          
           </Switch>

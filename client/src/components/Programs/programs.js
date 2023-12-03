@@ -32,11 +32,16 @@ function Programs(props) {
     console.log(`Editing program ${programNum}`);
   };
 
-  const applyToProgram = () => {
+  const applyToProgram = (programNum) => {
 
   }
 
-  const deleteProgramHandler = () => {
+  const deleteProgramHandler = (programNum) => {
+
+  }
+
+  const programDetailsHandler = (programNum) => {
+    history.push("/programs/" + programNum);
 
   }
 
@@ -47,7 +52,8 @@ function Programs(props) {
                               programData={program}
                               editProgramHandler={() => handleEditProgram(program.program_num)}
                               applyToProgram={() => applyToProgram(program.program_num)} 
-                              deleteProgramHandler={() => deleteProgramHandler(program.program_num)} />
+                              deleteProgramHandler={() => deleteProgramHandler(program.program_num)}
+                              programDetailsHandler={() => programDetailsHandler(program.program_num)} />
                           ))
 
   return (

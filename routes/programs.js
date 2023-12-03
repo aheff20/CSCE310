@@ -19,4 +19,17 @@ router.get("/getAllProgramData", async(req, res) => {
     
 });
 
+
+router.get("/getProgramInfo", async(req, res) => {
+    const programNum = req.query.programNum;
+
+    pool.query(`SELECT * FROM programs WHERE program_num=${programNum}`, (err, result) => {
+        if(err){
+            console.log(err);
+            res.status(400).json({message: "Error getting program details!"})
+        }
+        res.status(200).json(result.rows[0]);
+    })
+});
+
 module.exports = router;

@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Card } from "react-bootstrap";
 
 const ProgramCard = (props) => {
-    const { isAdmin, programData, editProgramHandler, applyToProgram, deleteProgramHandler } = props;
+    const { isAdmin, programData, editProgramHandler, applyToProgram, deleteProgramHandler, programDetailsHandler } = props;
 
     return (
         <div className="program-card">
@@ -22,6 +22,13 @@ const ProgramCard = (props) => {
 
                 {isAdmin ? (
                     <React.Fragment>
+                        <Button
+                            variant="primary"
+                            type="submit"
+                            onClick={() => programDetailsHandler(programData.program_num)}>
+                            Program Details
+                        </Button>
+                        <br></br>
                         <Button
                             variant="secondary"
                             type="submit"
