@@ -1,3 +1,9 @@
+/**
+View created and implemented by:
+    Aidan Heffron
+
+*/
+
 import { useState, useEffect } from "react";
 import { useHistory, Link } from "react-router-dom";
 import PropTypes from "prop-types";
@@ -7,6 +13,15 @@ import classnames from "classnames";
 import axios from "axios";
 import React from "react";
 
+
+/**
+    A management page for admins to view/edit/delete any user information on the website.
+
+    * Can update user/admin types
+    * Can edit any personal data for any user
+    * Can Deactivate or Delete any accounts
+
+*/
 function Management(props) {
     const history = useHistory();
     const [loading, setLoading] = useState(true);
@@ -40,6 +55,9 @@ function Management(props) {
     const [currentUserStudentType, setCurrentUserStudentType] = useState("");
     const [currentUserPhone, setCurrentUserPhone] = useState("");
 
+    /**
+        Grab information on all users to populate the table with
+    */
     useEffect(() => {
         axios
             .get("/users/getAllUserData")
@@ -50,6 +68,9 @@ function Management(props) {
             })
     }, []);
 
+    /**
+        Return row elements for the table so every student can be viewed and edited
+    */
     const getTable = (tableKey) => {
         const list = [];
         for(let k = 0; k < allUserData.length; k++) {
@@ -74,10 +95,16 @@ function Management(props) {
         return list;
     }
 
+    /**
+     * Function to create a new account, pushes admin to a new page where they can create the new account
+     */
     const createAccount = (type) => {
         history.push("/createAccount", {type: type})
     }
 
+    /**
+     * Function to edit a user account, sets all state variables to the specific account information and opens a modal to edit it
+     */
     const editAccount = (userUIN, userType) => {
         axios
             .get("/users/getUserData", {
@@ -114,6 +141,9 @@ function Management(props) {
             })        
     }
 
+    /**
+     * Reset all modal information and close modal
+     */
     const handleClose = () => {
         setCurrentUserUIN();
         setCurrentUserType("");
@@ -141,6 +171,9 @@ function Management(props) {
         setShow(false);
     }
 
+    /**
+     * Send updated user information to backend, refresh the page and close the modal
+     */
     const handleSave = () => {
         let updateParams = {};
 
@@ -184,7 +217,10 @@ function Management(props) {
             })
 
     }
-
+    
+    /**
+     * Function to deactivate a user account. Refresh page on complete
+     */
     const handleDeactivate = () => {
         let confirm = window.confirm("Are you sure you want to deactivate " + currentUserFName + " " + currentUserLName + "'s account?");
         if(!confirm) {
@@ -198,6 +234,9 @@ function Management(props) {
             })
     }
 
+    /**
+     * Function to delete a user account. Refresh page on complete
+     */
     const handleDelete = () => {
         let confirm = window.confirm("Are you sure you want to deactivate " + currentUserFName + " " + currentUserLName + "'s account? This action CANNOT be undone.");
         if(!confirm) {
@@ -212,6 +251,9 @@ function Management(props) {
     }
 
 
+    /**
+     * React html to return for the page view. Modal is called when set to show, the table is looped for each user and userType to be created efficiently.
+     */
     return (
         <div className="Management">
             <Modal show={show} onHide={handleClose}>
