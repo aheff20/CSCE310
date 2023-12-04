@@ -100,7 +100,7 @@ function Management(props) {
                 setCurrentUserRace(res.data.race);
                 setCurrentUserCitizen(res.data.citizen ? "Yes" : "No");
                 setCurrentUserFirstGen(res.data.first_gen ? "Yes" : "No");
-                setCurrentUserDOB(res.data.dob.substring(0,10));
+                setCurrentUserDOB(res.data.dob ? res.data.dob.substring(0,10) : "");
                 setCurrentUserGPA(res.data.gpa);
                 setCurrentUserMajor(res.data.major);
                 setCurrentUserMinor1(res.data.minor_1);
