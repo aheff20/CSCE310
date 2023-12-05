@@ -32,4 +32,18 @@ router.get("/getProgramInfo", async(req, res) => {
     })
 });
 
+router.get("/getProgramUsers", async(req, res) => {
+    const programNum = req.query.programNum;
+    //console.log(`getting users for ${programNum}`)
+
+    pool.query(`SELECT U.* FROM programs P JOIN track T ON T.program_num = P.program_num JOIN users U ON T.uin = U.uin WHERE P.program_num = ${programNum}`, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.status(400).json({message: "Error getting program users!"})
+        }
+        //console.log(result);
+        res.status(200).json(result.rows)
+    })
+})
+
 module.exports = router;
