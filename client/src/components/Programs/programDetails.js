@@ -398,6 +398,8 @@ function ProgramDetails(props) {
                 // Return a table with all students information who are in this program (programNum)
                 // Each row in the table should be able to view more details in a modal to see more details/edit students
                 <React.Fragment>
+                  <br/><br/>
+                  <p>Number of Enrolled Students: {allUserData.length}</p>
                   <div className="Admin Table">
                       <h2 className="display-5 text-center">Enrolled Students</h2>
                           <Table striped bordered hover className="text-center">
