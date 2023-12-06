@@ -1,8 +1,43 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, Card } from "react-bootstrap";
+import axios from "axios";
 
 const EventCard = (props) => {
-    const {isAdmin, eventData, eventDetailsHandler} = props;
+    const {isAdmin, userUIN, eventData, eventDetailsHandler} = props;
+
+    const [signedUp, setSignedUp] = useState(false);
+
+    const handleAddStudent = () => {
+        axios
+        .post("/events/addStudent", {
+        uin: userUIN,
+        event_id: eventData.event_id
+        })
+        .then((res) => {
+            history.go(0);
+        })
+    }
+
+    const eventSignedUp = (eventData) => {
+        axios
+        .get("/events/getSignedUpEvent", {
+            params: {
+                event_id: eventData.event_id,
+                uin: userUIN
+            }})
+        .then((res) =>{
+          if(res.data){
+            setSignedUp(true);
+          }
+          else{
+            setSignedUp(false);
+          }
+        })
+      }    
+
+      if(isAdmin == false){
+        eventSignedUp(eventData);
+      }
 
     return(
         <div className='event-card'>
@@ -17,12 +52,12 @@ const EventCard = (props) => {
                     </Card.Title>
                 </Card.Body>
 
-                <p>Start Date: {eventData.event_start_date}</p>
-                <p>End Date: {eventData.event_end_date}</p>
+                <p>Start Date: {eventData.event_start_date.substring(0,10)}</p>
+                <p>End Date: {eventData.event_end_date.substring(0,10)}</p>
                 <p>Time: {eventData.event_time}</p>
                 <p>Location: {eventData.event_location}</p>
 
-                {isAdmin ? (
+                {isAdmin &&
                     <React.Fragment>
                         <Button
                             variant="primary"
@@ -31,11 +66,18 @@ const EventCard = (props) => {
                             Event Details
                         </Button>
                     </React.Fragment>
-                    ) : (
-                    <Button variant="success btn-sm">
+                }
+                {!isAdmin && !signedUp &&
+                    <Button 
+                    variant="success btn-sm"
+                    onClick={() => handleAddStudent()}
+                    >
                         Sign Up
                     </Button>
-                )}
+                }                
+                {!isAdmin && signedUp &&
+                <b>You signed up!</b>
+                }
             </Card>
         </div>
     );

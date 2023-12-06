@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { useHistory, Link } from "react-router-dom";
+import { useHistory, Link, useParams } from "react-router-dom";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { Form, Button, Container, Table, Spinner, Row, Col, CardGroup } from "react-bootstrap";
+import { Form, Button, Container, Table, Spinner, Row, Col, CardGroup, Modal } from "react-bootstrap";
 import classnames from "classnames";
 import axios from "axios";
 import React from "react";
@@ -12,19 +12,53 @@ function Events(props) {
   const history = useHistory();
   const [loading, setLoading] = useState(true);
   const [allEventData, setAllEventData] = useState([]);
+  const [allProgramData, setAllProgramData] = useState([]);
+  const [currentUserUIN, setCurrentUserUIN] = useState(props.auth.user.uin);
+
+  const [assignedProgram, setAssignedProgram] = useState(1);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [time, setTime] = useState("");
+  const [eventType, setEventType] = useState("");
+  const [location, setLocation] = useState("");
+
+  const [showEventCreate, setshowEventCreate] = useState(false);
   
   useEffect(() => {
-    axios
-      .get("/events/getAllEventData")
-      .then((res) => {
-        setAllEventData(res.data);
-        setLoading(false);
-      });
-
+    Promise.all([
+      axios.get("/events/getAllEventData"),
+      axios.get("/programs/getAllProgramData")
+  ])
+  .then(([res1, res2]) => {
+      setAllEventData(res1.data);
+      setAllProgramData(res2.data);
+      setLoading(false);
+  });
   }, []);  
 
   const handleCreateNewEvent = () => {
-    console.log(`Creating new event`);
+    setshowEventCreate(true);
+  }
+
+  const handleCloseCreateEvent = () => {
+    setshowEventCreate(false);
+  }
+
+  const handleCreate = () => {
+    axios
+    .post("events/createEvent", {
+      uin: currentUserUIN,
+      program_num: assignedProgram,
+      startDate: startDate,
+      endDate: endDate,
+      time: time,
+      eventType: eventType,
+      location: location
+    })
+    .then((res) => {
+        history.go(0);
+        setshowEventCreate(false);
+    })
   }
 
   const eventDetailsHandler = (event_id) => {
@@ -35,9 +69,14 @@ function Events(props) {
     <EventCard
       key={event.event_id}
       isAdmin={props.auth.user.user_type === "Admin"}
+      userUIN={props.auth.user.uin}
       eventData={event} 
       eventDetailsHandler = {() => eventDetailsHandler(event.event_id)}
     />
+  ))
+
+  const programOptions = allProgramData.map((program) => (
+    <option value={program.program_num}>{program.program_name}</option>
   ))
 
   return (
@@ -50,6 +89,128 @@ function Events(props) {
             </center>
         ):(
             <React.Fragment>
+
+            <Modal show={showEventCreate} onHide={handleCloseCreateEvent}>
+              <Modal.Header closeButton>
+              <Modal.Title>
+                Create New Event
+              </Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <Row>
+                    <Col sm={4}>
+                        <b>Program: </b>
+                    </Col>
+                    <Col>
+                      <Form.Select
+                            aria-label="Assigned Program"
+                            value={assignedProgram}
+                            onChange={(e) => {
+                              setAssignedProgram(e.target.value); }}
+                            >
+                            {programOptions}
+                      </Form.Select>
+                    </Col>
+                </Row>
+
+                <Row>
+                  <Col sm={4}>
+                    <b>Start Date:</b>
+                  </Col>
+                  <Col>
+                  <Form.Group className="mb-3">
+                    <Form.Control
+                      type="date"
+                      aria-label="Start Date"
+                      value={startDate}
+                      onChange={(e) => {
+                        setStartDate(e.target.value);
+                      }}
+                      >
+                      </Form.Control>
+                    </Form.Group>
+                  </Col>
+                </Row>
+
+                <Row>
+                  <Col sm={4}>
+                    <b>End Date:</b>
+                  </Col>
+                  <Col>
+                    <Form.Group className="mb-3">
+                      <Form.Control
+                        type="date"
+                        aria-label="End Date"
+                        value={endDate}
+                        onChange={(e) => {
+                          setEndDate(e.target.value);
+                        }}
+                        >
+                        </Form.Control>
+                    </Form.Group>
+                  </Col>
+                </Row>
+
+                <Row>
+                  <Col sm={4}>
+                    <b>Time:</b>
+                  </Col>
+                  <Col>
+                    <Form.Group className="mb-3">
+                      <Form.Control
+                        type="time"
+                        aria-label="Time"
+                        value={time}
+                        onChange={(e) => {
+                          setTime(e.target.value);
+                        }}
+                        >
+                        </Form.Control>
+                    </Form.Group>
+                  </Col>
+                </Row>
+
+                <Row>
+                  <Col sm={4}>
+                    <b>Location:</b>
+                  </Col>
+                  <Col>
+                    <Form.Group>
+                            <Form.Control
+                            onChange={(e) => setLocation(e.target.value)}
+                            value={location}
+                            id="location"
+                            type="text"
+                            />
+                    </Form.Group>
+                  </Col>
+                </Row>
+
+                <Row>
+                  <Col sm={4}>
+                    <b>Event Type:</b>
+                  </Col>
+                  <Col>
+                    <Form.Group>
+                            <Form.Control
+                            onChange={(e) => setEventType(e.target.value)}
+                            value={eventType}
+                            id="EventType"
+                            type="text"
+                            />
+                    </Form.Group>
+                  </Col>
+                </Row>
+                <br></br>
+                <Row>
+                    <Button variant="success btn-lg" onClick={handleCreate}>
+                        Create Event
+                    </Button>
+                </Row>
+                <br></br>
+                </Modal.Body>
+            </Modal>
+
                 <br></br>
                 <h2 className="display-5 text-center">Event Data</h2>
                 {props.auth.user.user_type === "Admin" &&

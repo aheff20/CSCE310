@@ -59,7 +59,7 @@ function App() {
               <PrivateUserRoute exact path="/programs" component={Programs} />
               <PrivateUserRoute exact path="/events" component={Events} />
               <PrivateUserRoute exact path="/programs/:programNum" component={ProgramDetails} />
-              <PrivateUserRoute exact path="/events/:event_id" component={EventDetails} />
+              <PrivateAdminRoute exact path="/events/:event_id" component={EventDetails} />
               <PrivateAdminRoute exact path="/management" component={Management} />          
               <PrivateAdminRoute exact path="/createAccount" component={CreateAccount} />          
           </Switch>
