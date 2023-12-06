@@ -43,6 +43,12 @@ function ProgramDetails(props) {
   const [classification, setClassification] = useState("");
   const [studentType, setStudentType] = useState("");
   const [phone, setPhone] = useState("");
+  // data metrics
+  const [studentCount, setStudentCount] = useState(0);
+  const [raceCounts, setRaceCounts] = useState({});
+  const [hisplatCounts, setHispLatCounts] = useState(0);
+  const [majorCounts, setmajorCounts] = useState({});
+
 
   const programNum = useParams().programNum;
 
@@ -67,12 +73,35 @@ function ProgramDetails(props) {
                 .then((res) => {
                     //console.log(res)
                     setAllUserData(res.data);
+                    getMetricData(res.data);
                     setLoading(false);
                 })
             }
             else setLoading(false);
         })
   }, []);
+
+  const getMetricData = (userData) => {
+    let sc = userData.length;
+    let rc = {};
+    let hc = 0;
+    let mc = {};
+    for(let k = 0; k < sc; k++) {
+      if (userData[k].hispanic_latino) hc++;
+      let race = userData[k].race;
+      let major = userData[k].major;
+      if (race in rc) rc[race]++; else rc[race] = 1;
+      if (major in mc) mc[major]++; else mc[major] = 1;
+    }
+    //console.log("results");
+    //console.log(rc);
+    //console.log(mc);
+
+    setStudentCount(sc);
+    setRaceCounts(rc);
+    setHispLatCounts(hc);
+    setmajorCounts(mc);
+  }
 
   const studentHandler = (userUIN, userType) => {
     axios
@@ -390,7 +419,7 @@ function ProgramDetails(props) {
           </center>
         ) : (
           <React.Fragment>
-            <br></br>
+            <br/>
             <h2 className="display-5 text-center">{programInfo.program_name}</h2>
             <p className="text-center">{programInfo.program_description}</p>
 
@@ -398,8 +427,21 @@ function ProgramDetails(props) {
                 // Return a table with all students information who are in this program (programNum)
                 // Each row in the table should be able to view more details in a modal to see more details/edit students
                 <React.Fragment>
-                  <br/><br/>
-                  <p>Number of Enrolled Students: {allUserData.length}</p>
+                  <p>Number of Enrolled Students: {studentCount}</p>
+                  <br/>
+                  <p>Hispanic/latino Students: {hisplatCounts}</p>
+                  <p>Races:</p>
+                  <ul>
+                  {Object.keys(raceCounts).map((race) => (
+                    <li>{race}: {raceCounts[race]} ({(100*raceCounts[race]/studentCount).toFixed(2)}%)</li>
+                  ))}
+                  </ul>
+                  <p>Majors:</p>
+                  <ul>
+                  {Object.keys(majorCounts).map((major) => (
+                    <li>{major}: {majorCounts[major]} ({(100*majorCounts[major]/studentCount).toFixed(2)}%)</li>
+                  ))}
+                  </ul>
                   <div className="Admin Table">
                       <h2 className="display-5 text-center">Enrolled Students</h2>
                           <Table striped bordered hover className="text-center">
@@ -417,6 +459,7 @@ function ProgramDetails(props) {
                           </Table>
                           <br></br>
                   </div>
+                {/*No other tracking stuff needed?*/}
                 </React.Fragment>
             ) : (
                 // If the user is a student, they should have buttons to add new certifiates/classes/internships to the program
