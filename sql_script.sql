@@ -23,7 +23,7 @@ CREATE TABLE college_student(
     major VARCHAR,
     minor_1 VARCHAR,
     minor_2 VARCHAR,
-    expected_graduataion INT,
+    expected_graduation INT,
     school VARCHAR,
     classification VARCHAR,
     student_type VARCHAR,
@@ -178,7 +178,7 @@ CREATE TABLE track(
     PRIMARY KEY(track_num),
     CONSTRAINT fk_user
         FOREIGN KEY(uin)
-            REFERENCES users(uin),
+            REFERENCES college_student(uin),
     CONSTRAINT fk_programs
             FOREIGN KEY(program_num)
                 REFERENCES programs(program_num)
