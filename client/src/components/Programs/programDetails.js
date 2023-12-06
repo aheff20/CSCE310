@@ -291,7 +291,7 @@ function ProgramDetails(props) {
                     <b>Hispanic/Latino:</b>
                   </Col>
                   <Col>
-                    {hispaniclatino ? "Yes" : "No"}
+                    {hispaniclatino}
                   </Col>
                 </Row>
                 <Row>
@@ -307,7 +307,7 @@ function ProgramDetails(props) {
                     <b>US Citizen:</b>
                   </Col>
                   <Col>
-                    {citizen ? "Yes" : "No"}
+                    {citizen}
                   </Col>
                 </Row>
                 <Row>
@@ -315,7 +315,7 @@ function ProgramDetails(props) {
                     <b>First Gen Student:</b>
                   </Col>
                   <Col>
-                    {firstGen ? "Yes" : "No"}
+                    {firstGen}
                   </Col>
                 </Row>
                 <Row>
@@ -429,7 +429,7 @@ function ProgramDetails(props) {
                 <React.Fragment>
                   <p>Number of Enrolled Students: {studentCount}</p>
                   <br/>
-                  <p>Hispanic/latino Students: {hisplatCounts}</p>
+                  <p>Hispanic/Latino Students: {hisplatCounts}</p>
                   <p>Races:</p>
                   <ul>
                   {Object.keys(raceCounts).map((race) => (
