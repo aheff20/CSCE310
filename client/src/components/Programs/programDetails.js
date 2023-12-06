@@ -103,6 +103,11 @@ function ProgramDetails(props) {
     setmajorCounts(mc);
   }
 
+  const toPerc = (val, tot) => {
+    if (tot) return `(${(100*val/tot).toFixed(2)}%)`;
+    else return "";
+  }
+
   const studentHandler = (userUIN, userType) => {
     axios
       .get("/users/getUserData", {
@@ -433,13 +438,13 @@ function ProgramDetails(props) {
                   <p>Races:</p>
                   <ul>
                   {Object.keys(raceCounts).map((race) => (
-                    <li>{race}: {raceCounts[race]} ({(100*raceCounts[race]/studentCount).toFixed(2)}%)</li>
+                    <li>{race}: {raceCounts[race]} {toPerc(raceCounts[race],studentCount)}</li>
                   ))}
                   </ul>
                   <p>Majors:</p>
                   <ul>
                   {Object.keys(majorCounts).map((major) => (
-                    <li>{major}: {majorCounts[major]} ({(100*majorCounts[major]/studentCount).toFixed(2)}%)</li>
+                    <li>{major}: {majorCounts[major]} {toPerc(majorCounts[major],studentCount)}</li>
                   ))}
                   </ul>
                   <div className="Admin Table">
