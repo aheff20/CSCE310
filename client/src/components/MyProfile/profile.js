@@ -1,3 +1,9 @@
+/**
+View created and implemented by:
+    Aidan Heffron
+
+*/
+
 import { useState, useEffect } from "react";
 import { useHistory, Link } from "react-router-dom";
 import PropTypes from "prop-types";
@@ -10,6 +16,15 @@ import React from "react";
 import jwt_decode from "jwt-decode";
 import setAuthToken from "../../utils/setAuthToken";
 
+
+/**
+    A profile page for admins and users to view/edit/delete any of their own specific user information on the website.
+
+    * Can update account information
+    * Can view all their account information
+    * Can Deactivate own account
+
+*/
 function Profile(props) {
   const history = useHistory();
   const [loading, setLoading] = useState(true);
@@ -45,6 +60,10 @@ function Profile(props) {
   const [studentType, setStudentType] = useState("");
   const [phone, setPhone] = useState("");
 
+  /**
+   * State function to gather information about whatever user is looking at their profile
+   * 
+   */
   useEffect(() => {
     axios
         .get("/users/getUserData", {
@@ -60,6 +79,9 @@ function Profile(props) {
 
   }, []);
 
+  /**
+   * Function to gather user info to populate the edit modal
+   */
   const maintainRecency = () => {
     setUIN(userData.uin);
     setEmail(userData.email);
@@ -89,23 +111,37 @@ function Profile(props) {
     
   }
 
+  /**
+   * Open the modal to edit account information
+   */
   const handleShowAccountInfo = () => {
     maintainRecency();
     setShowAccountInfo(true);
     setShowStudentInfo(false);
   }
 
+  /**
+   * Open the modal to edit Student information
+   */
   const handleShowStudentInfo = () => {
     maintainRecency();
     setShowStudentInfo(true);
     setShowAccountInfo(true);
   }
 
+  /**
+   * Close the modal 
+   */
   const handleCloseAccountInfo = () => {
     setShowAccountInfo(false);
     setShowStudentInfo(false);
   }
 
+  /**
+   * Function to send all the updated information to the backend to update the user.
+   * Reset the JWT token to keep the updated information saved in props.
+   * Refresh on complete
+   */
   const handleSaveAccountInfo = () => {
     let updateParams = {};
 
@@ -161,6 +197,9 @@ function Profile(props) {
   }
 
 
+  /**
+   * Function to allow users to deactivate their own account
+   */
   const deactivateAccount = () => {
     let confirm = window.confirm("Are you sure you want to deactivate your account?");
     if(!confirm) {
@@ -174,6 +213,9 @@ function Profile(props) {
         })
   }
 
+  /**
+   * Return React html for user profile page. The modal has all information required based on type
+   */
   return (
     <div className="Profile">
         <Modal show={showAccountInfo} onHide={handleCloseAccountInfo}>

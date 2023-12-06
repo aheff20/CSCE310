@@ -1,3 +1,8 @@
+/**
+ * Backend routes for any statement dealing with Users
+ * 
+ */
+
 const express = require("express");
 const { Pool, Client } = require("pg");
 const router = express.Router();
@@ -7,7 +12,12 @@ const bcrypt = require("bcryptjs");
 const { pool } = require("../dbInstance");
 // import {pool} from "../dbInstance";
 
-
+/** Login route created and implemented by:
+ *    Aidan Heffron
+ * 
+ *    SQL:
+ *      * Select 
+ */
 router.post("/login", (req, res) => {
 
   const username = req.body.username.trim();
@@ -67,6 +77,13 @@ router.post("/login", (req, res) => {
 
 });
 
+/** Register route created and implemented by:
+ *    Aidan Heffron
+ * 
+ *    SQL:
+ *      * Select
+ *      * Insert 
+ */
 router.post("/register", async (req, res) => {
     const userData = {}
 
@@ -158,7 +175,12 @@ router.post("/register", async (req, res) => {
 
 });
 
-
+/** Get All User Data route created and implemented by:
+ *    Aidan Heffron
+ * 
+ *    SQL:
+ *      * Select 
+ */
 router.get("/getAllUserData", async (req, res) => {
     pool.query("SELECT * FROM users", (err, result) => {
       if(err) {
@@ -170,6 +192,12 @@ router.get("/getAllUserData", async (req, res) => {
     });
 })
 
+/** Get User Data route created and implemented by:
+ *    Aidan Heffron
+ * 
+ *    SQL:
+ *      * Select 
+ */
 router.get("/getUserData", async(req, res) => {
   const uin = req.query.uin;
 
@@ -197,6 +225,12 @@ router.get("/getUserData", async(req, res) => {
 
 });
 
+/** Update User route created and implemented by:
+ *    Aidan Heffron
+ * 
+ *    SQL:
+ *      * Update 
+ */
 router.post("/updateUserInfo", async(req, res) => {
   const userData = {}
 
@@ -303,7 +337,12 @@ router.post("/updateUserInfo", async(req, res) => {
 
 });
 
-
+/** Deactivate User route created and implemented by:
+ *    Aidan Heffron
+ * 
+ *    SQL:
+ *      * Update 
+ */
 router.post("/deactivateUser", async(req, res) => {
   const uin = req.body.uin;
   
@@ -317,6 +356,12 @@ router.post("/deactivateUser", async(req, res) => {
 
 });
 
+/** Delete User route created and implemented by:
+ *    Aidan Heffron
+ * 
+ *    SQL:
+ *      * Delete 
+ */
 router.post("/deleteUser", async(req, res) => {
   const uin = req.body.uin;
   

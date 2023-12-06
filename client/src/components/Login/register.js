@@ -1,3 +1,8 @@
+/**
+ * View created and implemented by:
+ *    Aidan Heffron
+ */
+
 import { useState, useEffect } from "react";
 import { useHistory, Link, withRouter } from "react-router-dom";
 import PropTypes from "prop-types";
@@ -6,6 +11,10 @@ import { registerUser } from "../../actions/authActions";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import classnames from "classnames";
 
+/**
+ * Creates a Register page for new students to enter infromation and create their account. Complete with data validation 
+ * to ensure only the correct information gets sent into the database.
+ */
 function Register(props) {
   const [fname, setfName] = useState("");
   const [lname, setlName] = useState("");
@@ -36,16 +45,26 @@ function Register(props) {
   const [error, setError] = useState({});
   const history = useHistory();
 
+  /**
+   * State function to determine if the user is already authenticated, if so send them to the landing page
+   */
   useEffect(() => {
     if (props.auth.isAuthenticated) {
       history.push("/");
     }
   }, [history, props.auth, props.auth.isAuthenticated]);
 
+  /**
+   * State function to grab any errors from erroneous data by the user registering
+   */
   useEffect(() => {
     setError(props.errors);
   }, [props.errors]);
 
+
+  /**
+   * Function to dispatch new user data to the backend to create a new user in the database. 
+   */
   const onSubmit = (e) => {
     e.preventDefault();
     const newUser = {
@@ -78,6 +97,9 @@ function Register(props) {
     props.registerUser(newUser, history);
   };
 
+  /**
+   * Return React HTML for register view, creates a form to ask all required information for registering users.
+   */
   return (
     <div className="Register">
       <Container>

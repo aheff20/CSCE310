@@ -1,3 +1,9 @@
+/**
+ * View created and implemented by:
+ *    Aidan Heffron
+ * 
+ */
+
 import { useState, useEffect } from "react";
 import { useHistory, Link, withRouter } from "react-router-dom";
 import PropTypes from "prop-types";
@@ -7,7 +13,10 @@ import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import classnames from "classnames";
 import React from "react";
 
+/**
+    A Create Account for admins and users to create any new accounts on the website that they want, can be used to create admin accounts and student accounts.
 
+*/
 function CreateAccount(props) {
   const [loading, setLoading] = useState(true);
   const [fname, setfName] = useState("");
@@ -41,6 +50,9 @@ function CreateAccount(props) {
 
   const history = useHistory();
 
+  /**
+   * State function to determine what type of account the admin is wanting to make (student or admin)
+   */
   useEffect(() => {
     if(history.location.state.type){
       setUserType(history.location.state.type);
@@ -50,10 +62,16 @@ function CreateAccount(props) {
 
   }, []);
 
+  /**
+   * State function to determine if the admin entered any erroneous data
+   */
   useEffect(() => {
     setError(props.errors);
   }, [props.errors]);
 
+  /**
+   * Function to submit information to the backend to create a new account
+   */
   const onSubmit = (e) => {
     e.preventDefault();
     if(userType === "Admin"){
@@ -104,8 +122,11 @@ function CreateAccount(props) {
     
   };
 
+  /**
+   * Return React HTML for the page to create a new account. Creates a form with all required information for whatever user type the admin is creating. 
+   */
   return (
-    <div className="Register">
+    <div className="Create Account">
       <Container>
         <h2 className="display-2 text-center">Create {userType} Account</h2>
         <Form noValidate onSubmit={onSubmit}>

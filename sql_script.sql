@@ -23,7 +23,7 @@ CREATE TABLE college_student(
     major VARCHAR,
     minor_1 VARCHAR,
     minor_2 VARCHAR,
-    expected_graduataion INT,
+    expected_graduation INT,
     school VARCHAR,
     classification VARCHAR,
     student_type VARCHAR,
@@ -48,7 +48,7 @@ CREATE TABLE class_enrollment(
     PRIMARY KEY(ce_num),
     CONSTRAINT fk_user
         FOREIGN KEY(uin)
-            REFERENCES users(uin),
+            REFERENCES college_student(uin),
     CONSTRAINT fk_classes
         FOREIGN KEY(class_id)
             REFERENCES classes(class_id)
@@ -71,7 +71,7 @@ CREATE TABLE intern_app(
     PRIMARY KEY(ia_num),
     CONSTRAINT fk_user
         FOREIGN KEY(uin)
-            REFERENCES users(uin),
+            REFERENCES college_student(uin),
     CONSTRAINT fk_internship
         FOREIGN KEY(intern_id)
             REFERENCES internship(intern_id)
@@ -104,7 +104,7 @@ CREATE TABLE cert_enrollment(
     PRIMARY KEY(certe_num),
     CONSTRAINT fk_user
         FOREIGN KEY(uin)
-            REFERENCES users(uin),
+            REFERENCES college_student(uin),
     CONSTRAINT fk_certification
         FOREIGN KEY(cert_id)
             REFERENCES certification(cert_id),
@@ -138,7 +138,7 @@ CREATE TABLE event_tracking(
     PRIMARY KEY(et_num),
     CONSTRAINT fk_user
         FOREIGN KEY(uin)
-            REFERENCES users(uin),
+            REFERENCES college_student(uin),
     CONSTRAINT fk_event
         FOREIGN KEY(event_id)
             REFERENCES event(event_id)
@@ -178,8 +178,9 @@ CREATE TABLE track(
     PRIMARY KEY(track_num),
     CONSTRAINT fk_user
         FOREIGN KEY(uin)
-            REFERENCES users(uin),
+            REFERENCES college_student(uin),
     CONSTRAINT fk_programs
             FOREIGN KEY(program_num)
                 REFERENCES programs(program_num)
 );
+
