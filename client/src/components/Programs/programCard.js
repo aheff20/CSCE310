@@ -2,13 +2,14 @@ import React from 'react';
 import { Button, Card } from "react-bootstrap";
 
 const ProgramCard = (props) => {
-    const { isAdmin, programData, editProgramHandler, applyToProgram, deleteProgramHandler, programDetailsHandler } = props;
+    const { isAdmin, programData, editProgramHandler, applyToProgram, accessProgramHandler, programDetailsHandler } = props;
+    const accessButtonText = programData.active ? "Close Program" : "Reopen Program";
 
     return (
         <div className="program-card">
             <Card
                 border={"secondary"}
-                style={{borderWidth: "5px", width:"20rem"}}
+                style={{ borderWidth: "5px", width: "20rem" }}
                 className="p-3 m-4 rounded shadow"
             >
                 <Card.Body>
@@ -17,7 +18,7 @@ const ProgramCard = (props) => {
                     </Card.Title>
 
                 </Card.Body>
-                
+
                 <p>{programData.program_description}</p>
 
                 {isAdmin ? (
@@ -39,8 +40,8 @@ const ProgramCard = (props) => {
                         <Button
                             variant="danger"
                             type="submit"
-                            onClick={() => deleteProgramHandler(programData.program_num)}>
-                            Delete Program
+                            onClick={() => accessProgramHandler(programData.program_num, programData.active)}>
+                            {accessButtonText}
                         </Button>
                     </React.Fragment>
 
