@@ -15,7 +15,13 @@ function Programs(props) {
   const [currentProgramNum, setCurrentProgramNum] = useState([]);
   const [currentProgramName, setCurrentProgramName] = useState([]);
   const [currentProgramDescription, setCurrentProgramDescription] = useState([]);
-  const [show, setShow] = useState(false);
+  const [currentAppUncomcert, setCurrentAppUncomcert] = useState([]);
+  const [currentAppCert, setCurrentAppCert] = useState([]);
+  const [currentAppPurpose, setCurrentAppPurpose] = useState([]);
+  const [deleteConfirmation, setDeleteConfirmation] = useState(false);
+  const [showCreate, setShowCreate] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
+  const [showApply, setShowApply] = useState(false);
   const [error, setError] = useState({});
 
 
@@ -31,6 +37,18 @@ function Programs(props) {
 
   const handleCreateNewProgram = () => {
     console.log(`Creating new program`);
+    setShowCreate(true);
+  }
+  const handleConfirmCreate = () => {
+    axios
+      .post("programs/createProgram", {
+        program_name: currentProgramName,
+        program_description: currentProgramDescription,
+      })
+      .then((res) => {
+        history.go(0);
+        setShowCreate(false);
+      })
   }
 
   const handleEditProgram = (programNum) => {
@@ -45,17 +63,70 @@ function Programs(props) {
         setCurrentProgramNum(programNum);
         setCurrentProgramName(res.data.program_name);
         setCurrentProgramDescription(res.data.program_description);
-        setShow(true);
+        setShowEdit(true);
       })
   };
 
   const applyToProgram = (programNum) => {
-
+    console.log(`Applying to program ${programNum}`);
+    axios
+      .get("/programs/getProgramInfo", {
+        params: {
+          programNum: programNum
+        }
+      })
+      .then((res) => {
+        setCurrentProgramNum(programNum);
+        setCurrentProgramName(res.data.program_name);
+        setCurrentProgramDescription(res.data.program_description);
+        setShowApply(true);
+      })
+  }
+  const handleConfirmApplication = () => {
+    console.log(`Confirmed application to program ${programNum}`);
+    handleClose();
   }
 
-  const deleteProgramHandler = (programNum) => {
+  const accessProgramHandler = (programNum, isActive) => {
+    console.log(`Changing active status of program ${programNum} to ${!isActive}`);
+    const programToUpdate = allProgramData.find((program) => program.program_num === programNum);
+    programToUpdate.active = !isActive;
 
+    axios
+      .post("/programs/updateProgramActiveStatus", { program: programToUpdate })
+      .then((res) => {
+        if (res.status === 201) {
+          console.log(res.data)
+          setError(res.data);
+        } else {
+          history.go(0);
+        }
+      })
   }
+
+  const handleDelete = (programNum) => {
+    setDeleteConfirmation(true);
+  };
+
+  const confirmDelete = () => {
+    console.log(`Deleting program ${currentProgramNum}`);
+    axios
+      .post("/programs/deleteProgram", { program_num: currentProgramNum })
+      .then((res) => {
+        if (res.status === 201) {
+          console.log(res.data)
+          setError(res.data);
+        } else {
+          history.go(0);
+          handleClose();
+          setDeleteConfirmation(false);
+        }
+      })
+  };
+
+  const cancelDelete = () => {
+    setDeleteConfirmation(false);
+  };
 
   const programDetailsHandler = (programNum) => {
     history.push("/programs/" + programNum);
@@ -80,7 +151,7 @@ function Programs(props) {
           setError(res.data);
         } else {
           history.go(0);
-          setShow(false);
+          setShowEdit(false);
         }
       })
 
@@ -90,30 +161,15 @@ function Programs(props) {
    * Reset all modal information and close modal
    */
   const handleClose = () => {
-    // setCurrentUserUIN();
-    // setCurrentUserType("");
-    // setCurrentUserFName("");
-    // setCurrentUserLName("");
-    // setCurrentUserMInitial("");
-    // setCurrentUserEmail("");
-    // setCurrentUserUsername("");
-    // setCurrentUserDiscord("");
-    // setCurrentUserGender("");
-    // setCurrentUserHispanicLatino("");
-    // setCurrentUserRace("");
-    // setCurrentUserCitizen("");
-    // setCurrentUserFirstGen("");
-    // setCurrentUserDOB("");
-    // setCurrentUserGPA();
-    // setCurrentUserMajor("");
-    // setCurrentUserMinor1("");
-    // setCurrentUserMinor2("");
-    // setCurrentUserGradYear();
-    // setCurrentUserSchool("");
-    // setCurrentUserClassification("");
-    // setCurrentUserStudentType("");
-    // setCurrentUserPhone("");
-    setShow(false);
+    setCurrentProgramNum("");
+    setCurrentProgramName("");
+    setCurrentProgramDescription("");
+    setCurrentAppUncomcert("");
+    setCurrentAppCert("");
+    setCurrentAppPurpose("");
+    setShowEdit(false);
+    setShowCreate(false);
+    setShowApply(false);
   }
 
   const programsForUser = allProgramData.map((program) => (
@@ -123,13 +179,61 @@ function Programs(props) {
       programData={program}
       editProgramHandler={() => handleEditProgram(program.program_num)}
       applyToProgram={() => applyToProgram(program.program_num)}
-      deleteProgramHandler={() => deleteProgramHandler(program.program_num)}
+      accessProgramHandler={() => accessProgramHandler(program.program_num, program.active)}
       programDetailsHandler={() => programDetailsHandler(program.program_num)} />
   ))
 
   return (
     <div className="Programs">
-      <Modal show={show} onHide={handleClose}>
+      <Modal show={showCreate} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            Creating a new Program
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Row>
+            <Col sm={6}>
+              <b>Program Name: </b>
+            </Col>
+            <Col>
+              <Form.Control
+                onChange={(e) => setCurrentProgramName(e.target.value)}
+                required
+                value={currentProgramName}
+                id="pname"
+                type="text"
+                isInvalid={error.program_name}
+              />
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={6}>
+              <b>Program Description: </b>
+            </Col>
+            <Col>
+              <Form.Control
+                onChange={(e) => setCurrentProgramDescription(e.target.value)}
+                required
+                value={currentProgramDescription}
+                id="pdesc"
+                type="textarea"
+                isInvalid={error.program_description}
+              />
+            </Col>
+          </Row>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={handleConfirmCreate}>
+            Create Program
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showEdit} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>
             Editing: <i>{currentProgramName}</i>
@@ -168,11 +272,99 @@ function Programs(props) {
           </Row>
         </Modal.Body>
         <Modal.Footer>
+          <Button variant="danger" onClick={handleDelete}>
+            Delete Program
+          </Button>
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
           <Button variant="primary" onClick={handleSave}>
             Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={deleteConfirmation} onHide={cancelDelete}>
+        <Modal.Header closeButton>
+          <Modal.Title>Delete Program</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete the program? This action CANNOT be undone!
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={cancelDelete}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={confirmDelete}>
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showApply} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            Applying: <i>{currentProgramName}</i>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Row>
+            <Col sm={6}>
+              <b>Uncomcert: </b>
+            </Col>
+            <Col>
+              <Form.Control
+                onChange={(e) => setCurrentAppUncomcert(e.target.value)}
+                required
+                value={currentAppUncomcert}
+                id="appucomcert"
+                type="text"
+                isInvalid={error.program_name}
+              />
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={6}>
+              <b>Program Cert: </b>
+            </Col>
+            <Col>
+              <Form.Control
+                onChange={(e) => setCurrentAppCert(e.target.value)}
+                required
+                value={currentAppCert}
+                id="appcert"
+                type="text"
+                isInvalid={error.program_description}
+              />
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={6}>
+              <b>Purpose Statement: </b>
+            </Col>
+            <Col>
+              <Form.Control
+                onChange={(e) => setCurrentAppPurpose(e.target.value)}
+                required
+                value={currentAppPurpose}
+                id="apppurp"
+                type="text"
+                isInvalid={error.program_description}
+              />
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={6}>
+              <b>Documents: </b>
+            </Col>
+          </Row>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={handleConfirmApplication}>
+            Apply
           </Button>
         </Modal.Footer>
       </Modal>
