@@ -116,6 +116,7 @@ CREATE TABLE cert_enrollment(
 
 CREATE TABLE event(
     event_id SERIAL,
+    event_name TEXT,
     uin INT,
     program_num INT,
     event_start_date DATE,
