@@ -22,6 +22,7 @@ function EventDetails(props) {
     const [time, setTime] = useState("");
     const [eventType, setEventType] = useState("");
     const [location, setLocation] = useState("");
+    const [eventName, setEventName] = useState("");
     const [programName, setProgramName] = useState("");
   
     const event_id = useParams().event_id;
@@ -45,6 +46,7 @@ function EventDetails(props) {
             setTime(res1.data.event_time);
             setLocation(res1.data.event_location);
             setEventType(res1.data.event_type);
+            setEventName(res1.data.event_name);
             setEventData(res1.data);
 
             findProgramName(res1.data.program_num);
@@ -114,7 +116,8 @@ function EventDetails(props) {
       time: time,
       eventType: eventType,
       location: location,
-      event_id: event_id
+      event_id: event_id,
+      eventName: eventName
     })
     .then((res) => {
         history.go(0);
@@ -123,7 +126,7 @@ function EventDetails(props) {
     }
 
     const deleteEventHandler = () => {
-      let confirm = window.confirm("Are you sure you want to remove Event " + event_id + "? This action CANNOT be undone.");
+      let confirm = window.confirm("Are you sure you want to remove " + eventData.event_name + "? This action CANNOT be undone.");
       if(!confirm) {
         return;
       }
@@ -167,10 +170,27 @@ function EventDetails(props) {
             <Modal show={showEditEvent} onHide={closeEdit}>
               <Modal.Header closeButton>
               <Modal.Title>
-                Edit Event {event_id}
+                Edit Event
               </Modal.Title>
               </Modal.Header>
               <Modal.Body>
+
+              <Row>
+                  <Col sm={4}>
+                    <b>Event Name:</b>
+                  </Col>
+                  <Col>
+                    <Form.Group>
+                            <Form.Control
+                            onChange={(e) => setEventName(e.target.value)}
+                            value={eventName}
+                            id="eventName"
+                            type="text"
+                            />
+                    </Form.Group>
+                  </Col>
+                </Row>
+
                 <Row>
                     <Col sm={4}>
                         <b>Program: </b>
@@ -286,11 +306,11 @@ function EventDetails(props) {
             </Modal>
 
               <br></br>
-              <h2 className="display-5 text-center">Event {event_id} Details</h2>
+              <h2 className="display-5 text-center">{eventData.event_name} Details</h2>
 
                 <p className="text-center">Associated Program: {programName}</p>
-                <p className="text-center">Start Date: {eventData.event_start_date}</p>
-                <p className="text-center">End Date: {eventData.event_end_date}</p>
+                <p className="text-center">Start Date: {eventData.event_start_date.substring(0,10)}</p>
+                <p className="text-center">End Date: {eventData.event_end_date.substring(0,10)}</p>
                 <p className="text-center">Time: {eventData.event_time}</p>
                 <p className="text-center">Location: {eventData.event_location}</p>
                 <p className="text-center">Type: {eventData.event_type}</p>

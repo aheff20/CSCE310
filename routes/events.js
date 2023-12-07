@@ -65,8 +65,9 @@ router.post("/createEvent", async(req, res) => {
     const time = req.body.time;
     const location = req.body.location;
     const eventType = req.body.eventType;
+    const eventName = req.body.eventName;
 
-    pool.query(`INSERT INTO event(uin, program_num, event_start_date, event_end_date, event_time, event_location, event_type) VALUES(${uin}, ${program_num}, '${startDate}', '${endDate}', '${time}', '${location}', '${eventType}')`, (err, result) => {
+    pool.query(`INSERT INTO event(uin, program_num, event_start_date, event_end_date, event_time, event_location, event_type, event_name) VALUES(${uin}, ${program_num}, '${startDate}', '${endDate}', '${time}', '${location}', '${eventType}', '${eventName}')`, (err, result) => {
         if(err){
             console.log(err);
             res.status(400).json({message: "Error creating event!"});
@@ -83,8 +84,9 @@ router.post("/updateEvent", async(req, res) => {
     const location = req.body.location;
     const eventType = req.body.eventType;
     const eventID = req.body.event_id;
+    const eventName = req.body.eventName;
 
-    pool.query(`UPDATE event SET program_num = ${program_num}, event_start_date = '${startDate}', event_end_date = '${endDate}', event_time = '${time}', event_location = '${location}', event_type = '${eventType}' WHERE event_id = ${eventID}`, (err, result) => {
+    pool.query(`UPDATE event SET program_num = ${program_num}, event_start_date = '${startDate}', event_end_date = '${endDate}', event_time = '${time}', event_location = '${location}', event_type = '${eventType}', event_name = '${eventName}' WHERE event_id = ${eventID}`, (err, result) => {
         if(err){
             console.log(err);
             res.status(400).json({message: "Error editing event!"});

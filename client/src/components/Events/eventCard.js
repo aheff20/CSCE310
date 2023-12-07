@@ -63,11 +63,12 @@ const EventCard = (props) => {
             >
                 <Card.Body>
                     <Card.Title>
-                        <h3 className="display-6 text-center">{eventData.event_type}</h3>
+                        <h3 className="display-6 text-center">{eventData.event_name}</h3>
                     </Card.Title>
                 </Card.Body>
 
                 <p>Associated Program: {programName}</p>
+                <p>Event Type: {eventData.event_type}</p>
                 <p>Start Date: {eventData.event_start_date.substring(0,10)}</p>
                 <p>End Date: {eventData.event_end_date.substring(0,10)}</p>
                 <p>Time: {eventData.event_time}</p>

@@ -21,6 +21,7 @@ function Events(props) {
   const [time, setTime] = useState("");
   const [eventType, setEventType] = useState("");
   const [location, setLocation] = useState("");
+  const [eventName, setEventName] = useState("");
 
   const [showEventCreate, setshowEventCreate] = useState(false);
   
@@ -53,7 +54,8 @@ function Events(props) {
       endDate: endDate,
       time: time,
       eventType: eventType,
-      location: location
+      location: location,
+      eventName: eventName
     })
     .then((res) => {
         history.go(0);
@@ -97,6 +99,23 @@ function Events(props) {
               </Modal.Title>
               </Modal.Header>
               <Modal.Body>
+                
+              <Row>
+                  <Col sm={4}>
+                    <b>Event Name:</b>
+                  </Col>
+                  <Col>
+                    <Form.Group>
+                            <Form.Control
+                            onChange={(e) => setEventName(e.target.value)}
+                            value={eventName}
+                            id="eventName"
+                            type="text"
+                            />
+                    </Form.Group>
+                  </Col>
+                </Row>
+                
                 <Row>
                     <Col sm={4}>
                         <b>Program: </b>
