@@ -89,6 +89,7 @@ CREATE TABLE programs(
     program_num SERIAL,
     program_name VARCHAR UNIQUE,
     program_description VARCHAR,
+    active BOOLEAN,
     PRIMARY KEY(program_num)
 );
 
