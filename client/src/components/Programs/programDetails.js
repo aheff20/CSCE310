@@ -12,12 +12,16 @@ function ProgramDetails(props) {
   const history = useHistory();
   const [loading, setLoading] = useState(true);
   const [allUserData, setAllUserData] = useState([]);
-  /* uin, first_name, last_name, m_initial, email, discord, username, pass, user_type */
   const [programInfo, setProgramInfo] = useState({});
-  /* program_description, program_name, program_num [can ignore] */
-    
-  // modal information (for admin view)
-  const [show, setShow] = useState(false);
+  const [error, setError] = useState({});
+  
+  // program edit information (for admin view)
+  const [showProgram, setShowProgram] = useState(false);
+  const [programName, setProgramName] = useState("");
+  const [programDesc, setProgramDesc] = useState("");
+
+  // account modal information (for admin view)
+  const [showAccount, setShowAccount] = useState(false);
   const [currentUserType, setUserType] = useState("");
   const [uin, setUIN] = useState();
   const [fname, setfName] = useState("");
@@ -43,6 +47,7 @@ function ProgramDetails(props) {
   const [classification, setClassification] = useState("");
   const [studentType, setStudentType] = useState("");
   const [phone, setPhone] = useState("");
+  
   // data metrics
   const [studentCount, setStudentCount] = useState(0);
   const [raceCounts, setRaceCounts] = useState({});
@@ -61,6 +66,8 @@ function ProgramDetails(props) {
         .then((res) => {
             //console.log(res.data)
             setProgramInfo(res.data);
+            setProgramName(res.data.program_name);
+            setProgramDesc(res.data.program_description);
             // get additional info only if admin
             if (props.auth.user.user_type == "Admin") {
               //console.log("getting users?")
@@ -108,7 +115,13 @@ function ProgramDetails(props) {
     else return "";
   }
 
-  const studentHandler = (userUIN, userType) => {
+  const editProgramHandler = () => {
+    setShowAccount(false);
+    setShowStudent(false);
+    setShowProgram(true);
+  }
+
+  const editStudentHandler = (userUIN, userType) => {
     axios
       .get("/users/getUserData", {
         params: {
@@ -117,6 +130,8 @@ function ProgramDetails(props) {
         }
       })
       .then((res) => {
+        setShowProgram(false);
+
         //console.log(res.data);
         setUserType(res.data.user_type);
         setUIN(res.data.uin);
@@ -148,12 +163,18 @@ function ProgramDetails(props) {
         setShowStudent(false);
         
         if (props.auth.user.user_type == "Admin") {
-          setShow(true);
+          setShowAccount(true);
         }
       })   
   }
 
-  const handleClose = () => {
+  const handleProgramClose = () => {
+    setProgramName(programInfo.program_name);
+    setProgramDesc(programInfo.program_description);
+    setShowProgram(false);
+  }
+
+  const handleAccountClose = () => {
     setUserType("");
     setUIN("");
     setfName("");
@@ -179,7 +200,44 @@ function ProgramDetails(props) {
     setStudentType("");
     setPhone("");
     setShowStudent(false);
-    setShow(false);
+    setShowAccount(false);
+  }
+
+  const saveProgramHandler = () => {
+    // update program
+    console.log("save/update program handler");
+  }
+
+  const deactivateProgramHandler = () => {
+    let confirm = window.confirm(`Are you sure you want to deactivate ${programInfo.program_name}?`);
+    if (!confirm) {
+      return;
+    }
+    console.log("deactivate program handler");
+  }
+
+  const deactivateAccounthandler = () => {
+    let confirm = window.confirm(`Are you sure you want to deactivate ${fname} ${lname}'s account?`);
+    if (!confirm) {
+      return;
+    }
+    console.log("deactivate program handler");
+  }
+
+  const deleteProgramHandler = () => {
+    let confirm = window.confirm(`Are you sure you want to delete ${programInfo.program_name}?\nThis action CANNOT be undone.`);
+    if (!confirm) {
+      return;
+    }
+    console.log("delete program handler");
+  }
+
+  const deleteAccounthandler = () => {
+    let confirm = window.confirm(`Are you sure you want to delete ${fname} ${lname}'s account?\nThis action CANNOT be undone.`);
+    if (!confirm) {
+      return;
+    }
+    console.log("deactivate program handler");
   }
 
   const getTable = () => {
@@ -194,7 +252,7 @@ function ProgramDetails(props) {
                         <td>{allUserData[k].username}</td>
                         <td>{allUserData[k].discord}</td>
                         <td>
-                            <Button variant="success btn-sm" onClick={() => studentHandler(allUserData[k].uin, allUserData[k].userType)}>
+                            <Button variant="success btn-sm" onClick={() => editStudentHandler(allUserData[k].uin, allUserData[k].userType)}>
                                 Edit
                             </Button>
                         </td>
@@ -208,10 +266,62 @@ function ProgramDetails(props) {
     <div className="Programs">
     {/*
     
-    MODAL STARTS HERE
+    PROGRAM MODAL STARTS HERE
     
     */}
-      <Modal show={show} onHide={handleClose}>
+      <Modal show={showProgram} onHide={handleProgramClose}>
+        <Modal.Header closeButton>
+        <Modal.Title>
+          Editing: <i>{programInfo.program_name}</i>
+        </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Row>
+            <Col sm={6}>
+              <b>Program Name: </b>
+            </Col>
+            <Col>
+              <Form.Control
+                onChange={(e) => setProgramName(e.target.value)}
+                required
+                value={programName}
+                id="pname"
+                type="text"
+                isInvalid={error.program_name}
+              />
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={6}>
+              <b>Program Description: </b>
+            </Col>
+            <Col>
+              <Form.Control
+                onChange={(e) => setProgramDesc(e.target.value)}
+                required
+                value={programDesc}
+                id="pdesc"
+                type="textarea"
+                isInvalid={error.program_description}
+              />
+            </Col>
+          </Row>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleProgramClose}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={saveProgramHandler}>
+            Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    {/*
+    
+    ACCOUNT MODAL STARTS HERE
+    
+    */}
+      <Modal show={showAccount} onHide={handleAccountClose}>
         <Modal.Header closeButton>
         <Modal.Title>
           <i>{fname} {m_initial}. {lname}</i>
@@ -279,7 +389,7 @@ function ProgramDetails(props) {
         {currentUserType === "Student" &&
           <React.Fragment>
             <br/>
-            <Button variant="primary" onClick={()=>{setShowStudent(!showStudent)}}>Show Student Information</Button>
+            <Button variant="info" onClick={()=>{setShowStudent(!showStudent)}}>Show Student Information</Button>
             { showStudent &&
               <React.Fragment>
                 <br/>
@@ -410,6 +520,11 @@ function ProgramDetails(props) {
         <br/>
         add tracking stuff here
         </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleAccountClose}>
+            Close
+          </Button>
+        </Modal.Footer>
       </Modal>
       {/*
 
@@ -427,6 +542,14 @@ function ProgramDetails(props) {
             <br/>
             <h2 className="display-5 text-center">{programInfo.program_name}</h2>
             <p className="text-center">{programInfo.program_description}</p>
+            <div className="col d-flex justify-content-center align-items-center">
+              <Button variant="primary" onClick={() => editProgramHandler()}>Edit Program</Button>
+            </div>
+            <div className="col d-flex justify-content-center align-items-center">
+              <Button variant="warning" onClick={() => deactivateProgramHandler()}>Deactivate Program</Button>
+              <Button variant="danger" onClick={() => deleteProgramHandler()}>Delete Program</Button>
+            </div>
+            <br/>
 
             {props.auth.user.user_type == "Admin" ? (
                 // Return a table with all students information who are in this program (programNum)
