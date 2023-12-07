@@ -6,6 +6,7 @@ const EventCard = (props) => {
     const {isAdmin, userUIN, eventData, eventDetailsHandler} = props;
 
     const [signedUp, setSignedUp] = useState(false);
+    const [programName, setProgramName] = useState("");
 
     const handleAddStudent = () => {
         axios
@@ -33,11 +34,25 @@ const EventCard = (props) => {
             setSignedUp(false);
           }
         })
-      }    
+      }
+      
+      const findProgramName = (program_num) => {
+        axios
+        .get("/programs/getProgramInfo", {
+            params: {
+              programNum: program_num
+            }
+          })
+        .then((res) => {
+            setProgramName(res.data.program_name);
+        })
+    }
 
       if(isAdmin == false){
         eventSignedUp(eventData);
       }
+
+      findProgramName(eventData.program_num);
 
     return(
         <div className='event-card'>
@@ -52,6 +67,7 @@ const EventCard = (props) => {
                     </Card.Title>
                 </Card.Body>
 
+                <p>Associated Program: {programName}</p>
                 <p>Start Date: {eventData.event_start_date.substring(0,10)}</p>
                 <p>End Date: {eventData.event_end_date.substring(0,10)}</p>
                 <p>Time: {eventData.event_time}</p>

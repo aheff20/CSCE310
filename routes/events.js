@@ -40,7 +40,7 @@ router.get("/getAttendingUsers", async(req, res) => {
             console.log(err);
             res.status(400).json({message: "Error getting attending user details!"})
         }
-        res.status(200).json(result.rows[0]);
+        res.status(200).json(result.rows);
     })
 });
 

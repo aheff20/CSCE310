@@ -6,7 +6,6 @@ import { Form, Button, Container, Table, Spinner, Row, Col, CardGroup, Modal } f
 import classnames from "classnames";
 import axios from "axios";
 import React from "react";
-import EventCard from './eventCard';
 
 function EventDetails(props) {
     const history = useHistory();
@@ -14,6 +13,7 @@ function EventDetails(props) {
     const [allProgramData, setAllProgramData] = useState([]);
     const [attendingUsersAmount, setAttendingUsersAmount] = useState("");
     const [attendingUsers, setAttendingUsers] = useState([]);
+    const [eventData, setEventData] = useState();
 
     const [showEditEvent, setShowEditEvent] = useState(false);
     const [assignedProgram, setAssignedProgram] = useState(1);
@@ -22,6 +22,7 @@ function EventDetails(props) {
     const [time, setTime] = useState("");
     const [eventType, setEventType] = useState("");
     const [location, setLocation] = useState("");
+    const [programName, setProgramName] = useState("");
   
     const event_id = useParams().event_id;
 
@@ -44,10 +45,13 @@ function EventDetails(props) {
             setTime(res1.data.event_time);
             setLocation(res1.data.event_location);
             setEventType(res1.data.event_type);
+            setEventData(res1.data);
 
-            setAttendingUsers([res2.data]);
+            findProgramName(res1.data.program_num);
+
+            setAttendingUsers(res2.data);
             if(res2.data){
-              setAttendingUsersAmount([res2.data].length);
+              setAttendingUsersAmount(res2.data.length);
             }
             else{
               setAttendingUsersAmount(0);
@@ -132,6 +136,18 @@ function EventDetails(props) {
         history.go(-1);
       })
     }
+
+  const findProgramName = (program_num) => {
+      axios
+      .get("/programs/getProgramInfo", {
+          params: {
+            programNum: program_num
+          }
+        })
+      .then((res) => {
+          setProgramName(res.data.program_name);
+      })
+  }
   
    const programOptions = allProgramData.map((program) => (
     <option value={program.program_num}>{program.program_name}</option>
@@ -272,11 +288,12 @@ function EventDetails(props) {
               <br></br>
               <h2 className="display-5 text-center">Event {event_id} Details</h2>
 
-                <p className="text-center">Start Date: {startDate}</p>
-                <p className="text-center">End Date: {endDate}</p>
-                <p className="text-center">Time: {time}</p>
-                <p className="text-center">Location: {location}</p>
-                <p className="text-center">Type: {eventType}</p>
+                <p className="text-center">Associated Program: {programName}</p>
+                <p className="text-center">Start Date: {eventData.event_start_date}</p>
+                <p className="text-center">End Date: {eventData.event_end_date}</p>
+                <p className="text-center">Time: {eventData.event_time}</p>
+                <p className="text-center">Location: {eventData.event_location}</p>
+                <p className="text-center">Type: {eventData.event_type}</p>
                 <p className="text-center">Number of Students attending: {attendingUsersAmount}</p>
 
                 <center>
