@@ -83,7 +83,7 @@ function Programs(props) {
       })
   }
   const handleConfirmApplication = () => {
-    console.log(`Confirmed application to program ${programNum}`);
+    console.log(`Confirmed application to program ${currentProgramNum}`);
     handleClose();
   }
 
@@ -301,7 +301,7 @@ function Programs(props) {
         </Modal.Footer>
       </Modal>
 
-      <Modal show={showApply} onHide={handleClose}>
+      <Modal show={showApply} onHide={handleClose} size="lg">
         <Modal.Header closeButton>
           <Modal.Title>
             Applying: <i>{currentProgramName}</i>
@@ -310,7 +310,7 @@ function Programs(props) {
         <Modal.Body>
           <Row>
             <Col sm={6}>
-              <b>Uncomcert: </b>
+              <b>Are you currently enrolled in other uncompleted certifications sponsored by the Cybersecurity Center? </b>
             </Col>
             <Col>
               <Form.Control
@@ -318,7 +318,7 @@ function Programs(props) {
                 required
                 value={currentAppUncomcert}
                 id="appucomcert"
-                type="text"
+                as="textarea"
                 isInvalid={error.program_name}
               />
             </Col>
@@ -333,7 +333,7 @@ function Programs(props) {
                 required
                 value={currentAppCert}
                 id="appcert"
-                type="text"
+                as="textarea"
                 isInvalid={error.program_description}
               />
             </Col>
@@ -348,7 +348,7 @@ function Programs(props) {
                 required
                 value={currentAppPurpose}
                 id="apppurp"
-                type="text"
+                as="textarea"
                 isInvalid={error.program_description}
               />
             </Col>
