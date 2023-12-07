@@ -15,9 +15,13 @@ function Programs(props) {
   const [currentProgramNum, setCurrentProgramNum] = useState([]);
   const [currentProgramName, setCurrentProgramName] = useState([]);
   const [currentProgramDescription, setCurrentProgramDescription] = useState([]);
+  const [currentAppUncomcert, setCurrentAppUncomcert] = useState([]);
+  const [currentAppCert, setCurrentAppCert] = useState([]);
+  const [currentAppPurpose, setCurrentAppPurpose] = useState([]);
   const [deleteConfirmation, setDeleteConfirmation] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
+  const [showApply, setShowApply] = useState(false);
   const [error, setError] = useState({});
 
 
@@ -64,7 +68,23 @@ function Programs(props) {
   };
 
   const applyToProgram = (programNum) => {
-
+    console.log(`Applying to program ${programNum}`);
+    axios
+      .get("/programs/getProgramInfo", {
+        params: {
+          programNum: programNum
+        }
+      })
+      .then((res) => {
+        setCurrentProgramNum(programNum);
+        setCurrentProgramName(res.data.program_name);
+        setCurrentProgramDescription(res.data.program_description);
+        setShowApply(true);
+      })
+  }
+  const handleConfirmApplication = () => {
+    console.log(`Confirmed application to program ${programNum}`);
+    handleClose();
   }
 
   const accessProgramHandler = (programNum, isActive) => {
@@ -144,8 +164,12 @@ function Programs(props) {
     setCurrentProgramNum("");
     setCurrentProgramName("");
     setCurrentProgramDescription("");
+    setCurrentAppUncomcert("");
+    setCurrentAppCert("");
+    setCurrentAppPurpose("");
     setShowEdit(false);
     setShowCreate(false);
+    setShowApply(false);
   }
 
   const programsForUser = allProgramData.map((program) => (
@@ -273,6 +297,74 @@ function Programs(props) {
           </Button>
           <Button variant="danger" onClick={confirmDelete}>
             Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showApply} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            Applying: <i>{currentProgramName}</i>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Row>
+            <Col sm={6}>
+              <b>Uncomcert: </b>
+            </Col>
+            <Col>
+              <Form.Control
+                onChange={(e) => setCurrentAppUncomcert(e.target.value)}
+                required
+                value={currentAppUncomcert}
+                id="appucomcert"
+                type="text"
+                isInvalid={error.program_name}
+              />
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={6}>
+              <b>Program Cert: </b>
+            </Col>
+            <Col>
+              <Form.Control
+                onChange={(e) => setCurrentAppCert(e.target.value)}
+                required
+                value={currentAppCert}
+                id="appcert"
+                type="text"
+                isInvalid={error.program_description}
+              />
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={6}>
+              <b>Purpose Statement: </b>
+            </Col>
+            <Col>
+              <Form.Control
+                onChange={(e) => setCurrentAppPurpose(e.target.value)}
+                required
+                value={currentAppPurpose}
+                id="apppurp"
+                type="text"
+                isInvalid={error.program_description}
+              />
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={6}>
+              <b>Documents: </b>
+            </Col>
+          </Row>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={handleConfirmApplication}>
+            Apply
           </Button>
         </Modal.Footer>
       </Modal>

@@ -76,7 +76,7 @@ router.post("/createProgram", async (req, res) => {
     const program_description = req.body.program_description;
     const active = true;
 
-    pool.query(`INSERT INTO program (program_name, program_description, active) VALUES ($1, $2, $3)`, [program_name, program_description, active], (err, result) => {
+    pool.query(`INSERT INTO programs (program_name, program_description, active) VALUES ($1, $2, $3)`, [program_name, program_description, active], (err, result) => {
         if (err) {
             console.log(err);
             res.status(400).json({ message: "Error creating program!" });
