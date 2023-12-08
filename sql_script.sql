@@ -184,6 +184,7 @@ CREATE TABLE applications(
             FOREIGN KEY(program_num)
                 REFERENCES programs(program_num)
 );
+CREATE INDEX idx_applications_uin ON applications(uin);
 
 CREATE TABLE documentation(
     doc_num SERIAL,
