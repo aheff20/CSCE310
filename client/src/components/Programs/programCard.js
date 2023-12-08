@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Card } from "react-bootstrap";
 
 const ProgramCard = (props) => {
-    const { isAdmin, programData, editProgramHandler, applyToProgram, accessProgramHandler, programDetailsHandler } = props;
+    const { isAdmin, programData, applicationNum, editProgramHandler, applyToProgram, editApplication, accessProgramHandler, programDetailsHandler } = props;
     const accessButtonText = programData.active ? "Close Program" : "Reopen Program";
     const isActive = programData.active;
 
@@ -49,13 +49,25 @@ const ProgramCard = (props) => {
 
                 {(!isAdmin && !isActive) && <h3>This Program is closed.</h3>}
 
-                {(!isAdmin && isActive) && <Button
-                    variant="success"
-                    type="submit"
-                    onClick={() => applyToProgram(programData.program_num)}>
-                    Apply for Program!
-                </Button>
-                }
+                {!isAdmin && isActive && (
+                    applicationNum ? (
+                        <Button
+                            variant="primary"
+                            type="submit"
+                            onClick={() => editApplication(programData.program_num)}
+                        >
+                            View / Edit Application
+                        </Button>
+                    ) : (
+                        <Button
+                            variant="success"
+                            type="submit"
+                            onClick={() => applyToProgram(programData.program_num)}
+                        >
+                            Apply for Program!
+                        </Button>
+                    )
+                )}
 
 
 
