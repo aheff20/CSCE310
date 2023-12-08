@@ -18,11 +18,14 @@ function Programs(props) {
   const [currentAppUncomcert, setCurrentAppUncomcert] = useState("");
   const [currentAppCert, setCurrentAppCert] = useState("");
   const [currentAppPurpose, setCurrentAppPurpose] = useState("");
-  const [deleteConfirmation, setDeleteConfirmation] = useState(false);
+  const [deleteProgramConfirmation, setDeleteProgramConfirmation] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
-  const [showEdit, setShowEdit] = useState(false);
+  const [showEditProgram, setShowEditProgram] = useState(false);
   const [showApply, setShowApply] = useState(false);
+  const [showEditApplication, setShowEditApplication] = useState(false);
+  const [deleteApplicationConfirmation, setDeleteApplicationConfirmation] = useState(false);
   const [error, setError] = useState({});
+
 
   const [numDocuments, setNumDocuments] = useState(1);
   const [link1, setLink1] = useState("");
@@ -55,15 +58,28 @@ function Programs(props) {
     console.log(`Creating new program`);
     setShowCreate(true);
   }
+
   const handleConfirmCreate = () => {
+    const isNameUnique = allProgramData.every((program) => program.program_name !== currentProgramName);
+
+    if (!isNameUnique) {
+      setError({ program_name: "This Program name is already taken!" });
+      return;
+    }
+
     axios
       .post("programs/createProgram", {
         program_name: currentProgramName,
         program_description: currentProgramDescription,
       })
       .then((res) => {
-        history.go(0);
-        setShowCreate(false);
+        if (res.status === 201) {
+          console.log(res.data)
+          setError(res.data);
+        } else {
+          history.go(0);
+          setShowCreate(false);
+        }
       })
   }
 
@@ -79,7 +95,7 @@ function Programs(props) {
         setCurrentProgramNum(programNum);
         setCurrentProgramName(res.data.program_name);
         setCurrentProgramDescription(res.data.program_description);
-        setShowEdit(true);
+        setShowEditProgram(true);
       })
   };
 
@@ -131,11 +147,11 @@ function Programs(props) {
       })
   }
 
-  const handleDelete = (programNum) => {
-    setDeleteConfirmation(true);
+  const handleDeleteProgram = (programNum) => {
+    setDeleteProgramConfirmation(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDeleteProgram = () => {
     // track, then applications, (then maybe events and cert_enrollments, add later), then the program itself
 
     console.log(`Deleting program ${currentProgramNum}`);
@@ -166,15 +182,15 @@ function Programs(props) {
                 } else {
                   history.go(0);
                   handleClose();
-                  setDeleteConfirmation(false);
+                  setDeleteProgramConfirmation(false);
                 }
               });
           });
       });
   };
 
-  const cancelDelete = () => {
-    setDeleteConfirmation(false);
+  const cancelDeleteProgram = () => {
+    setDeleteProgramConfirmation(false);
   };
 
   const programDetailsHandler = (programNum) => {
@@ -200,7 +216,7 @@ function Programs(props) {
           setError(res.data);
         } else {
           history.go(0);
-          setShowEdit(false);
+          setShowEditProgram(false);
         }
       })
 
@@ -216,7 +232,7 @@ function Programs(props) {
     setCurrentAppUncomcert("");
     setCurrentAppCert("");
     setCurrentAppPurpose("");
-    setShowEdit(false);
+    setShowEditProgram(false);
     setShowCreate(false);
     setShowApply(false);
   }
@@ -246,14 +262,17 @@ function Programs(props) {
               <b>Program Name: </b>
             </Col>
             <Col>
-              <Form.Control
-                onChange={(e) => setCurrentProgramName(e.target.value)}
-                required
-                value={currentProgramName}
-                id="pname"
-                type="text"
-                isInvalid={error.program_name}
-              />
+              <Form.Group>
+                <Form.Control
+                  onChange={(e) => setCurrentProgramName(e.target.value)}
+                  required
+                  value={currentProgramName}
+                  id="pname"
+                  type="text"
+                  isInvalid={error.program_name}
+                />
+                <Form.Control.Feedback type="invalid">{error.program_name}</Form.Control.Feedback>
+              </Form.Group>
             </Col>
           </Row>
           <Row>
@@ -261,14 +280,17 @@ function Programs(props) {
               <b>Program Description: </b>
             </Col>
             <Col>
-              <Form.Control
-                onChange={(e) => setCurrentProgramDescription(e.target.value)}
-                required
-                value={currentProgramDescription}
-                id="pdesc"
-                type="textarea"
-                isInvalid={error.program_description}
-              />
+              <Form.Group>
+                <Form.Control
+                  onChange={(e) => setCurrentProgramDescription(e.target.value)}
+                  required
+                  value={currentProgramDescription}
+                  id="pdesc"
+                  type="textarea"
+                  isInvalid={error.program_description}
+                />
+                <Form.Control.Feedback type="invalid">{error.program_description}</Form.Control.Feedback>
+              </Form.Group>
             </Col>
           </Row>
         </Modal.Body>
@@ -282,7 +304,7 @@ function Programs(props) {
         </Modal.Footer>
       </Modal>
 
-      <Modal show={showEdit} onHide={handleClose}>
+      <Modal show={showEditProgram} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>
             Editing: <i>{currentProgramName}</i>
@@ -294,14 +316,17 @@ function Programs(props) {
               <b>Program Name: </b>
             </Col>
             <Col>
-              <Form.Control
-                onChange={(e) => setCurrentProgramName(e.target.value)}
-                required
-                value={currentProgramName}
-                id="pname"
-                type="text"
-                isInvalid={error.program_name}
-              />
+              <Form.Group>
+                <Form.Control
+                  onChange={(e) => setCurrentProgramName(e.target.value)}
+                  required
+                  value={currentProgramName}
+                  id="pname"
+                  type="text"
+                  isInvalid={error.program_name}
+                />
+                <Form.Control.Feedback type="invalid">{error.program_name}</Form.Control.Feedback>
+              </Form.Group>
             </Col>
           </Row>
           <Row>
@@ -309,19 +334,22 @@ function Programs(props) {
               <b>Program Description: </b>
             </Col>
             <Col>
-              <Form.Control
-                onChange={(e) => setCurrentProgramDescription(e.target.value)}
-                required
-                value={currentProgramDescription}
-                id="pdesc"
-                type="textarea"
-                isInvalid={error.program_description}
-              />
+              <Form.Group>
+                <Form.Control
+                  onChange={(e) => setCurrentProgramDescription(e.target.value)}
+                  required
+                  value={currentProgramDescription}
+                  id="pdesc"
+                  type="textarea"
+                  isInvalid={error.program_description}
+                />
+                <Form.Control.Feedback type="invalid">{error.program_description}</Form.Control.Feedback>
+              </Form.Group>
             </Col>
           </Row>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="danger" onClick={handleDelete}>
+          <Button variant="danger" onClick={handleDeleteProgram}>
             Delete Program
           </Button>
           <Button variant="secondary" onClick={handleClose}>
@@ -333,7 +361,7 @@ function Programs(props) {
         </Modal.Footer>
       </Modal>
 
-      <Modal show={deleteConfirmation} onHide={cancelDelete}>
+      <Modal show={deleteProgramConfirmation} onHide={cancelDeleteProgram}>
         <Modal.Header closeButton>
           <Modal.Title>Delete Program</Modal.Title>
         </Modal.Header>
@@ -341,10 +369,10 @@ function Programs(props) {
           Are you sure you want to delete the program? This action CANNOT be undone!
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={cancelDelete}>
+          <Button variant="secondary" onClick={cancelDeleteProgram}>
             Cancel
           </Button>
-          <Button variant="danger" onClick={confirmDelete}>
+          <Button variant="danger" onClick={confirmDeleteProgram}>
             Delete
           </Button>
         </Modal.Footer>
