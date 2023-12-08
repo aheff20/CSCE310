@@ -33,12 +33,13 @@ function Initiatives(props) {
   const [internshipIsGov, setIsGov] = useState("Select Option"); // "yes" or "no"
   const [certLevel, setCertLevel] = useState("");
   // general application info
+  const [isApplying, setIsApplying] = useState(false);
   const [initiativeNum, setInitiativeNum] = useState(0);
   const [UIN, setUIN] = useState(0);
   const [appStatus, setAppStatus] = useState("");
-  const [appYear, setAppYear] = useState(0);
+  const [appYear, setAppYear] = useState(new Date().getFullYear());
   // specific application info
-  const [appSemester, setAppSemester] = useState("");
+  const [appSemester, setAppSemester] = useState("Select Option");
   const [certAppTraining, setCertAppTraining] = useState("");
   const [certAppProgramNum, setCertAppProgramNum] = useState(0);
   
@@ -60,6 +61,7 @@ function Initiatives(props) {
             axios.get("/initiatives/getAllCertificateData")
               .then((res) => {
                 setCertificateData(res.data);
+                if (props.auth.user.user_type !== "Admin") setIsApplying(true); 
                 //console.log(res.data);
                 setLoading(false);
               })
@@ -334,14 +336,112 @@ function Initiatives(props) {
                   </Row>
                 </React.Fragment>
               }
-              <hr/>
-              {/*
-                * status
-                * year
-                * ----
-                * class semester
-                * certificate training_status, program_num, semester
-                */}
+              
+              
+              {isApplying && 
+                <React.Fragment>
+                  <hr/>
+                  <Row>
+                    <Col sm={4}>
+                      <b>Application Status: </b>
+                    </Col>
+                    <Col>
+                      <Form.Group className="mb-3">
+                        <Form.Control
+                        value={appStatus}
+                        isInvalid={!!error.appStatus}
+                        onChange={(e) => {
+                          setAppStatus(e.target.value);
+                        }}
+                        required
+                        id="Application Status"
+                        type="text"
+                        >
+                        </Form.Control>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col sm={4}>
+                      <b>Application Year: </b>
+                    </Col>
+                    <Col>
+                      <Form.Group className="mb-3">
+                        <Form.Control
+                        value={appYear}
+                        isInvalid={!!error.appStatus}
+                        onChange={(e) => {
+                          setAppYear(e.target.value);
+                        }}
+                        required
+                        id="Application Year"
+                        type="number"
+                        min="0"
+                        >
+                        </Form.Control>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  {(initiativeType==="Class" || initiativeType=="Certificate") && 
+                    <React.Fragment>
+                      <Row>
+                        <Col sm={4}>
+                          <b>Semester: </b>
+                        </Col>
+                        <Col>
+                          <Form.Group className="mb-3">
+                            <Form.Select
+                            aria-label="Application Semester"
+                            value={appSemester}
+                            isInvalid={!!error.appSemester}
+                            onChange={(e) => {
+                              setAppSemester(e.target.value);
+                            }}
+                            >
+                              <option>Select Option</option>
+                              <option>Spring</option>
+                              <option>Summer</option>
+                              <option>Fall</option>
+                            </Form.Select>
+                          </Form.Group>
+                        </Col>
+                      </Row>
+                    </React.Fragment>
+                  }
+                  {initiativeType=="Certificate" &&
+                    <React.Fragment>
+                      <Row>
+                        <Col sm={4}>
+                          <b>Training Status: </b>
+                        </Col>
+                        <Col>
+                          <Form.Group className="mb-3">
+                            <Form.Control
+                            value={certAppTraining}
+                            isInvalid={!!error.certAppTraining}
+                            onChange={(e) => {
+                              setCertAppTraining(e.target.value);
+                            }}
+                            required
+                            id="Certification Training Status"
+                            type="text"
+                            >
+                            </Form.Control>
+                          </Form.Group>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col sm={4}>
+                          <b>Program: </b>
+                        </Col>
+                        <Col>
+                          ...
+                        </Col>
+                      </Row>
+                    </React.Fragment>
+                  }
+                </React.Fragment>
+              }
 
             </React.Fragment>
           }
