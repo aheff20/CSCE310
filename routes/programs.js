@@ -26,6 +26,22 @@ router.get("/getAllProgramData", async (req, res) => {
 
 });
 
+router.get("/exists", async (req, res) => {
+    const programNum = req.query.programNum;
+
+    pool.query(`SELECT * FROM programs WHERE program_num=${programNum} LIMIT 1`, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.status(400).json({ message: `Error getting program ${programNum} details!` });
+        }
+        
+        if(result.rows.length > 0) {
+            res.status(200).json({ valid : true });
+        }
+        else res.status(200).json({ valid : false });
+    })
+});
+
 /** Get Single Program Information route created and implemented by:
  *    Lucas Wilber
  * 

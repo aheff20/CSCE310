@@ -60,35 +60,45 @@ function ProgramDetails(props) {
 
 
   useEffect(() => {
-    axios.get("/programs/getProgramInfo", {
-        params: {
-            programNum: programNum
-        }})
-        .then((res) => {
-            //console.log(res.data)
-            setProgramInfo(res.data);
-            setProgramName(res.data.program_name);
-            setProgramDesc(res.data.program_description);
-            setProgramActive(res.data.active);
-            // get additional info only if admin
-            if (props.auth.user.user_type == "Admin") {
-              //console.log("getting users?")
-              axios
-                .get("/programs/getProgramUsers", {
-                  params: {
-                    programNum: programNum
-                  }
-                })
-                .then((res) => {
-                    //console.log(res)
-                    setAllUserData(res.data);
-                    setStudentCount(res.data.length);
-                    setLoading(false);
-                    getMetricData(res.data);
-                })
-            }
-            else setLoading(false);
-        })
+    axios.get("/programs/exists", {
+      params: {
+          programNum: programNum
+      }})
+      .then((res) => {
+        if (!res.data.valid) {
+          history.replace("/programs/");;
+        }
+
+        axios.get("/programs/getProgramInfo", {
+          params: {
+              programNum: programNum
+          }})
+          .then((res) => {
+              //console.log(res.data)
+              setProgramInfo(res.data);
+              setProgramName(res.data.program_name);
+              setProgramDesc(res.data.program_description);
+              setProgramActive(res.data.active);
+              // get additional info only if admin
+              if (props.auth.user.user_type == "Admin") {
+                //console.log("getting users?")
+                axios
+                  .get("/programs/getProgramUsers", {
+                    params: {
+                      programNum: programNum
+                    }
+                  })
+                  .then((res) => {
+                      //console.log(res)
+                      setAllUserData(res.data);
+                      setStudentCount(res.data.length);
+                      setLoading(false);
+                      getMetricData(res.data);
+                  })
+              }
+              else setLoading(false);
+          })
+      })
   }, []);
 
   const getMetricData = (userData) => {
