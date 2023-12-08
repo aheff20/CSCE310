@@ -82,6 +82,13 @@ CREATE TABLE intern_app(
             REFERENCES internship(intern_id)
 );
 
+CREATE VIEW program_fed_intern_view AS 
+SELECT p.program_num, ia.*, i.is_gov, i.location
+FROM programs p
+JOIN applications a ON p.program_num = a.program_num
+JOIN intern_app ia ON a.uin = ia.uin
+JOIN internship i ON ia.intern_id = i.intern_id;
+
 CREATE TABLE certification(
     cert_id INT,
     cert_level VARCHAR,
