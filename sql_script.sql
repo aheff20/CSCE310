@@ -165,7 +165,7 @@ CREATE TABLE applications(
     PRIMARY KEY(app_num),
     CONSTRAINT fk_user
         FOREIGN KEY(uin)
-            REFERENCES users(uin),
+            REFERENCES college_student(uin),
     CONSTRAINT fk_programs
             FOREIGN KEY(program_num)
                 REFERENCES programs(program_num)
