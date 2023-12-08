@@ -225,145 +225,143 @@ function Profile(props) {
             </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Row>
-                    <Col sm={4}>
-                        <b>UIN: </b>
-                    </Col>
-                    <Col>
-                    <Form.Control
-                        readOnly
-                        value={uin}
-                        id="uin"
-                        type="text"
-                        />
-                    </Col>
-                </Row>
-                <Row>
-                    <Col sm={4}>
-                        <b>First Name: </b>
-                    </Col>
-                    <Col>
-                        <Form.Group>
-                            <Form.Control
-                            onChange={(e) => setfName(e.target.value)}
-                            required
-                            value={fname}
-                            id="fname"
-                            type="text"
-                            isInvalid={error.first_name}
-                            />
-                            <Form.Control.Feedback type="invalid">
-                                {error.first_name}
-                            </Form.Control.Feedback>
-                        </Form.Group>
-                    </Col>
-                    
-                </Row>
-                <Row>
-                    <Col sm={4}>
-                        <b>Last Name: </b>
-                    </Col>
-                    <Col>
-                    <Form.Group>
-                        <Form.Control
-                        onChange={(e) => setlName(e.target.value)}
-                        required
-                        isInvalid={error.last_name}
-                        value={lname}
-                        id="lname"
-                        type="text"
-                        />
-                        <Form.Control.Feedback type="invalid">
-                            {error.last_name}
-                        </Form.Control.Feedback>
-                    </Form.Group>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col sm={4}>
-                        <b>M Initial: </b>
-                    </Col>
-                    <Col>
-                    <Form.Group>
-                        <Form.Control
-                            onChange={(e) => setMInitial(e.target.value)}
-                            required
-                            isInvalid={error.m_initial}
-                            value={m_initial}
-                            id="m_initial"
-                            type="text"
-                            />
-                            <Form.Control.Feedback type="invalid">
-                                {error.m_initial}
-                            </Form.Control.Feedback>
-                    </Form.Group>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col sm={4}>
-                        <b>Email: </b>
-                    </Col>
-                    <Col>
-                    <Form.Group>
-                        <Form.Control
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                            value={email}
-                            id="email"
-                            isInvalid={error.registerEmail}
-                            type="text"
-                            />
-                            <Form.Control.Feedback type="invalid">
-                                {error.registerEmail}
-                            </Form.Control.Feedback>
-                    </Form.Group>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col sm={4}>
-                        <b>Discord: </b>
-                    </Col>
-                    <Col>
-                    <Form.Group>
-                        <Form.Control
-                            onChange={(e) => setDiscord(e.target.value)}
-                            required
-                            value={discord}
-                            id="discord"
-                            isInvalid={error.discord}
-                            type="text"
-                            />
-                            <Form.Control.Feedback type="invalid">
-                                {error.discord}
-                            </Form.Control.Feedback>
-                    </Form.Group>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col sm={4}>
-                        <b>Username:</b>
-                    </Col>
-                    <Col>
-                    <Form.Group>
-                        <Form.Control
-                        onChange={(e) => setUsername(e.target.value)}
-                        required
-                        value={username}
-                        id="username"
-                        isInvalid={error.registerUsername}
-                        type="text"
-                        />
-                        <Form.Control.Feedback type="invalid">
-                            {error.registerUsername}
-                        </Form.Control.Feedback>
-                    </Form.Group>
-                    </Col>
-                </Row>
-
-                
-
                 {!showStudentInfo &&
                     <React.Fragment>
+                        <Row>
+                            <Col sm={4}>
+                                <b>UIN: </b>
+                            </Col>
+                            <Col>
+                            <Form.Control
+                                readOnly
+                                value={uin}
+                                id="uin"
+                                type="text"
+                                />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col sm={4}>
+                                <b>First Name: </b>
+                            </Col>
+                            <Col>
+                                <Form.Group>
+                                    <Form.Control
+                                    onChange={(e) => setfName(e.target.value)}
+                                    required
+                                    value={fname}
+                                    id="fname"
+                                    type="text"
+                                    isInvalid={error.first_name}
+                                    />
+                                    <Form.Control.Feedback type="invalid">
+                                        {error.first_name}
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                            </Col>
+                            
+                        </Row>
+                        <Row>
+                            <Col sm={4}>
+                                <b>Last Name: </b>
+                            </Col>
+                            <Col>
+                            <Form.Group>
+                                <Form.Control
+                                onChange={(e) => setlName(e.target.value)}
+                                required
+                                isInvalid={error.last_name}
+                                value={lname}
+                                id="lname"
+                                type="text"
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    {error.last_name}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col sm={4}>
+                                <b>M Initial: </b>
+                            </Col>
+                            <Col>
+                            <Form.Group>
+                                <Form.Control
+                                    onChange={(e) => setMInitial(e.target.value)}
+                                    required
+                                    isInvalid={error.m_initial}
+                                    value={m_initial}
+                                    id="m_initial"
+                                    type="text"
+                                    />
+                                    <Form.Control.Feedback type="invalid">
+                                        {error.m_initial}
+                                    </Form.Control.Feedback>
+                            </Form.Group>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col sm={4}>
+                                <b>Email: </b>
+                            </Col>
+                            <Col>
+                            <Form.Group>
+                                <Form.Control
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                    value={email}
+                                    id="email"
+                                    isInvalid={error.registerEmail}
+                                    type="text"
+                                    />
+                                    <Form.Control.Feedback type="invalid">
+                                        {error.registerEmail}
+                                    </Form.Control.Feedback>
+                            </Form.Group>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col sm={4}>
+                                <b>Discord: </b>
+                            </Col>
+                            <Col>
+                            <Form.Group>
+                                <Form.Control
+                                    onChange={(e) => setDiscord(e.target.value)}
+                                    required
+                                    value={discord}
+                                    id="discord"
+                                    isInvalid={error.discord}
+                                    type="text"
+                                    />
+                                    <Form.Control.Feedback type="invalid">
+                                        {error.discord}
+                                    </Form.Control.Feedback>
+                            </Form.Group>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col sm={4}>
+                                <b>Username:</b>
+                            </Col>
+                            <Col>
+                            <Form.Group>
+                                <Form.Control
+                                onChange={(e) => setUsername(e.target.value)}
+                                required
+                                value={username}
+                                id="username"
+                                isInvalid={error.registerUsername}
+                                type="text"
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    {error.registerUsername}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            </Col>
+                        </Row>
+
                         <hr></hr>
                         <Modal.Title>
                             Change Password
