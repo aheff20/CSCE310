@@ -14,6 +14,7 @@ import Programs from "./components/Programs/programs";
 import ProgramDetails from "./components/Programs/programDetails";
 import Events from "./components/Events/events";
 import EventDetails from "./components/Events/eventDetails";
+import Initiatives from "./components/Initiatives/initiatives";
 
 import setAuthToken from "./utils/setAuthToken";
 import { setCurrentUser, logoutUser } from "./actions/authActions";
@@ -59,6 +60,7 @@ function App() {
               <PrivateUserRoute exact path="/programs" component={Programs} />
               <PrivateUserRoute exact path="/events" component={Events} />
               <PrivateUserRoute exact path="/programs/:programNum" component={ProgramDetails} />
+              <PrivateUserRoute exact path="/initiatives" component={Initiatives} />
               <PrivateAdminRoute exact path="/events/:event_id" component={EventDetails} />
               <PrivateAdminRoute exact path="/management" component={Management} />          
               <PrivateAdminRoute exact path="/createAccount" component={CreateAccount} />          

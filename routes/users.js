@@ -17,6 +17,8 @@ const { pool } = require("../dbInstance");
  * 
  *    SQL:
  *      * Select 
+ * 
+ *    This route is used by both admins and students to log into their account
  */
 router.post("/login", (req, res) => {
 
@@ -83,6 +85,8 @@ router.post("/login", (req, res) => {
  *    SQL:
  *      * Select
  *      * Insert 
+ * 
+ *    This route is used by both admins and students to create accounts
  */
 router.post("/register", async (req, res) => {
     const userData = {}
@@ -197,6 +201,8 @@ router.get("/getAllUserData", async (req, res) => {
  * 
  *    SQL:
  *      * Select 
+ * 
+ *    This route is used by both admins and students to view their account info
  */
 router.get("/getUserData", async(req, res) => {
   const uin = req.query.uin;
@@ -230,6 +236,8 @@ router.get("/getUserData", async(req, res) => {
  * 
  *    SQL:
  *      * Update 
+ * 
+ *    This route is used by both admins and students to update their account
  */
 router.post("/updateUserInfo", async(req, res) => {
   const userData = {}
@@ -265,6 +273,22 @@ router.post("/updateUserInfo", async(req, res) => {
     if(isUserDataValid != true) {
       return res.status(201).json(isUserDataValid);
     }
+
+  // This takes advantage of the Index on username to speedily check if the username is already taken
+  verifyUsername = await new Promise((resolve, reject) => {
+      pool.query(`SELECT * FROM users WHERE username='${userData.username}'`, (err, result) => {
+        if(err) {
+          reject(err);
+        }
+        
+        resolve(result.rows.length == 0);
+    
+      })
+    })
+
+  if(verifyUsername != true) {
+    return res.status(201).json({registerUsername: "Username already taken!"})
+  }
   
   let updatedHashedPassword;
   
@@ -374,6 +398,12 @@ router.post("/deleteUser", async(req, res) => {
   })
 
 });
+
+const validateUsername = async (username) => {
+
+  
+
+}
 
 const validateUserInfo = (userData) => {
   if(isNaN(userData.uin) || isNaN(parseFloat(userData.uin))) {
