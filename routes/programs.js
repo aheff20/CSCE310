@@ -34,11 +34,11 @@ router.get("/exists", async (req, res) => {
             console.log(err);
             res.status(400).json({ message: `Error getting program ${programNum} details!` });
         }
-        
-        if(result.rows.length > 0) {
-            res.status(200).json({ valid : true });
+
+        if (result.rows.length > 0) {
+            res.status(200).json({ valid: true });
         }
-        else res.status(200).json({ valid : false });
+        else res.status(200).json({ valid: false });
     })
 });
 
@@ -85,17 +85,17 @@ router.get("/getProgramUsers", async (req, res) => {
  *  
  *  SQL: SELECT
  */
-router.get("/getUploadedDocuments", async(req, res) => {
+router.get("/getUploadedDocuments", async (req, res) => {
     const app_num = req.query.app_num;
 
     pool.query(`SELECT * FROM documentation WHERE app_num = ${app_num}`, (err, result) => {
-        if(err){
+        if (err) {
             console.log(err);
             res.status(400).json("Error getting all uploaded document information")
         }
         res.status(200).json(result.rows);
     })
-    
+
 });
 
 /** Create Document route created and implemented by:
@@ -103,17 +103,17 @@ router.get("/getUploadedDocuments", async(req, res) => {
  *  
  *  SQL: INSERT
  */
-router.post("/createDocument", async(req, res) => {
+router.post("/createDocument", async (req, res) => {
     const app_num = req.body.app_num;
     const link = req.body.link;
     const doc_type = req.body.doc_type;
 
     pool.query(`INSERT INTO documentation(app_num, link, doc_type) VALUES(${app_num}, '${link}', '${doc_type}')`, (err, result) => {
-        if(err){
+        if (err) {
             console.log(err);
-            res.status(400).json({message: "Error creating document!"});
+            res.status(400).json({ message: "Error creating document!" });
         }
-        res.status(200).json({message: "Success!"});
+        res.status(200).json({ message: "Success!" });
     })
 });
 
@@ -122,18 +122,18 @@ router.post("/createDocument", async(req, res) => {
  *  
  *  SQL: UPDATE
  */
-router.post("/updateDocument", async(req, res) => {
+router.post("/updateDocument", async (req, res) => {
     const doc_num = req.body.doc_num;
     const app_num = req.body.app_num;
     const link = req.body.link;
     const doc_type = req.body.doc_type;
 
     pool.query(`UPDATE documentation SET app_num = ${app_num}, link = '${link}', doc_type = '${doc_type}' WHERE doc_num = ${doc_num}`, (err, result) => {
-        if(err){
+        if (err) {
             console.log(err);
-            res.status(400).json({message: "Error editing document!"});
+            res.status(400).json({ message: "Error editing document!" });
         }
-        res.status(200).json({message: "Success!"});
+        res.status(200).json({ message: "Success!" });
     })
 });
 
@@ -142,15 +142,15 @@ router.post("/updateDocument", async(req, res) => {
  *  
  *  SQL: DELETE
  */
-router.post("/deleteDocument", async(req, res) => {
+router.post("/deleteDocument", async (req, res) => {
     const doc_num = req.body.doc_num;
 
     pool.query(`DELETE FROM documentation WHERE doc_num = ${doc_num}`, (err, result) => {
-        if(err){
+        if (err) {
             console.log(err);
-            res.status(400).json({message: "Error deleting document!"});
+            res.status(400).json({ message: "Error deleting document!" });
         }
-        res.status(200).json({message: "Success!"});
+        res.status(200).json({ message: "Success!" });
     })
 });
 
@@ -159,15 +159,37 @@ router.post("/deleteDocument", async(req, res) => {
  *  
  *  SQL: DELETE
  */
-router.post("/deleteApplicationsWithDocument", async(req, res) => {
+router.post("/deleteApplicationsWithDocument", async (req, res) => {
     const app_num = req.body.app_num;
 
     pool.query(`DELETE FROM applications WHERE app_num = ${app_num}`, (err, result) => {
-        if(err){
+        if (err) {
             console.log(err);
-            res.status(400).json({message: "Error deleting applications with document!"});
+            res.status(400).json({ message: "Error deleting applications with document!" });
         }
-        res.status(200).json({message: "Success!"});
+        res.status(200).json({ message: "Success!" });
+    })
+});
+
+/** Create Application route created and implemented by:
+ *    Lucas Wilber
+ * 
+ *    SQL:
+ *      * Insert 
+ */
+router.post("/createApplication", async (req, res) => {
+    const program_num = req.body.program_num;
+    const uin = req.body.uin;
+    const uncom_cert = req.body.uncom_cert;
+    const com_cert = req.body.com_cert;
+    const purpose_statement = req.body.purpose;
+
+    pool.query(`INSERT INTO applications (program_num, uin, uncom_cert, com_cert, purpose_statement) VALUES ($1, $2, $3, $4, $5)`, [program_num, uin, uncom_cert, com_cert, purpose_statement], (err, result) => {
+        if (err) {
+            console.log(err);
+            res.status(400).json({ message: "Error creating application!" });
+        }
+        res.status(200).json({ message: "Success!" });
     })
 });
 
@@ -177,7 +199,6 @@ router.post("/deleteApplicationsWithDocument", async(req, res) => {
  *    SQL:
  *      * Insert 
  */
-router.p
 router.post("/createProgram", async (req, res) => {
     const program_name = req.body.program_name;
     const program_description = req.body.program_description;
@@ -293,27 +314,27 @@ router.post("/deleteProgram", async (req, res) => {
     })
 });
 
-router.post("/deleteProgramTrack", async(req, res) => {
+router.post("/deleteProgramTrack", async (req, res) => {
     const program_num = req.body.program_num;
-    
+
     pool.query(`DELETE FROM track WHERE program_num = ${program_num}`, (err, result) => {
-        if(err){
+        if (err) {
             console.log(err);
-            res.status(400).json({message: "Error deleting event from track table!"});
+            res.status(400).json({ message: "Error deleting event from track table!" });
         }
-        res.status(200).json({message: "Success!"});
+        res.status(200).json({ message: "Success!" });
     })
 })
 
-router.post("/deleteProgramApplications", async(req, res) => {
+router.post("/deleteProgramApplications", async (req, res) => {
     const program_num = req.body.program_num;
-    
+
     pool.query(`DELETE FROM applications WHERE program_num = ${program_num}`, (err, result) => {
-        if(err){
+        if (err) {
             console.log(err);
-            res.status(400).json({message: "Error deleting event from track table!"});
+            res.status(400).json({ message: "Error deleting event from track table!" });
         }
-        res.status(200).json({message: "Success!"});
+        res.status(200).json({ message: "Success!" });
     })
 })
 
