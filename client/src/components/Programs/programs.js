@@ -12,9 +12,11 @@ function Programs(props) {
   const history = useHistory();
   const [loading, setLoading] = useState(true);
   const [allProgramData, setAllProgramData] = useState([]);
+  const [userApplications, setUserApplications] = useState([]);
   const [currentProgramNum, setCurrentProgramNum] = useState([]);
   const [currentProgramName, setCurrentProgramName] = useState([]);
   const [currentProgramDescription, setCurrentProgramDescription] = useState([]);
+  const [currentAppNum, setCurrentAppNum] = useState([]);
   const [currentAppUncomcert, setCurrentAppUncomcert] = useState("");
   const [currentAppCert, setCurrentAppCert] = useState("");
   const [currentAppPurpose, setCurrentAppPurpose] = useState("");
@@ -46,9 +48,23 @@ function Programs(props) {
 
   useEffect(() => {
     axios
-      .get("/programs/getAllProgramData")
+      .get("/programs/getAllProgramData", {
+        params: {
+          uin: props.auth.user.uin
+        }
+      })
       .then((res) => {
         setAllProgramData(res.data);
+      });
+
+    axios
+      .get("/programs/getAllUserApplications", {
+        params: {
+          uin: props.auth.user.uin
+        }
+      })
+      .then((res) => {
+        setUserApplications(res.data);
         setLoading(false);
       });
 
@@ -114,6 +130,17 @@ function Programs(props) {
         setShowApply(true);
       })
   }
+
+  const handleEditApplication = (programNum) => {
+    console.log(`Editing Application to program ${programNum}`);
+    const application = userApplications.find(app => app.program_num === programNum);
+    setCurrentAppNum(application.app_num);
+    setCurrentAppCert(application.com_cert);
+    setCurrentAppUncomcert(application.uncom_cert);
+    setCurrentAppPurpose(application.purpose_statement);
+    setShowEditApplication(true);
+  };
+
   const handleConfirmApplication = () => {
     console.log(`Confirmed application to program ${currentProgramNum}`);
     axios
@@ -129,6 +156,31 @@ function Programs(props) {
         setShowApply(false);
       })
   }
+
+  const handleDeleteApplication = (programNum) => {
+    setDeleteApplicationConfirmation(true);
+  };
+
+  const confirmDeleteApplication = () => {
+    console.log(`Deleting application ${currentAppNum}`);
+    axios
+      .post("/programs/deleteApplicationsWithDocument", { app_num: currentAppNum })
+      .then((res) => {
+        if (res.status === 201) {
+          console.log(res.data);
+          setError(res.data);
+        } else {
+          history.go(0);
+          handleClose();
+          setDeleteApplicationConfirmation(false);
+        }
+      })
+
+  };
+
+  const cancelDeleteApplication = () => {
+    setDeleteApplicationConfirmation(false);
+  };
 
   const accessProgramHandler = (programNum, isActive) => {
     console.log(`Changing active status of program ${programNum} to ${!isActive}`);
@@ -199,7 +251,7 @@ function Programs(props) {
   }
 
   /**
-     * Send updated user information to backend, refresh the page and close the modal
+     * Send updated program information to backend, refresh the page and close the modal
      */
   const handleSave = () => {
     let updateParams = {};
@@ -219,7 +271,30 @@ function Programs(props) {
           setShowEditProgram(false);
         }
       })
+  }
 
+  /**
+     * Send updated application information to backend, refresh the page and close the modal
+     */
+  const handleSaveApplication = () => {
+    let updateParams = {};
+
+    updateParams["app_num"] = currentAppNum;
+    updateParams["updatedUncomCert"] = currentAppUncomcert;
+    updateParams["updatedCert"] = currentAppCert;
+    updateParams["updatedPurpose"] = currentAppPurpose;
+
+    axios
+      .post("/programs/updateApplicationInfo", updateParams)
+      .then((res) => {
+        if (res.status === 201) {
+          console.log(res.data)
+          setError(res.data);
+        } else {
+          history.go(0);
+          setShowEditProgram(false);
+        }
+      })
   }
 
   /**
@@ -235,18 +310,27 @@ function Programs(props) {
     setShowEditProgram(false);
     setShowCreate(false);
     setShowApply(false);
+    setShowEditApplication(false);
   }
 
-  const programsForUser = allProgramData.map((program) => (
-    <ProgramCard
-      key={program.program_num}
-      isAdmin={props.auth.user.user_type === "Admin"}
-      programData={program}
-      editProgramHandler={() => handleEditProgram(program.program_num)}
-      applyToProgram={() => applyToProgram(program.program_num)}
-      accessProgramHandler={() => accessProgramHandler(program.program_num, program.active)}
-      programDetailsHandler={() => programDetailsHandler(program.program_num)} />
-  ))
+  const programsForUser = allProgramData.map((program) => {
+    const application = userApplications.find(app => app.program_num === program.program_num);
+    const appNum = application ? application.app_num : null;
+
+    return (
+      <ProgramCard
+        key={program.program_num}
+        isAdmin={props.auth.user.user_type === "Admin"}
+        programData={program}
+        applicationNum={appNum}
+        editProgramHandler={() => handleEditProgram(program.program_num)}
+        applyToProgram={() => applyToProgram(program.program_num)}
+        editApplication={() => handleEditApplication(program.program_num)}
+        accessProgramHandler={() => accessProgramHandler(program.program_num, program.active)}
+        programDetailsHandler={() => programDetailsHandler(program.program_num)}
+      />
+    )
+  })
 
   return (
     <div className="Programs">
@@ -641,6 +725,298 @@ function Programs(props) {
           </Button>
           <Button variant="primary" onClick={handleConfirmApplication}>
             Apply
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showEditApplication} onHide={handleClose} size="lg">
+        <Modal.Header closeButton>
+          <Modal.Title>
+            Application to <i>{currentProgramName}</i>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Row>
+            <Col sm={6}>
+              <b>Are you currently enrolled in other uncompleted certifications sponsored by the Cybersecurity Center? </b>
+            </Col>
+            <Col>
+              <Form.Control
+                onChange={(e) => setCurrentAppUncomcert(e.target.value)}
+                required
+                value={currentAppUncomcert}
+                id="appucomcert"
+                as="textarea"
+                isInvalid={error.program_name}
+              />
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={6}>
+              <b>Have you completed any cybersecurity industry certifications via the Cybersecurity Center? </b>
+            </Col>
+            <Col>
+              <Form.Control
+                onChange={(e) => setCurrentAppCert(e.target.value)}
+                required
+                value={currentAppCert}
+                id="appcert"
+                as="textarea"
+                isInvalid={error.program_description}
+              />
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={6}>
+              <b>Purpose Statement: </b>
+            </Col>
+            <Col>
+              <Form.Control
+                onChange={(e) => setCurrentAppPurpose(e.target.value)}
+                required
+                value={currentAppPurpose}
+                id="apppurp"
+                as="textarea"
+                isInvalid={error.program_description}
+              />
+            </Col>
+          </Row>
+          <br></br>
+          <Row>
+            <Col>
+              <b>Uploaded Documents: </b>
+            </Col>
+            <Col>
+              <p>list documents</p>
+            </Col>
+          </Row>
+          <br></br>
+          <Row hidden={numDocuments <= 0}>
+            <Col sm={6}>
+              <b>Enter Document Type: </b>
+            </Col>
+            <Col>
+              <Form.Group>
+                <Form.Control
+                  onChange={(e) => {
+                    setDocType1(e.target.value);
+                  }}
+                  value={doc_type1}
+                  id="fileType"
+                  type="text"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row hidden={numDocuments <= 0}>
+            <Col sm={6}>
+              <b>Enter Link: </b>
+            </Col>
+            <Col>
+              <Form.Group>
+                <Form.Control
+                  onChange={(e) => {
+                    setLink1(e.target.value);
+                  }}
+                  value={link1}
+                  id="fileUpload"
+                  type="text"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <br hidden={numDocuments <= 1}></br>
+
+          <Row hidden={numDocuments <= 1}>
+            <Col sm={6}>
+              <b>Enter Document Type: </b>
+            </Col>
+            <Col>
+              <Form.Group>
+                <Form.Control
+                  onChange={(e) => {
+                    setDocType2(e.target.value);
+                  }}
+                  value={doc_type2}
+                  id="fileType"
+                  type="text"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row hidden={numDocuments <= 1}>
+            <Col sm={6}>
+              <b>Enter Link: </b>
+            </Col>
+            <Col>
+              <Form.Group>
+                <Form.Control
+                  onChange={(e) => {
+                    setLink2(e.target.value);
+                  }}
+                  value={link2}
+                  id="fileUpload"
+                  type="text"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <br hidden={numDocuments <= 2}></br>
+
+          <Row hidden={numDocuments <= 2}>
+            <Col sm={6}>
+              <b>Enter Document Type: </b>
+            </Col>
+            <Col>
+              <Form.Group>
+                <Form.Control
+                  onChange={(e) => {
+                    setDocType3(e.target.value);
+                  }}
+                  value={doc_type3}
+                  id="fileType"
+                  type="text"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row hidden={numDocuments <= 2}>
+            <Col sm={6}>
+              <b>Enter Link: </b>
+            </Col>
+            <Col>
+              <Form.Group>
+                <Form.Control
+                  onChange={(e) => {
+                    setLink3(e.target.value);
+                  }}
+                  value={link3}
+                  id="fileUpload"
+                  type="text"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <br hidden={numDocuments <= 3}></br>
+
+          <Row hidden={numDocuments <= 3}>
+            <Col sm={6}>
+              <b>Enter Document Type: </b>
+            </Col>
+            <Col>
+              <Form.Group>
+                <Form.Control
+                  onChange={(e) => {
+                    setDocType4(e.target.value);
+                  }}
+                  value={doc_type4}
+                  id="fileType"
+                  type="text"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row hidden={numDocuments <= 3}>
+            <Col sm={6}>
+              <b>Enter Link: </b>
+            </Col>
+            <Col>
+              <Form.Group>
+                <Form.Control
+                  onChange={(e) => {
+                    setLink4(e.target.value);
+                  }}
+                  value={link4}
+                  id="fileUpload"
+                  type="text"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <br hidden={numDocuments <= 4}></br>
+
+          <Row hidden={numDocuments <= 4}>
+            <Col sm={6}>
+              <b>Enter Document Type: </b>
+            </Col>
+            <Col>
+              <Form.Group>
+                <Form.Control
+                  onChange={(e) => {
+                    setDocType5(e.target.value);
+                  }}
+                  value={doc_type5}
+                  id="fileType"
+                  type="text"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row hidden={numDocuments <= 4}>
+            <Col sm={6}>
+              <b>Enter Link: </b>
+            </Col>
+            <Col>
+              <Form.Group>
+                <Form.Control
+                  onChange={(e) => {
+                    setLink5(e.target.value);
+                  }}
+                  value={link5}
+                  id="fileUpload"
+                  type="text"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row hidden={numDocuments <= 4}>
+            <b>Can not add any more documents</b>
+          </Row>
+
+          <Row>
+            <Col>
+              <Button hidden={numDocuments > 4} variant="success" onClick={() => setNumDocuments(numDocuments + 1)}>
+                Add New Document
+              </Button>
+            </Col>
+          </Row>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="danger" onClick={handleDeleteApplication}>
+            Delete
+          </Button>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handleSaveApplication}>
+            Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={deleteApplicationConfirmation} onHide={cancelDeleteApplication}>
+        <Modal.Header closeButton>
+          <Modal.Title>Delete Application</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete this Application? This action CANNOT be undone!
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={cancelDeleteApplication}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={confirmDeleteApplication}>
+            Delete
           </Button>
         </Modal.Footer>
       </Modal>

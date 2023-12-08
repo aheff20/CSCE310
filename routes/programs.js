@@ -106,6 +106,26 @@ router.get("/getProgramEvents", async (req, res) => {
     })
 })
 
+/** Get Program User Aplication route created and implemented by:
+ *    Lucas Wilber
+ * 
+ *    SQL:
+ *      * Select 
+ */
+router.get("/getAllUserApplications", async (req, res) => {
+    const uin = req.query.uin;
+    //console.log(`getting users for ${programNum}`)
+
+    pool.query(`SELECT * FROM applications WHERE uin=${uin}`, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.status(400).json({ message: "Error getting program user applications!" })
+        }
+        //console.log(result);
+        res.status(200).json(result.rows)
+    })
+})
+
 /** Get Uploaded Documents route created and implemented by:
  *  Billy Harkins
  *  
@@ -216,6 +236,49 @@ router.post("/createApplication", async (req, res) => {
             res.status(400).json({ message: "Error creating application!" });
         }
         res.status(200).json({ message: "Success!" });
+    })
+});
+
+/** Update Application route created and implemented by:
+ *    Lucas Wilber
+ * 
+ *    SQL:
+ *      * Update 
+ */
+router.post("/updateApplicationInfo", async (req, res) => {
+    const appData = {};
+
+    appData.app_num = req.body.app_num;
+    appData.uncom_cert = req.body.updatedUncomCert;
+    appData.com_cert = req.body.updatedCert;
+    appData.purpose_statement = req.body.updatedPurpose;
+
+    pool.query(`UPDATE applications SET uncom_cert='${appData.uncom_cert}', com_cert='${appData.com_cert}', purpose_statement='${appData.purpose_statement}' WHERE app_num=${appData.app_num}`, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.status(400).json({ message: "Error updating application!" })
+        }
+        const payload = {
+            app_num: appData.app_num,
+            uncom_cert: appData.uncom_cert,
+            com_cert: appData.com_cert,
+            purpose_statement: appData.purpose_statement,
+        };
+
+        // Sign token
+        jwt.sign(
+            payload,
+            keys.secretOrKey,
+            {
+                expiresIn: 604800, // 7 days in seconds
+            },
+            (err, token) => {
+                res.status(200).json({
+                    success: true,
+                    token: "Bearer " + token,
+                });
+            }
+        );
     })
 });
 
