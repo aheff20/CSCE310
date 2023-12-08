@@ -80,6 +80,97 @@ router.get("/getProgramUsers", async (req, res) => {
     })
 })
 
+/** Get Uploaded Documents route created and implemented by:
+ *  Billy Harkins
+ *  
+ *  SQL: SELECT
+ */
+router.get("/getUploadedDocuments", async(req, res) => {
+    const app_num = req.query.app_num;
+
+    pool.query(`SELECT * FROM documentation WHERE app_num = ${app_num}`, (err, result) => {
+        if(err){
+            console.log(err);
+            res.status(400).json("Error getting all uploaded document information")
+        }
+        res.status(200).json(result.rows);
+    })
+    
+});
+
+/** Create Document route created and implemented by:
+ *  Billy Harkins
+ *  
+ *  SQL: INSERT
+ */
+router.post("/createDocument", async(req, res) => {
+    const app_num = req.body.app_num;
+    const link = req.body.link;
+    const doc_type = req.body.doc_type;
+
+    pool.query(`INSERT INTO documentation(app_num, link, doc_type) VALUES(${app_num}, '${link}', '${doc_type}')`, (err, result) => {
+        if(err){
+            console.log(err);
+            res.status(400).json({message: "Error creating document!"});
+        }
+        res.status(200).json({message: "Success!"});
+    })
+});
+
+/** Update Document route created and implemented by:
+ *  Billy Harkins
+ *  
+ *  SQL: UPDATE
+ */
+router.post("/updateDocument", async(req, res) => {
+    const doc_num = req.body.doc_num;
+    const app_num = req.body.app_num;
+    const link = req.body.link;
+    const doc_type = req.body.doc_type;
+
+    pool.query(`UPDATE documentation SET app_num = ${app_num}, link = '${link}', doc_type = '${doc_type}' WHERE doc_num = ${doc_num}`, (err, result) => {
+        if(err){
+            console.log(err);
+            res.status(400).json({message: "Error editing document!"});
+        }
+        res.status(200).json({message: "Success!"});
+    })
+});
+
+/** Delete Document route created and implemented by:
+ *  Billy Harkins
+ *  
+ *  SQL: DELETE
+ */
+router.post("/deleteDocument", async(req, res) => {
+    const doc_num = req.body.doc_num;
+
+    pool.query(`DELETE FROM documentation WHERE doc_num = ${doc_num}`, (err, result) => {
+        if(err){
+            console.log(err);
+            res.status(400).json({message: "Error deleting document!"});
+        }
+        res.status(200).json({message: "Success!"});
+    })
+});
+
+/** Delete Applications With Document route created and implemented by:
+ *  Billy Harkins
+ *  
+ *  SQL: DELETE
+ */
+router.post("/deleteApplicationsWithDocument", async(req, res) => {
+    const app_num = req.body.app_num;
+
+    pool.query(`DELETE FROM applications WHERE app_num = ${app_num}`, (err, result) => {
+        if(err){
+            console.log(err);
+            res.status(400).json({message: "Error deleting applications with document!"});
+        }
+        res.status(200).json({message: "Success!"});
+    })
+});
+
 /** Create Program route created and implemented by:
  *    Lucas Wilber
  * 

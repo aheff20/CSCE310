@@ -24,6 +24,22 @@ function Programs(props) {
   const [showApply, setShowApply] = useState(false);
   const [error, setError] = useState({});
 
+  const [numDocuments, setNumDocuments] = useState(1);
+  const [link1, setLink1] = useState("");
+  const [doc_type1, setDocType1] = useState("");
+
+  const [link2, setLink2] = useState("");
+  const [doc_type2, setDocType2] = useState("");
+
+  const [link3, setLink3] = useState("");
+  const [doc_type3, setDocType3] = useState("");
+
+  const [link4, setLink4] = useState("");
+  const [doc_type4, setDocType4] = useState("");
+
+  const [link5, setLink5] = useState("");
+  const [doc_type5, setDocType5] = useState("");
+
 
   useEffect(() => {
     axios
@@ -375,9 +391,198 @@ function Programs(props) {
               />
             </Col>
           </Row>
+          <br></br>
           <Row>
+          <b>Document Upload: </b>
+          </Row>
+          <br></br>
+          <Row hidden={numDocuments <= 0}>
             <Col sm={6}>
-              <b>Documents: </b>
+              <b>Enter Document Type: </b>
+            </Col>
+            <Col>
+              <Form.Group>
+                <Form.Control
+                    onChange={(e) => {
+                      setDocType1(e.target.value);}}
+                    value={doc_type1}
+                    id="fileType"
+                    type="text"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row hidden={numDocuments <= 0}>
+            <Col sm={6}>
+              <b>Enter Link: </b>
+            </Col>
+            <Col>
+              <Form.Group>
+                <Form.Control
+                    onChange={(e) => {
+                      setLink1(e.target.value);}}
+                    value={link1}
+                    id="fileUpload"
+                    type="text"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <br hidden={numDocuments <= 1}></br>
+
+          <Row hidden={numDocuments <= 1}>
+            <Col sm={6}>
+              <b>Enter Document Type: </b>
+            </Col>
+            <Col>
+              <Form.Group>
+                <Form.Control
+                    onChange={(e) => {
+                      setDocType2(e.target.value);}}
+                    value={doc_type2}
+                    id="fileType"
+                    type="text"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row hidden={numDocuments <= 1}>
+            <Col sm={6}>
+              <b>Enter Link: </b>
+            </Col>
+            <Col>
+              <Form.Group>
+                <Form.Control
+                    onChange={(e) => {
+                      setLink2(e.target.value);}}
+                    value={link2}
+                    id="fileUpload"
+                    type="text"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <br hidden={numDocuments <= 2}></br>
+
+          <Row hidden={numDocuments <= 2}>
+            <Col sm={6}>
+              <b>Enter Document Type: </b>
+            </Col>
+            <Col>
+              <Form.Group>
+                <Form.Control
+                    onChange={(e) => {
+                      setDocType3(e.target.value);}}
+                    value={doc_type3}
+                    id="fileType"
+                    type="text"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row hidden={numDocuments <= 2}>
+            <Col sm={6}>
+              <b>Enter Link: </b>
+            </Col>
+            <Col>
+              <Form.Group>
+                <Form.Control
+                    onChange={(e) => {
+                      setLink3(e.target.value);}}
+                    value={link3}
+                    id="fileUpload"
+                    type="text"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <br hidden={numDocuments <= 3}></br>
+
+          <Row hidden={numDocuments <= 3}>
+            <Col sm={6}>
+              <b>Enter Document Type: </b>
+            </Col>
+            <Col>
+              <Form.Group>
+                <Form.Control
+                    onChange={(e) => {
+                      setDocType4(e.target.value);}}
+                    value={doc_type4}
+                    id="fileType"
+                    type="text"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row hidden={numDocuments <= 3}>
+            <Col sm={6}>
+              <b>Enter Link: </b>
+            </Col>
+            <Col>
+              <Form.Group>
+                <Form.Control
+                    onChange={(e) => {
+                      setLink4(e.target.value);}}
+                    value={link4}
+                    id="fileUpload"
+                    type="text"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <br hidden={numDocuments <= 4}></br>
+          
+          <Row hidden={numDocuments <= 4}>
+            <Col sm={6}>
+              <b>Enter Document Type: </b>
+            </Col>
+            <Col>
+              <Form.Group>
+                <Form.Control
+                    onChange={(e) => {
+                      setDocType5(e.target.value);}}
+                    value={doc_type5}
+                    id="fileType"
+                    type="text"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row hidden={numDocuments <= 4}>
+            <Col sm={6}>
+              <b>Enter Link: </b>
+            </Col>
+            <Col>
+              <Form.Group>
+                <Form.Control
+                    onChange={(e) => {
+                      setLink5(e.target.value);}}
+                    value={link5}
+                    id="fileUpload"
+                    type="text"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row hidden={numDocuments <= 4}>
+            <b>Can not add any more documents</b>
+          </Row>
+
+          <Row>
+            <Col>
+              <Button hidden={numDocuments > 4} variant="success" onClick={() => setNumDocuments(numDocuments + 1)}>
+                Add New Document
+              </Button>
             </Col>
           </Row>
         </Modal.Body>
