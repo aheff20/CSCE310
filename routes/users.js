@@ -203,32 +203,19 @@ router.get("/getAllUserData", async (req, res) => {
  *      * Select 
  * 
  *    This route is used by both admins and students to view their account info
+ *    Uses the "combined_users" view to speed up data retrieval for both users and college_student
  */
 router.get("/getUserData", async(req, res) => {
   const uin = req.query.uin;
 
-  pool.query(`SELECT * FROM college_student WHERE uin=${uin}`, (err, result) => {
+  pool.query(`SELECT * FROM combined_users WHERE uin=${uin}`, (err, result) => {
     if(err) {
       console.log(err);
       res.status(400).json({message: "Error getting user data!"});
     }
 
-    if(result.rows.length == 0) {
-      pool.query(`SELECT * FROM users WHERE uin=${uin}`, (err, result) => {
-        if(err) {
-          console.log(err);
-          res.status(400).json({message: "Error getting user data!"});
-        }
-        res.status(200).json(result.rows[0])
-      })
-    } else {
-      res.status(200).json(result.rows[0])
-    }
-      
-    
+    res.status(200).json(result.rows[0]);
   })
-  
-
 });
 
 /** Update User route created and implemented by:
@@ -238,6 +225,8 @@ router.get("/getUserData", async(req, res) => {
  *      * Update 
  * 
  *    This route is used by both admins and students to update their account
+ * 
+ *    Uses an Index in users table on the 'username' column to speed up search for a unique attribute
  */
 router.post("/updateUserInfo", async(req, res) => {
   const userData = {}

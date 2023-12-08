@@ -30,6 +30,11 @@ CREATE TABLE college_student(
     phone VARCHAR
 ) INHERITS(users);
 
+CREATE INDEX username_idx ON users(username);
+
+CREATE VIEW combined_users AS SELECT p.*, c.gender, c.hispanic_latino, c.race, c.citizen, c.first_gen, c.dob, c.gpa, c.major, c.minor_1, c.minor_2, c.expected_graduation, c.school,
+ c.classification, c.student_type, c.phone FROM users p LEFT JOIN college_student c ON p.uin = c.uin;
+
 CREATE TABLE classes(
     class_id INT,
     class_name VARCHAR,

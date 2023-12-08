@@ -360,53 +360,60 @@ function Profile(props) {
                     </Col>
                 </Row>
 
-                <hr></hr>
-                <Modal.Title>
-                    Change Password
-                </Modal.Title>
-                <br></br>
+                
 
-                <Row>
-                    <Col sm={4}>
-                        <b>New Password:</b>
-                    </Col>
-                    <Col>
-                    <Form.Group>
-                        <Form.Control
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        value={password}
-                        id="password"
-                        isInvalid={error.registerPassword}
-                        type="password"
-                        />
-                        <Form.Control.Feedback type="invalid">
-                            {error.registerPassword}
-                        </Form.Control.Feedback>
-                    </Form.Group>
-                    </Col>
-                </Row>
+                {!showStudentInfo &&
+                    <React.Fragment>
+                        <hr></hr>
+                        <Modal.Title>
+                            Change Password
+                        </Modal.Title>
+                        <br></br>
+                        <Row>
+                            <Col sm={4}>
+                                <b>New Password:</b>
+                            </Col>
+                            <Col>
+                            <Form.Group>
+                                <Form.Control
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                                value={password}
+                                id="password"
+                                isInvalid={error.registerPassword}
+                                type="password"
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    {error.registerPassword}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            </Col>
+                        </Row>
 
-                <Row>
-                    <Col sm={4}>
-                        <b>Confirm Password:</b>
-                    </Col>
-                    <Col>
-                    <Form.Group>
-                        <Form.Control
-                        onChange={(e) => setPassword2(e.target.value)}
-                        required
-                        value={password2}
-                        id="password2"
-                        isInvalid={error.registerPassword2}
-                        type="password"
-                        />
-                        <Form.Control.Feedback type="invalid">
-                            {error.registerPassword2}
-                        </Form.Control.Feedback>
-                    </Form.Group>
-                    </Col>
-                </Row>
+                        <Row>
+                            <Col sm={4}>
+                                <b>Confirm Password:</b>
+                            </Col>
+                            <Col>
+                            <Form.Group>
+                                <Form.Control
+                                onChange={(e) => setPassword2(e.target.value)}
+                                required
+                                value={password2}
+                                id="password2"
+                                isInvalid={error.registerPassword2}
+                                type="password"
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    {error.registerPassword2}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            </Col>
+                        </Row>
+                    </React.Fragment>
+                
+                }
+                
 
                 {showStudentInfo && 
                     <React.Fragment>
