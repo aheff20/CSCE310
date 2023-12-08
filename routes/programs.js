@@ -174,18 +174,41 @@ router.post("/updateProgramActiveStatus", async (req, res) => {
  *    SQL:
  *      * Delete 
  */
-// router.post("/deleteProgram", async (req, res) => {
-//     const program_num = req.body.program_num;
+router.post("/deleteProgram", async (req, res) => {
+    const program_num = req.body.program_num;
+    //console.log("deleting program "+program_num);
+    pool.query(`DELETE FROM programs WHERE program_num=${program_num}`, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.status(400).json({ message: "Error deleting Program!" })
+        }
+        res.status(200).json({ message: "Success!" })
+    })
+});
 
-//     pool.query(`DELETE FROM programs WHERE program_num=${program_num}`, (err, result) => {
-//         if (err) {
-//             console.log(err);
-//             res.status(400).json({ message: "Error deleting Program!" })
-//         }
-//         res.status(200).json({ message: "Success!" })
-//     })
+router.post("/deleteProgramTrack", async(req, res) => {
+    const program_num = req.body.program_num;
+    
+    pool.query(`DELETE FROM track WHERE program_num = ${program_num}`, (err, result) => {
+        if(err){
+            console.log(err);
+            res.status(400).json({message: "Error deleting event from track table!"});
+        }
+        res.status(200).json({message: "Success!"});
+    })
+})
 
-// });
+router.post("/deleteProgramApplications", async(req, res) => {
+    const program_num = req.body.program_num;
+    
+    pool.query(`DELETE FROM applications WHERE program_num = ${program_num}`, (err, result) => {
+        if(err){
+            console.log(err);
+            res.status(400).json({message: "Error deleting event from track table!"});
+        }
+        res.status(200).json({message: "Success!"});
+    })
+})
 
 const validateProgramInfo = (programData) => {
     if (programData.program_name == "") {

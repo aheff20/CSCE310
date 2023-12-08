@@ -19,6 +19,7 @@ function ProgramDetails(props) {
   const [showProgram, setShowProgram] = useState(false);
   const [programName, setProgramName] = useState("");
   const [programDesc, setProgramDesc] = useState("");
+  const [programActive, setProgramActive] = useState(false);
 
   // account modal information (for admin view)
   const [showAccount, setShowAccount] = useState(false);
@@ -68,6 +69,7 @@ function ProgramDetails(props) {
             setProgramInfo(res.data);
             setProgramName(res.data.program_name);
             setProgramDesc(res.data.program_description);
+            setProgramActive(res.data.active);
             // get additional info only if admin
             if (props.auth.user.user_type == "Admin") {
               //console.log("getting users?")
@@ -80,8 +82,9 @@ function ProgramDetails(props) {
                 .then((res) => {
                     //console.log(res)
                     setAllUserData(res.data);
-                    getMetricData(res.data);
+                    setStudentCount(res.data.length);
                     setLoading(false);
+                    getMetricData(res.data);
                 })
             }
             else setLoading(false);
@@ -90,24 +93,26 @@ function ProgramDetails(props) {
 
   const getMetricData = (userData) => {
     let sc = userData.length;
-    let rc = {};
-    let hc = 0;
-    let mc = {};
-    for(let k = 0; k < sc; k++) {
-      if (userData[k].hispanic_latino) hc++;
-      let race = userData[k].race;
-      let major = userData[k].major;
-      if (race in rc) rc[race]++; else rc[race] = 1;
-      if (major in mc) mc[major]++; else mc[major] = 1;
-    }
-    //console.log("results");
-    //console.log(rc);
-    //console.log(mc);
+    if (sc) {
+      let rc = {};
+      let hc = 0;
+      let mc = {};
+      for(let k = 0; k < sc; k++) {
+        if (userData[k].hispanic_latino) hc++;
+        let race = userData[k].race;
+        let major = userData[k].major;
+        if (race in rc) rc[race]++; else rc[race] = 1;
+        if (major in mc) mc[major]++; else mc[major] = 1;
+      }
+      //console.log("results");
+      //console.log(rc);
+      //console.log(mc);
 
-    setStudentCount(sc);
-    setRaceCounts(rc);
-    setHispLatCounts(hc);
-    setmajorCounts(mc);
+      setStudentCount(sc);
+      setRaceCounts(rc);
+      setHispLatCounts(hc);
+      setmajorCounts(mc);
+    }
   }
 
   const toPerc = (val, tot) => {
@@ -206,14 +211,47 @@ function ProgramDetails(props) {
   const saveProgramHandler = () => {
     // update program
     console.log("save/update program handler");
+    const updateParams = {};
+    updateParams["programNum"] = programNum;
+    updateParams["updatedName"] = programName;
+    updateParams["updatedDesc"] = programDesc;
+    //console.log(updateParams);
+
+    axios
+      .post("/programs/updateProgramInfo", updateParams)
+      .then((res) => {
+        if (res.status === 201) {
+          console.log(res.data)
+          setError(res.data);
+        } else {
+          setShowProgram(false);
+          setLoading(true);
+          history.go(0);
+        }
+      })
   }
 
-  const deactivateProgramHandler = () => {
-    let confirm = window.confirm(`Are you sure you want to deactivate ${programInfo.program_name}?`);
+  const accessProgramHandler = () => {
+    let confirm = window.confirm(`Are you sure you want to ${programActive ? "close" : "open"} ${programInfo.program_name}?`);
     if (!confirm) {
       return;
     }
-    console.log("deactivate program handler");
+
+    const updateParams = {};
+    updateParams["program_num"] = programNum;
+    updateParams["active"] = !programActive;
+
+    axios
+      .post("/programs/updateProgramActiveStatus", { program: updateParams })
+      .then((res) => {
+        if (res.status === 201) {
+          console.log(res.data)
+          setError(res.data);
+        } else {
+          setLoading(true);
+          history.go(0);
+        }
+      })
   }
 
   const deactivateAccounthandler = () => {
@@ -229,7 +267,40 @@ function ProgramDetails(props) {
     if (!confirm) {
       return;
     }
+
+    // track, then applications, (then maybe events and cert_enrollments, add later), then the program itself
     console.log("delete program handler");
+    axios
+      .post("/programs/deleteProgramTrack", { program_num: programNum })
+      .then((res) => {
+        if (res.status === 201) {
+          console.log(res.data);
+          setError(res.data);
+          return;
+        }
+
+    axios
+      .post("/programs/deleteProgramApplications", { program_num: programNum })
+      .then((res) => {
+        if (res.status === 201) {
+          console.log(res.data);
+          setError(res.data);
+          return;
+        }
+
+    axios
+      .post("/programs/deleteProgram", { program_num: programNum })
+      .then((res) => {
+        if (res.status === 201) {
+          console.log(res.data);
+          setError(res.data);
+        } else {
+          history.push("/programs/");
+          setLoading(true);
+        }
+      });
+      });
+      });
   }
 
   const deleteAccounthandler = () => {
@@ -546,7 +617,9 @@ function ProgramDetails(props) {
               <Button variant="primary" onClick={() => editProgramHandler()}>Edit Program</Button>
             </div>
             <div className="col d-flex justify-content-center align-items-center">
-              <Button variant="warning" onClick={() => deactivateProgramHandler()}>Deactivate Program</Button>
+              <Button variant="warning" onClick={() => accessProgramHandler()}>
+                {programActive ? "Close Program" : "Reopen Program"}
+              </Button>
               <Button variant="danger" onClick={() => deleteProgramHandler()}>Delete Program</Button>
             </div>
             <br/>
@@ -556,20 +629,24 @@ function ProgramDetails(props) {
                 // Each row in the table should be able to view more details in a modal to see more details/edit students
                 <React.Fragment>
                   <p>Number of Enrolled Students: {studentCount}</p>
-                  <br/>
-                  <p>Hispanic/Latino Students: {hisplatCounts}</p>
-                  <p>Races:</p>
-                  <ul>
-                  {Object.keys(raceCounts).map((race) => (
-                    <li>{race}: {raceCounts[race]} {toPerc(raceCounts[race],studentCount)}</li>
-                  ))}
-                  </ul>
-                  <p>Majors:</p>
-                  <ul>
-                  {Object.keys(majorCounts).map((major) => (
-                    <li>{major}: {majorCounts[major]} {toPerc(majorCounts[major],studentCount)}</li>
-                  ))}
-                  </ul>
+                  {studentCount ? (
+                    <React.Fragment>
+                      <br/>
+                      <p>Hispanic/Latino Students: {hisplatCounts}</p>
+                      <p>Races:</p>
+                      <ul>
+                      {Object.keys(raceCounts).map((race) => (
+                        <li>{race}: {raceCounts[race]} {toPerc(raceCounts[race],studentCount)}</li>
+                      ))}
+                      </ul>
+                      <p>Majors:</p>
+                      <ul>
+                      {Object.keys(majorCounts).map((major) => (
+                        <li>{major}: {majorCounts[major]} {toPerc(majorCounts[major],studentCount)}</li>
+                      ))}
+                      </ul>
+                    </React.Fragment>
+                  ) : <></>}
                   <div className="Admin Table">
                       <h2 className="display-5 text-center">Enrolled Students</h2>
                           <Table striped bordered hover className="text-center">

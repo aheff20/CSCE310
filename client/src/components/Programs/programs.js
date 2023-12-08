@@ -109,19 +109,41 @@ function Programs(props) {
   };
 
   const confirmDelete = () => {
+    // track, then applications, (then maybe events and cert_enrollments, add later), then the program itself
+
     console.log(`Deleting program ${currentProgramNum}`);
+    axios
+      .post("/programs/deleteProgramTrack", { program_num: currentProgramNum })
+      .then((res) => {
+        if (res.status === 201) {
+          console.log(res.data);
+          setError(res.data);
+          return;
+        }
+
+    axios
+      .post("/programs/deleteProgramApplications", { program_num: currentProgramNum })
+      .then((res) => {
+        if (res.status === 201) {
+          console.log(res.data);
+          setError(res.data);
+          return;
+        }
+
     axios
       .post("/programs/deleteProgram", { program_num: currentProgramNum })
       .then((res) => {
         if (res.status === 201) {
-          console.log(res.data)
+          console.log(res.data);
           setError(res.data);
         } else {
           history.go(0);
           handleClose();
           setDeleteConfirmation(false);
         }
-      })
+      });
+      });
+      });
   };
 
   const cancelDelete = () => {
