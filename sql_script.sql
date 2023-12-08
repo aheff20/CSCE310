@@ -123,7 +123,8 @@ CREATE TABLE cert_enrollment(
             FOREIGN KEY(program_num)
                 REFERENCES programs(program_num)
 );
-CREATE VIEW user_classes AS SELECT U.uin, C.* FROM users U JOIN cert_enrollment UC ON U.uin = UC.uin JOIN certification C on C.cert_id = UC.cert_id;
+CREATE VIEW user_certifications AS SELECT U.uin, C.* FROM users U JOIN cert_enrollment UC ON U.uin = UC.uin JOIN certification C on C.cert_id = UC.cert_id;
+CREATE VIEW program_certifications AS SELECT P.program_num, C.* FROM programs P JOIN cert_enrollment PC ON P.program_num = PC.program_num JOIN certification C on C.cert_id = PC.cert_id;
 
 CREATE TABLE event(
     event_id SERIAL,
