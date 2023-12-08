@@ -1,3 +1,9 @@
+/**
+View created and implemented by:
+    Billy Harkins
+
+*/
+
 import { useState, useEffect } from "react";
 import { useHistory, Link, useParams } from "react-router-dom";
 import PropTypes from "prop-types";
@@ -7,6 +13,14 @@ import classnames from "classnames";
 import axios from "axios";
 import React from "react";
 
+/**
+    Event Details Page:
+      * Each page is associated with one specific event.
+      * Admins can edit this page's event.
+      * Admins can delete this page's event.
+      * Admins can view which students and how many students are signed up for this page's event.
+      * Admins can edit the attendance of this page's event by removing students who have signed up.
+*/
 function EventDetails(props) {
     const history = useHistory();
     const [loading, setLoading] = useState(true);
@@ -27,6 +41,9 @@ function EventDetails(props) {
   
     const event_id = useParams().event_id;
 
+    /**
+      Grab information on this page's event, its attending users, and all programs to ensure the page is correctly populated
+    */
     useEffect(() => {
         Promise.all([
             axios.get("/events/getEventInfo", {
@@ -64,6 +81,12 @@ function EventDetails(props) {
         });
     }, []);
 
+    /**
+      Removes a given user from the bridge table in the database, 
+      effectively making it so that they are not signed up for this page's event.
+      
+      Refreshes page when action is complete.
+    */
     const removeUserFromEvent = (uin) => {
       axios.post("/events/deleteUserFromEvent", {
         uin: uin,
@@ -74,6 +97,9 @@ function EventDetails(props) {
       })
     }
 
+    /**
+      Dynamically creates the body of the table that shows all students that are signed up for this page's event
+    */
     const getTable = () => {
         const list = [];
         if(!attendingUsers[0]){
@@ -99,14 +125,23 @@ function EventDetails(props) {
         return list;
     }
 
+    /**
+      Makes the event editing modal visible
+    */
     const showEdit = () => {
       setShowEditEvent(true);
     }
 
+    /**
+      Makes the event editing modal invisible
+    */
     const closeEdit = () => {
       setShowEditEvent(false);
     }
 
+    /**
+      Edits the information associated with this page's event in the database. Refreshes page when action is complete.
+    */
     const editEventHandler = () => {
       axios
     .post("/events/updateEvent", {
@@ -125,6 +160,10 @@ function EventDetails(props) {
     })
     }
 
+    /**
+      Confirms with the user whether or not they want to delete this page's event.
+      If user confirms, deletes event from database and returns to Events Page.
+    */
     const deleteEventHandler = () => {
       let confirm = window.confirm("Are you sure you want to remove " + eventData.event_name + "? This action CANNOT be undone.");
       if(!confirm) {
@@ -140,6 +179,10 @@ function EventDetails(props) {
       })
     }
 
+  /**
+    Queries the database and sets the programName constant to 
+    the name of the program that the page's event is associated with 
+  */
   const findProgramName = (program_num) => {
       axios
       .get("/programs/getProgramInfo", {
@@ -152,10 +195,17 @@ function EventDetails(props) {
       })
   }
   
+  /**
+    Creates a list of option components using the previously queried program information from the database.
+    This is used to populate a dropdown menu that allows admins to edit which program the page's event is associated with.
+  */
    const programOptions = allProgramData.map((program) => (
     <option value={program.program_num}>{program.program_name}</option>
   ))
-
+  
+    /**
+      React html code to return for the page view. The modal is shown whenever showEditEvent is set to true. 
+    */
     return (
       <div className="Events">
         <Container>

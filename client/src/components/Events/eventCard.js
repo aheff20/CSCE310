@@ -1,13 +1,29 @@
+/**
+Component created and implemented by:
+    Billy Harkins
+
+*/
+
 import React, { useState } from 'react';
 import { Button, Card } from "react-bootstrap";
 import axios from "axios";
 
+/**
+    Event Card:
+        * Displays once for each event in the database
+        * Allows admins to travel to event details page by pressing a button
+        * Allows users to sign up for an event, given that they haven't signed up already
+        * Allows all users to view general information about the card's event
+*/
 const EventCard = (props) => {
     const {isAdmin, userUIN, eventData, eventDetailsHandler} = props;
 
     const [signedUp, setSignedUp] = useState(false);
     const [programName, setProgramName] = useState("");
 
+    /**
+        Adds a student to the card's event in the database, refreshes page when completed
+    */
     const handleAddStudent = () => {
         axios
         .post("/events/addStudent", {
@@ -19,6 +35,10 @@ const EventCard = (props) => {
         })
     }
 
+    /**
+        Sets the signedUp constant to true or false depending on whether or not 
+        the logged in student is signed up for the card's event
+    */
     const eventSignedUp = (eventData) => {
         axios
         .get("/events/getSignedUpEvent", {
@@ -36,6 +56,10 @@ const EventCard = (props) => {
         })
       }
       
+    /**
+        Queries the database and sets the programName constant to 
+        the name of the program that the card's event is associated with 
+    */
       const findProgramName = (program_num) => {
         axios
         .get("/programs/getProgramInfo", {
@@ -48,12 +72,22 @@ const EventCard = (props) => {
         })
     }
 
+    /**
+        If the current user is a student, checks if the student is signed up for the card's event
+    */
       if(isAdmin == false){
         eventSignedUp(eventData);
       }
 
+    /**
+        Gets the current name of the program associated with the card's event
+    */
       findProgramName(eventData.program_num);
 
+
+    /**
+        React html code to return for the Card component.
+    */
     return(
         <div className='event-card'>
             <Card

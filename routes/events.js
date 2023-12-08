@@ -7,6 +7,11 @@ const bcrypt = require("bcryptjs");
 const { pool } = require("../dbInstance");
 // import {pool} from "../dbInstance";
 
+/** Get All Event Data route created and implemented by:
+ *  Billy Harkins
+ *  
+ *  SQL: SELECT
+ */
 router.get("/getAllEventData", async(req, res) => {
 
     pool.query("SELECT * FROM event", (err, result) => {
@@ -19,6 +24,11 @@ router.get("/getAllEventData", async(req, res) => {
     
 });
 
+/** Get Event Info route created and implemented by:
+ *  Billy Harkins
+ *  
+ *  SQL: SELECT
+ */
 router.get("/getEventInfo", async(req, res) => {
     const event_id = req.query.event_id;
 
@@ -31,10 +41,14 @@ router.get("/getEventInfo", async(req, res) => {
     })
 });
 
+/** Get Attending Users route created and implemented by:
+ *  Billy Harkins
+ *  
+ *  SQL: SELECT
+ */
 router.get("/getAttendingUsers", async(req, res) => {
     const event_id = req.query.event_id;
 
-    // SELECT U.* FROM event E JOIN event_tracking ET ON E.event_id = ET.event_ID JOIN users U on ET.uin = U.uin WHERE E.event_id = 1;
     pool.query(`SELECT U.* FROM event E JOIN event_tracking ET ON E.event_id = ET.event_ID JOIN users U on ET.uin = U.uin WHERE E.event_id = ${event_id}`, (err, result) => {
         if(err){
             console.log(err);
@@ -44,6 +58,11 @@ router.get("/getAttendingUsers", async(req, res) => {
     })
 });
 
+/** Get Signed Up Event route created and implemented by:
+ *  Billy Harkins
+ *  
+ *  SQL: SELECT
+ */
 router.get("/getSignedUpEvent", async(req, res) => {
     const event_id = req.query.event_id;
     const uin = req.query.uin;
@@ -57,6 +76,11 @@ router.get("/getSignedUpEvent", async(req, res) => {
     })
 });
 
+/** Create Event route created and implemented by:
+ *  Billy Harkins
+ *  
+ *  SQL: INSERT
+ */
 router.post("/createEvent", async(req, res) => {
     const uin = req.body.uin;
     const program_num = req.body.program_num;
@@ -76,6 +100,11 @@ router.post("/createEvent", async(req, res) => {
     })
 });
 
+/** Update Event route created and implemented by:
+ *  Billy Harkins
+ *  
+ *  SQL: UPDATE
+ */
 router.post("/updateEvent", async(req, res) => {
     const program_num = req.body.program_num;
     const startDate = req.body.startDate;
@@ -95,6 +124,11 @@ router.post("/updateEvent", async(req, res) => {
     })
 });
 
+/** Delete Event route created and implemented by:
+ *  Billy Harkins
+ *  
+ *  SQL: DELETE
+ */
 router.post("/deleteEvent", async(req, res) => {
     const eventID = req.body.event_id;
 
@@ -107,6 +141,11 @@ router.post("/deleteEvent", async(req, res) => {
     })
 });
 
+/** Delete Event Bridge route created and implemented by:
+ *  Billy Harkins
+ *  
+ *  SQL: DELETE
+ */
 router.post("/deleteEventBridge", async(req, res) => {
     const eventID = req.body.event_id;
     
@@ -119,6 +158,11 @@ router.post("/deleteEventBridge", async(req, res) => {
     })
 })
 
+/** Delete User From Event route created and implemented by:
+ *  Billy Harkins
+ *  
+ *  SQL: DELETE
+ */
 router.post("/deleteUserFromEvent", async(req, res) =>{
     const event_id = req.body.event_id;
     const uin = req.body.uin;
@@ -132,6 +176,11 @@ router.post("/deleteUserFromEvent", async(req, res) =>{
     })
 })
 
+/** Add Student route created and implemented by:
+ *  Billy Harkins
+ *  
+ *  SQL: INSERT
+ */
 router.post("/addStudent", async(req, res) => {
     const uin = req.body.uin;
     const eventID = req.body.event_id;

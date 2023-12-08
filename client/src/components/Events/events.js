@@ -1,3 +1,9 @@
+/**
+View created and implemented by:
+    Billy Harkins
+
+*/
+
 import { useState, useEffect } from "react";
 import { useHistory, Link, useParams } from "react-router-dom";
 import PropTypes from "prop-types";
@@ -8,6 +14,12 @@ import axios from "axios";
 import React from "react";
 import EventCard from './eventCard';
 
+/**
+    Events Page:
+      * Admins can create new events
+      * Students can sign up for events they haven't already signed up for
+      * All users can view general information about each event.
+*/
 function Events(props) {
   const history = useHistory();
   const [loading, setLoading] = useState(true);
@@ -25,6 +37,9 @@ function Events(props) {
 
   const [showEventCreate, setshowEventCreate] = useState(false);
   
+  /**
+    Grabs information on all events and programs to ensure the page is correctly populated
+  */
   useEffect(() => {
     Promise.all([
       axios.get("/events/getAllEventData"),
@@ -37,14 +52,23 @@ function Events(props) {
   });
   }, []);  
 
+  /**
+     Makes the event creation modal visible
+  */
   const handleCreateNewEvent = () => {
     setshowEventCreate(true);
   }
 
+  /**
+     Makes the event creation modal invisible
+  */
   const handleCloseCreateEvent = () => {
     setshowEventCreate(false);
   }
 
+  /**
+     Creates a new event by inserting it into the database. Upon completion, the page refreshes to display the new event.
+  */
   const handleCreate = () => {
     axios
     .post("events/createEvent", {
@@ -63,10 +87,17 @@ function Events(props) {
     })
   }
 
+  /**
+     Handles navigation between this page and the dynamically generated event details page
+  */
   const eventDetailsHandler = (event_id) => {
     history.push("/events/" + event_id);
   }
 
+  /**
+     Creates a list of EventCard components using the previously queried event information from the database.
+     One component is created for each event and contains general event information.
+  */
   const eventsForUser = allEventData.map((event) => (
     <EventCard
       key={event.event_id}
@@ -77,10 +108,17 @@ function Events(props) {
     />
   ))
 
+  /**
+     Creates a list of option components using the previously queried program information from the database.
+     This is used to populate a dropdown menu that allows admins to select which program the event is associated with.
+  */
   const programOptions = allProgramData.map((program) => (
     <option value={program.program_num}>{program.program_name}</option>
   ))
 
+  /**
+     React html code to return for the page view. The modal is shown whenever showEventCreate is set to true. 
+  */
   return (
     <div className="Events">
       <Container>
