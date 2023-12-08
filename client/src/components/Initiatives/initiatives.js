@@ -36,7 +36,7 @@ function Initiatives(props) {
   // general application info
   const [isApplying, setIsApplying] = useState(false);
   const [initiativeNum, setInitiativeNum] = useState(-1);
-  const [UIN, setUIN] = useState(-1);
+  const [UIN, setUIN] = useState(props.auth.user.uin);
   const [appStatus, setAppStatus] = useState("");
   const [appYear, setAppYear] = useState(new Date().getFullYear());
   // specific application info
@@ -100,7 +100,7 @@ function Initiatives(props) {
 
     setIsApplying(false);
     setInitiativeNum(-1);
-    setUIN(-1);
+    setUIN(props.auth.user.uin);
     setAppStatus("");
     setAppYear(new Date().getFullYear());
     
@@ -174,7 +174,7 @@ function Initiatives(props) {
         console.log(Internship);
         setInitiativeName(Internship.company_name);
         setInitiativeDesc(Internship.intern_description);
-        setIsGov(Internship.is_gov);
+        setIsGov(Internship.is_gov ? "Yes" : "No");
       }
     }
 
@@ -191,7 +191,107 @@ function Initiatives(props) {
   }
 
   const createInitiativeHandler = () => {
-    changeInitiativeTypeHandler("Choose Type");
+    //changeInitiativeTypeHandler("Choose Type");
+    if (initiativeType === "Choose Type") {
+      alert("Please select the type of initiative");
+      return;
+    }
+    
+    if (isNew === "Select Option") {
+      alert("Please select method of creation");
+      return;
+    }
+
+    if (isNew === "Select Existing" && selectOption < 0) {
+      alert("Please select a valid initiative");
+      return;
+    }
+
+    const isNameFilled = (initiativeName.trim().length > 0);
+    if (!isNameFilled) {
+      alert("Please insert a name");
+      return;
+    }
+
+    const isGovFilled = (initiativeType !== "Internship" || internshipIsGov !== "Select Option");
+    if (!isGovFilled) {
+      alert("Please select a government affiliation option");
+    }
+
+    if (isApplying) {
+      if (!appYear) {
+        alert("Please insert an application year");
+        return;
+      }
+
+      if (initiativeType !== "Internship" && appSemester === "Select Option") {
+        alert("Please select a semester");
+        return;
+      }
+
+      if (initiativeType === "Certificate" && certAppProgramNum < 0) {
+        alert("Please select a program");
+        return;
+      }
+    }
+
+    // create
+    if (!isApplying && isNew !== "Create New") {
+      alert("ERROR: expected to create new initiative, but option is not selected");
+      return;
+    }
+
+    console.log("creating...");
+    if (isNew === "Create New") {
+      // class
+      if (initiativeType === "Class") {
+        axios.post("initiatives/createClass", {
+          name : initiativeName,
+          description : initiativeDesc,
+          classType : classType
+        })
+        .then((res) => {
+          if (isApplying) {
+            console.log("created initiative");
+            axios.get("initiatives/lastClassMatch", {
+              params: {
+                  class_name: initiativeName
+              }}).then((res) => {
+                let initID = res.data.class_id;
+                console.log(initID);
+                axios.post("initiatives/createClassEnrollment", {
+                  uin : props.auth.user.user_type === "Admin" ? UIN : props.auth.user.uin,
+                  class_id : initID,
+                  class_status : appStatus,
+                  semester : appSemester,
+                  year: appYear
+                }).then((res) => {
+                  history.go(0);
+                  setLoading(true);
+                })
+              })
+          } else {
+            history.go(0);
+            setLoading(true);
+          }
+        })
+      }
+    } else if (isApplying) {
+      // class
+      if (initiativeType === "Class") {
+        axios.post("initiatives/createClassEnrollment", {
+          uin : props.auth.user.user_type === "Admin" ? UIN : props.auth.user.uin,
+          class_id : initiativeNum,
+          class_status : appStatus,
+          semester : appSemester,
+          year: appYear
+        }).then((res) => {
+          history.go(0);
+          setLoading(true);
+        })
+      }
+    }
+
   }
 
   const editClassHandler = () => {
@@ -273,30 +373,55 @@ function Initiatives(props) {
             </Row>
           }
           {isApplying && 
-            <Row>
-              <Col sm={4}>
-                <b>Select Existing or Create New</b>
-              </Col>
-              <Col>
-                <Form.Group className="mb-3">
-                  <Form.Select
-                  aria-label="Select Existing or Create New"
-                  value={isNew}
-                  isInvalid={!!error.isNew}
-                  onChange={(e) => {
-                    {
-                      setIsNew(e.target.value);
-                      updateSelectionHandler(-1);
-                    }
-                  }}
-                  >
-                    <option>Select Option</option>
-                    <option>Select Existing</option>
-                    <option>Create New</option>
-                  </Form.Select>
-                </Form.Group>
-              </Col>
-            </Row>
+            <React.Fragment>
+              {props.auth.user.user_type === "Admin" && 
+                <Row>
+                  <Col sm={4}>
+                    <b>Student UIN: </b>
+                  </Col>
+                  <Col>
+                    <Form.Group className="mb-3">
+                      <Form.Control
+                      value={UIN}
+                      isInvalid={!!error.UIN}
+                      onChange={(e) => {
+                        setUIN(e.target.value);
+                      }}
+                      required
+                      id="Student UIN"
+                      type="number"
+                      min="0"
+                      >
+                      </Form.Control>
+                    </Form.Group>
+                  </Col>
+                </Row>
+              }
+              <Row>
+                <Col sm={4}>
+                  <b>Select Existing or Create New</b>
+                </Col>
+                <Col>
+                  <Form.Group className="mb-3">
+                    <Form.Select
+                    aria-label="Select Existing or Create New"
+                    value={isNew}
+                    isInvalid={!!error.isNew}
+                    onChange={(e) => {
+                      {
+                        setIsNew(e.target.value);
+                        updateSelectionHandler(-1);
+                      }
+                    }}
+                    >
+                      <option>Select Option</option>
+                      <option>Select Existing</option>
+                      <option>Create New</option>
+                    </Form.Select>
+                  </Form.Group>
+                </Col>
+              </Row>
+            </React.Fragment>
           }
           {isNew === "Select Existing" &&
             <React.Fragment>
@@ -322,7 +447,7 @@ function Initiatives(props) {
             </React.Fragment>
           }
           
-          {initiativeType !== "Choose Type" && isNew!=="Select Option" &&
+          {initiativeType !== "Choose Type" && isNew !== "Select Option" &&
             <React.Fragment>
               <hr />
               <Row>
