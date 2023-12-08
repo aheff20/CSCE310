@@ -180,18 +180,18 @@ router.post("/deleteDocument", async (req, res) => {
     })
 });
 
-/** Delete Applications With Document route created and implemented by:
+/** Delete Documents Of Application route created and implemented by:
  *  Billy Harkins
  *  
  *  SQL: DELETE
  */
-router.post("/deleteApplicationsWithDocument", async (req, res) => {
+router.post("/deleteDocumentsOfApplication", async (req, res) => {
     const app_num = req.body.app_num;
 
-    pool.query(`DELETE FROM applications WHERE app_num = ${app_num}`, (err, result) => {
+    pool.query(`DELETE FROM documentation WHERE app_num = ${app_num}`, (err, result) => {
         if (err) {
             console.log(err);
-            res.status(400).json({ message: "Error deleting applications with document!" });
+            res.status(400).json({ message: "Error deleting documents assigned to given application!" });
         }
         res.status(200).json({ message: "Success!" });
     })
