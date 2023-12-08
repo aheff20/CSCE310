@@ -15,15 +15,16 @@ function Initiatives(props) {
   const [allClassData, setClassData] = useState({});
   const [allInternshipData, setInternshipData] = useState({});
   const [allCertificateData, setCertificateData] = useState({});
+  const [allProgramData, setProgramData] = useState({});
   const [loading, setLoading] = useState(true);
 
   // modal info
   const [initiativeType, setInitiativeType] = useState("Choose Type");
   const [showInitiative, setShowInitiative] = useState(false);
-  const [isNew, setIsNew] = useState("Select Option"); // "yes" or "no"
+  const [isNew, setIsNew] = useState("Select Option"); // "Select Existing" or "Create New"
   const [error, setError] = useState({});
   // general body info
-  const [initiativeID, setInitiativeID] = useState(0);
+  const [initiativeID, setInitiativeID] = useState(-1);
   const [initiativeName, setInitiativeName] = useState("");
   const [initiativeDesc, setInitiativeDesc] = useState("");
   const [initiativeOptions, setInitiativeOptions] = useState([<option value={-1}>Choose Option</option>]);
@@ -34,14 +35,15 @@ function Initiatives(props) {
   const [certLevel, setCertLevel] = useState("");
   // general application info
   const [isApplying, setIsApplying] = useState(false);
-  const [initiativeNum, setInitiativeNum] = useState(0);
-  const [UIN, setUIN] = useState(0);
+  const [initiativeNum, setInitiativeNum] = useState(-1);
+  const [UIN, setUIN] = useState(-1);
   const [appStatus, setAppStatus] = useState("");
   const [appYear, setAppYear] = useState(new Date().getFullYear());
   // specific application info
   const [appSemester, setAppSemester] = useState("Select Option");
   const [certAppTraining, setCertAppTraining] = useState("");
-  const [certAppProgramNum, setCertAppProgramNum] = useState(0);
+  const [certAppProgramNum, setCertAppProgramNum] = useState(-1);
+  const [certProgramOptions, setCertProgramOptions] = useState([<option value={-1}>Choose Option</option>]);
   
 
   useEffect(() => {
@@ -61,9 +63,14 @@ function Initiatives(props) {
             axios.get("/initiatives/getAllCertificateData")
               .then((res) => {
                 setCertificateData(res.data);
-                if (props.auth.user.user_type !== "Admin") setIsApplying(true); 
+                setIsApplying(props.auth.user.user_type === "Student");
                 //console.log(res.data);
                 setLoading(false);
+
+                axios.get("/programs/getAllProgramData")
+                  .then((res) => {
+                    updateProgramOptionsHandler(res.data);
+                  })
               })
           })
       })
@@ -71,6 +78,9 @@ function Initiatives(props) {
   }, []);
 
   const openInitiativeHandler = () => {
+    if (props.auth.user.user_type === "Admin") {
+      setIsNew("Create New");
+    }
     setShowInitiative(true);
   }
 
@@ -82,20 +92,35 @@ function Initiatives(props) {
     setInitiativeType(type);
     let opts = [];
     //console.log(opts);
-    if (type == "Class" && allClassData.length > 0) opts = allClassData.map((Class) => {
+    if (type == "Class" && allClassData.length > 0) opts = allClassData.map((Class) => (
       <option value={Class.class_id}>{Class.class_name}</option>
-    });
-    else if (type == "Internship" && allInternshipData.length > 0) opts = allInternshipData.map((Internship) => {
+    ));
+    else if (type == "Internship" && allInternshipData.length > 0) opts = allInternshipData.map((Internship) => (
       <option value={Internship.intern_id}>{Internship.company_name}</option>
-    });
-    else if (type == "Certificate" && allCertificateData.length > 0) opts = allCertificateData.map((Certificate) => {
+    ));
+    else if (type == "Certificate" && allCertificateData.length > 0) opts = allCertificateData.map((Certificate) => (
       <option value={Certificate.cert_id}>{Certificate.cert_name}</option>
-    });
+    ));
     opts.unshift(
       <option value={-1}>Choose Option</option>
     );
-    //console.log(opts);
+    console.log(opts);
     setInitiativeOptions(opts);
+  }
+
+  const updateProgramOptionsHandler = (data) => {
+    let dataf = data.filter((program) => (program.active));
+    setProgramData(dataf);
+
+    let opts = [];
+    if (dataf.length > 0) opts = dataf.map((program) => (
+      <option value={program.program_num}>{program.program_name}</option>
+    ))
+    opts.unshift(
+      <option value={-1}>Choose Option</option>
+    );
+
+    setCertProgramOptions(opts);
   }
 
   const updateSelectionHandler = (id) => {
@@ -106,7 +131,19 @@ function Initiatives(props) {
       setClassType("");
       setIsGov("Select Option");
       setCertLevel("");
+      return;
     }
+
+    if (initiativeType==="Class") {
+      let Class = allClassData.filter((Class) => (Class.class_id))[0];
+      if (Class) {
+        console.log(Class);
+        setInitiativeName(Class.class_name);
+        setInitiativeDesc(Class.class_description);
+        setClassType(Class.class_type);
+      }
+    }
+    
   }
 
   const createInitiativeHandler = () => {
@@ -142,7 +179,7 @@ function Initiatives(props) {
       <Modal show={showInitiative} onHide={closeInitiativeHandler}>
         <Modal.Header closeButton>
           <Modal.Title>
-            Creating a new Initiative
+            Creating a New Initiative
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -171,30 +208,52 @@ function Initiatives(props) {
               </Form.Group>
             </Col>
           </Row>
-          <Row>
-            <Col sm={4}>
-              <b>Select Existing or Create New</b>
-            </Col>
-            <Col>
-              <Form.Group className="mb-3">
-                <Form.Select
-                aria-label="Initiative Type"
-                value={isNew}
-                isInvalid={!!error.isNew}
-                onChange={(e) => {
-                  {
-                    setIsNew(e.target.value);
-                    updateSelectionHandler(-1);
-                  }
-                }}
-                >
-                  <option>Select Option</option>
-                  <option>Select Existing</option>
-                  <option>Create New</option>
-                </Form.Select>
-              </Form.Group>
-            </Col>
-          </Row>
+          {props.auth.user.user_type === "Admin" &&
+            <Row>
+              <Col sm={4}>
+                <b>Apply a student</b>
+              </Col>
+              <Col>
+                <Form.Group className="mb-3">
+                  <Form.Check
+                    type="switch"
+                    id="isApplying"
+                    defaultChecked={isApplying}
+                    onChange={(e) => {
+                      setIsApplying(!isApplying);
+                      if(isApplying) setIsNew("Create New");
+                    }}
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+          }
+          {isApplying && 
+            <Row>
+              <Col sm={4}>
+                <b>Select Existing or Create New</b>
+              </Col>
+              <Col>
+                <Form.Group className="mb-3">
+                  <Form.Select
+                  aria-label="Select Existing or Create New"
+                  value={isNew}
+                  isInvalid={!!error.isNew}
+                  onChange={(e) => {
+                    {
+                      setIsNew(e.target.value);
+                      updateSelectionHandler(-1);
+                    }
+                  }}
+                  >
+                    <option>Select Option</option>
+                    <option>Select Existing</option>
+                    <option>Create New</option>
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+            </Row>
+          }
           {isNew === "Select Existing" &&
             <React.Fragment>
               <Row>
@@ -218,6 +277,7 @@ function Initiatives(props) {
               </Row>
             </React.Fragment>
           }
+          
           {initiativeType !== "Choose Type" && isNew!=="Select Option" &&
             <React.Fragment>
               <hr />
@@ -337,7 +397,6 @@ function Initiatives(props) {
                 </React.Fragment>
               }
               
-              
               {isApplying && 
                 <React.Fragment>
                   <hr/>
@@ -435,7 +494,18 @@ function Initiatives(props) {
                           <b>Program: </b>
                         </Col>
                         <Col>
-                          ...
+                          <Form.Group className="mb-3">
+                            <Form.Select
+                            aria-label="Program Options"
+                            value={certAppProgramNum}
+                            isInvalid={!!error.certAppProgramNum}
+                            onChange={(e) => {
+                              setCertAppProgramNum(e.target.value);
+                            }}
+                            >
+                              {certProgramOptions}
+                            </Form.Select>
+                          </Form.Group>
                         </Col>
                       </Row>
                     </React.Fragment>
@@ -451,7 +521,7 @@ function Initiatives(props) {
             Cancel
           </Button>
           <Button variant="primary" onClick={createInitiativeHandler}>
-            Create Initiative
+            Confirm
           </Button>
         </Modal.Footer>
       </Modal>
@@ -461,21 +531,28 @@ function Initiatives(props) {
                 {" "}
                 <Spinner animation="border" />{" "}
             </center>
-        ):( props.auth.user.user_type == "Admin" ? (
-            <></>
-        ):(
-            <React.Fragment>
-                <br/>
-                <h1 className="display-5 text-center">My Initiatives</h1>
-                <div className="col d-flex justify-content-center align-items-center">
-                  <Button variant="primary" onClick={() => openInitiativeHandler()}>Create Initiative</Button>
-                </div>
+        ):( 
+          <React.Fragment>
+            <br/>
+            <h1 className="display-5 text-center">Initiatives</h1>
+            <div className="col d-flex justify-content-center align-items-center">
+              <Button variant="primary" onClick={() => openInitiativeHandler()}>Create Initiative</Button>
+            </div>
+            {props.auth.user.user_type == "Admin" ? (
+              <React.Fragment>
                 <h2 className="display-5 text-center">Classes</h2>
                 <h2 className="display-5 text-center">Internships</h2>
                 <h2 className="display-5 text-center">Certificates</h2>
-                
-            </React.Fragment>
-        ))}
+              </React.Fragment>
+            ):(
+              <React.Fragment>
+                <h2 className="display-5 text-center">Classes</h2>
+                <h2 className="display-5 text-center">Internships</h2>
+                <h2 className="display-5 text-center">Certificates</h2>
+              </React.Fragment>
+            )}
+        </React.Fragment>
+        )}
         </Container>
         </div>
       
