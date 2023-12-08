@@ -61,6 +61,57 @@ router.get("/getAllCertificateData", async(req, res) => {
     
 });
 
+/** Get all user_class data route created and implemented by:
+ *    Logan Carbo
+ * 
+ *    SQL: select
+ */
+router.get("/getAllUserClassData", async(req, res) => {
+
+    pool.query("SELECT * FROM user_classes", (err, result) => {
+        if(err){
+            console.log(err);
+            res.status(400).json("Error getting all event information");
+        }
+        res.status(200).json(result.rows);
+    })
+    
+});
+
+/** Get all user_internships data route created and implemented by:
+ *    Logan Carbo
+ * 
+ *    SQL: select
+ */
+router.get("/getAllUserInternshipData", async(req, res) => {
+
+    pool.query("SELECT * FROM user_internships", (err, result) => {
+        if(err){
+            console.log(err);
+            res.status(400).json("Error getting all event information");
+        }
+        res.status(200).json(result.rows);
+    })
+    
+});
+
+/** Get all user_certificates data route created and implemented by:
+ *    Logan Carbo
+ * 
+ *    SQL: select
+ */
+router.get("/getAllUserCertificateData", async(req, res) => {
+
+    pool.query("SELECT * FROM user_certifications", (err, result) => {
+        if(err){
+            console.log(err);
+            res.status(400).json("Error getting all event information");
+        }
+        res.status(200).json(result.rows);
+    })
+    
+});
+
 /** Get last class matching name route created and implemented by:
  *    Logan Carbo
  * 

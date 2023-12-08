@@ -64,6 +64,7 @@ function NavBar(props) {
                                 <React.Fragment>
                                     {loggedIn && <Nav.Link href="/programs">Programs</Nav.Link>}
                                     {loggedIn && <Nav.Link href="/events">Events</Nav.Link>}
+                                    {loggedIn && <Nav.Link href="/initiatives">Initiatives</Nav.Link>}
                                     {loggedIn && <Nav.Link href="/management">Manage Users</Nav.Link>}
                                 </React.Fragment>
                             }

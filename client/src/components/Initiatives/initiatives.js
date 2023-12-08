@@ -15,6 +15,9 @@ function Initiatives(props) {
   const [allClassData, setClassData] = useState({});
   const [allInternshipData, setInternshipData] = useState({});
   const [allCertificateData, setCertificateData] = useState({});
+  const [allUserClassData, setUserClassData] = useState({});
+  const [allUserInternshipData, setUserInternshipData] = useState({});
+  const [allUserCertificateData, setUserCertificateData] = useState({});
   const [allProgramData, setProgramData] = useState({});
   const [loading, setLoading] = useState(true);
 
@@ -32,6 +35,7 @@ function Initiatives(props) {
   // specific init info
   const [classType, setClassType] = useState("");
   const [internshipIsGov, setIsGov] = useState("Select Option"); // "yes" or "no"
+  const [internshipLocation, setLocation] = useState("");
   const [certLevel, setCertLevel] = useState("");
   // general application info
   const [isApplying, setIsApplying] = useState(false);
@@ -56,22 +60,42 @@ function Initiatives(props) {
       .then((res) => {
         setClassData(res.data);
         //console.log(res.data);
-        axios.get("/initiatives/getAllInternshipData")
-          .then((res) => {
-            setInternshipData(res.data);
-            //console.log(res.data);
-            axios.get("/initiatives/getAllCertificateData")
-              .then((res) => {
-                setCertificateData(res.data);
-                //console.log(res.data);
-                setLoading(false);
+    
+    axios.get("/initiatives/getAllUserClassData")
+      .then((res) => {
+        setUserClassData(res.data);
+        //console.log(res.data);
 
-                axios.get("/programs/getAllProgramData")
-                  .then((res) => {
-                    updateProgramOptionsHandler(res.data);
-                  })
-              })
-          })
+    axios.get("/initiatives/getAllInternshipData")
+      .then((res) => {
+        setInternshipData(res.data);
+        //console.log(res.data);
+    
+    axios.get("/initiatives/getAllUserClassData")
+      .then((res) => {
+        setUserInternshipData(res.data);
+        //console.log(res.data);
+
+    axios.get("/initiatives/getAllCertificateData")
+      .then((res) => {
+        setCertificateData(res.data);
+        //console.log(res.data);
+        setLoading(false);
+    
+    axios.get("/initiatives/getAllUserCertificateData")
+      .then((res) => {
+        setUserCertificateData(res.data);
+        //console.log(res.data);
+
+    axios.get("/programs/getAllProgramData")
+      .then((res) => {
+        updateProgramOptionsHandler(res.data);
+      })
+      })
+      })
+      })
+      })
+      })
       })
 
   }, []);
@@ -175,6 +199,7 @@ function Initiatives(props) {
         setInitiativeName(Internship.company_name);
         setInitiativeDesc(Internship.intern_description);
         setIsGov(Internship.is_gov ? "Yes" : "No");
+        setLocation(Internship.location);
       }
     }
 
@@ -283,7 +308,7 @@ function Initiatives(props) {
           name : initiativeName,
           description : initiativeDesc,
           isGov : internshipIsGov,
-          location : 'temp'
+          location : internshipLocation
         })
         .then((res) => {
           if (isApplying) {
@@ -417,6 +442,40 @@ function Initiatives(props) {
 
   const deleteCertificateHandler = () => {
 
+  }
+
+  const getClassTable = (data, showUser, showEnroll) => {
+    const list = [];
+    for(let k = 0; k < data.length; k++) {
+      let Class = data[k];
+      // class_status   | semester |  yr
+
+      const temp = <tr key={k}>
+                      {showUser && 
+                        <React.Fragment>
+                          <td>{Class.uin}</td>
+                          <td>{Class.first_name} {Class.m_initial} {Class.last_name}</td>
+                        </React.Fragment>
+                      }
+                      <td>{Class.class_name}</td>
+                      <td>{Class.class_description}</td>
+                      <td>{Class.class_type}</td>
+                      {showEnroll &&
+                        <React.Fragment>
+                          <td>{Class.class_status}</td>
+                          <td>{Class.semester}</td>
+                          <td>{Class.yr}</td>
+                        </React.Fragment>
+                      }
+                      <td>
+                        <Button variant="success btn-sm" onClick={() => {}}>
+                          Edit
+                        </Button>
+                      </td>
+                   </tr>
+      list.push(temp);
+    }
+    return list;
   }
 
   return (
@@ -640,6 +699,26 @@ function Initiatives(props) {
                       </Form.Group>
                     </Col>
                   </Row>
+                  <Row>
+                    <Col sm={4}>
+                      <b>Location: </b>
+                    </Col>
+                    <Col>
+                      <Form.Group className="mb-3">
+                        <Form.Control
+                        value={internshipLocation}
+                        isInvalid={!!error.internshipLocation}
+                        onChange={(e) => {
+                          setLocation(e.target.value);
+                        }}
+                        id="Internship Location"
+                        type="text"
+                        disabled = {isNew === "Select Existing"}
+                        >
+                        </Form.Control>
+                      </Form.Group>
+                    </Col>
+                  </Row>
                 </React.Fragment>
               }
               {initiativeType==="Certificate" &&
@@ -813,14 +892,56 @@ function Initiatives(props) {
             {props.auth.user.user_type == "Admin" ? (
               <React.Fragment>
                 <h2 className="display-5 text-center">Classes</h2>
+                <Table stiped bordered hover className="text-center">
+                  <thead>
+                    <tr>
+                      <th className="col-md-1">Class</th>
+                      <th className="col-md-1">Description</th>
+                      <th className="col-md-1">Class Type</th>
+                      <th className="col-md-1">Edit</th>
+                    </tr>
+                  </thead>
+                  <tbody>{getClassTable(allClassData, false, false)}</tbody>
+                </Table>
+                <h2 className="display-5 text-center">Class Enrollments</h2>
+                <Table stiped bordered hover className="text-center">
+                  <thead>
+                    <tr>
+                      <th className="col-md-1">UIN</th>
+                      <th className="col-md-1">Name</th>
+                      <th className="col-md-1">Class</th>
+                      <th className="col-md-1">Description</th>
+                      <th className="col-md-1">Class Type</th>
+                      <th classname="col-md-1">Class Status</th>
+                      <th classname="col-md-1">Semester</th>
+                      <th classname="col-md-1">Year</th>
+                      <th className="col-md-1">Edit</th>
+                    </tr>
+                  </thead>
+                  <tbody>{getClassTable(allUserClassData, true, true)}</tbody>
+                </Table>
                 <h2 className="display-5 text-center">Internships</h2>
                 <h2 className="display-5 text-center">Certificates</h2>
               </React.Fragment>
             ):(
               <React.Fragment>
-                <h2 className="display-5 text-center">Classes</h2>
-                <h2 className="display-5 text-center">Internships</h2>
-                <h2 className="display-5 text-center">Certificates</h2>
+                <h2 className="display-5 text-center">My Classes</h2>
+                <Table stiped bordered hover className="text-center">
+                  <thead>
+                    <tr>
+                      <th className="col-md-1">Class</th>
+                      <th className="col-md-1">Description</th>
+                      <th className="col-md-1">Class Type</th>
+                      <th classname="col-md-1">Class Status</th>
+                      <th classname="col-md-1">Semester</th>
+                      <th classname="col-md-1">Year</th>
+                      <th className="col-md-1">Edit</th>
+                    </tr>
+                  </thead>
+                  <tbody>{getClassTable(allUserClassData.filter((Class) => (Class.uin===props.auth.user.uin)), false, true)}</tbody>
+                </Table>
+                <h2 className="display-5 text-center">My Internships</h2>
+                <h2 className="display-5 text-center">My Certificates</h2>
               </React.Fragment>
             )}
         </React.Fragment>
