@@ -63,7 +63,6 @@ function Initiatives(props) {
             axios.get("/initiatives/getAllCertificateData")
               .then((res) => {
                 setCertificateData(res.data);
-                setIsApplying(props.auth.user.user_type === "Student");
                 //console.log(res.data);
                 setLoading(false);
 
@@ -77,14 +76,38 @@ function Initiatives(props) {
 
   }, []);
 
-  const openInitiativeHandler = () => {
-    if (props.auth.user.user_type === "Admin") {
+  const openInitiativeHandler = (applyStatus) => {
+    setIsApplying(applyStatus);
+    if (!applyStatus) {
       setIsNew("Create New");
     }
     setShowInitiative(true);
   }
 
-  const closeInitiativeHandler = () => {
+  const resetModalValues = () => {
+    setInitiativeType("Choose Type");
+    setIsNew("Select Option");
+
+    setInitiativeID(-1);
+    setInitiativeName("");
+    setInitiativeDesc("");
+    setInitiativeOptions([<option value={-1}>Choose Option</option>]);
+    setSelectOption(-1);
+
+    setClassType("");
+    setIsGov("");
+    setCertLevel("");
+
+    setIsApplying(false);
+    setInitiativeNum(-1);
+    setUIN(-1);
+    setAppStatus("");
+    setAppYear(new Date().getFullYear());
+    
+    setAppSemester("Select Option");
+    setCertAppTraining("");
+    setCertAppProgramNum(-1);
+
     setShowInitiative(false);
   }
 
@@ -125,6 +148,7 @@ function Initiatives(props) {
 
   const updateSelectionHandler = (id) => {
     setSelectOption(id);
+    setInitiativeNum(id);
     if (id < 0) {
       setInitiativeName("");
       setInitiativeDesc("");
@@ -141,6 +165,26 @@ function Initiatives(props) {
         setInitiativeName(Class.class_name);
         setInitiativeDesc(Class.class_description);
         setClassType(Class.class_type);
+      }
+    }
+
+    if (initiativeType==="Internship") {
+      let Internship = allInternshipData.filter((Internship) => (Internship.intern_id))[0];
+      if (Internship) {
+        console.log(Internship);
+        setInitiativeName(Internship.company_name);
+        setInitiativeDesc(Internship.intern_description);
+        setIsGov(Internship.is_gov);
+      }
+    }
+
+    if (initiativeType==="Certificate") {
+      let Cert = allCertificateData.filter((Cert) => (Cert.cert_id))[0];
+      if (Cert) {
+        console.log(Cert);
+        setInitiativeName(Cert.cert_name);
+        setInitiativeDesc(Cert.cert_description);
+        setCertLevel(Cert.cert_level);
       }
     }
     
@@ -176,7 +220,7 @@ function Initiatives(props) {
 
   return (
     <div className="Profile">
-      <Modal show={showInitiative} onHide={closeInitiativeHandler}>
+      <Modal show={showInitiative} onHide={resetModalValues}>
         <Modal.Header closeButton>
           <Modal.Title>
             Creating a New Initiative
@@ -220,8 +264,8 @@ function Initiatives(props) {
                     id="isApplying"
                     defaultChecked={isApplying}
                     onChange={(e) => {
-                      setIsApplying(!isApplying);
                       if(isApplying) setIsNew("Create New");
+                      setIsApplying(!isApplying);
                     }}
                   />
                 </Form.Group>
@@ -517,7 +561,7 @@ function Initiatives(props) {
           }
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={closeInitiativeHandler}>
+          <Button variant="secondary" onClick={resetModalValues}>
             Cancel
           </Button>
           <Button variant="primary" onClick={createInitiativeHandler}>
@@ -536,7 +580,9 @@ function Initiatives(props) {
             <br/>
             <h1 className="display-5 text-center">Initiatives</h1>
             <div className="col d-flex justify-content-center align-items-center">
-              <Button variant="primary" onClick={() => openInitiativeHandler()}>Create Initiative</Button>
+              <Button variant="primary" onClick={() => openInitiativeHandler(props.auth.user.user_type === "Student")}>
+                Create Initiative
+              </Button>
             </div>
             {props.auth.user.user_type == "Admin" ? (
               <React.Fragment>
