@@ -7,6 +7,14 @@ import Login from "./components/Login/login";
 import Register from "./components/Login/register";
 import Landing from "./components/Gen/landing";
 import NavBar from "./components/Gen/NavBar";
+import Management from "./components/Management/management";
+import CreateAccount from "./components/Management/createAccount";
+import Profile from "./components/MyProfile/profile";
+import Programs from "./components/Programs/programs";
+import ProgramDetails from "./components/Programs/programDetails";
+import Events from "./components/Events/events";
+import EventDetails from "./components/Events/eventDetails";
+import Initiatives from "./components/Initiatives/initiatives";
 
 import setAuthToken from "./utils/setAuthToken";
 import { setCurrentUser, logoutUser } from "./actions/authActions";
@@ -47,7 +55,15 @@ function App() {
           <Route exact path="/" component={Landing} />
           <Switch>
               <Route exact path="/login" component={Login} />
-              <Route exact path="/register" component={Register} />              
+              <Route exact path="/register" component={Register} />
+              <PrivateUserRoute exact path="/myprofile" component={Profile} />
+              <PrivateUserRoute exact path="/programs" component={Programs} />
+              <PrivateUserRoute exact path="/events" component={Events} />
+              <PrivateUserRoute exact path="/programs/:programNum" component={ProgramDetails} />
+              <PrivateUserRoute exact path="/initiatives" component={Initiatives} />
+              <PrivateAdminRoute exact path="/events/:event_id" component={EventDetails} />
+              <PrivateAdminRoute exact path="/management" component={Management} />          
+              <PrivateAdminRoute exact path="/createAccount" component={CreateAccount} />          
           </Switch>
         </div>
       </Router>

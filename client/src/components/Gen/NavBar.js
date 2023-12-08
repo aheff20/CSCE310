@@ -19,11 +19,11 @@ function NavBar(props) {
             setLoggedIn(false);
             setAdminNav(false);
         }
-        if (props.auth.user.role === "admin") {
+        if (props.auth.user.user_type === "Admin") {
             setAdminNav(true);
             setUserNav(false);
         }
-        if (props.auth.user.role === "user"){
+        if (props.auth.user.user_type === "Student") {
             setUserNav(true);
             setAdminNav(false);
         }
@@ -53,28 +53,26 @@ function NavBar(props) {
                     <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                     <Navbar.Collapse id="responsive-navbar-nav">
                         <Nav className="me-auto">
-                        {user && 
-                        <React.Fragment>
-                            {loggedIn && <Nav.Link href="/menu">Menu</Nav.Link>}
-                            {loggedIn && <Nav.Link href="/bag">Bag</Nav.Link>}
-                            {loggedIn && <Nav.Link href="/settings">Settings</Nav.Link>}
-                            {loggedIn && <Nav.Link href="/help">Help</Nav.Link>}
-                        </React.Fragment>
-                        }
-                        {admin &&
-                        <React.Fragment>
-                            {loggedIn && <Nav.Link href="/processOrders">Process Orders</Nav.Link>}
-                            {loggedIn && <Nav.Link href="/adjustMenu">Adjust Menu</Nav.Link>}
-                            {loggedIn && <Nav.Link href="/addMenuItem">Add Menu Item</Nav.Link>}
-                            {loggedIn && <Nav.Link href="/reports">Reports</Nav.Link>}
-                            {loggedIn && <Nav.Link href="/settings">Settings</Nav.Link>}
-                            {loggedIn && <Nav.Link href="/help">Help</Nav.Link>}
-                        </React.Fragment>
-                        }                            
+                            {user &&
+                                <React.Fragment>
+                                    {loggedIn && <Nav.Link href="/programs">Programs</Nav.Link>}
+                                    {loggedIn && <Nav.Link href="/events">Events</Nav.Link>}
+                                    {loggedIn && <Nav.Link href="/initiatives">Initiatives</Nav.Link>}
+                                </React.Fragment>
+                            }
+                            {admin &&
+                                <React.Fragment>
+                                    {loggedIn && <Nav.Link href="/programs">Programs</Nav.Link>}
+                                    {loggedIn && <Nav.Link href="/events">Events</Nav.Link>}
+                                    {loggedIn && <Nav.Link href="/initiatives">Initiatives</Nav.Link>}
+                                    {loggedIn && <Nav.Link href="/management">Manage Users</Nav.Link>}
+                                </React.Fragment>
+                            }
                         </Nav>
                         <Nav>
                             {!loggedIn && <Nav.Link href="/login">Login</Nav.Link>}
                             {!loggedIn && <Nav.Link href="/register">Register</Nav.Link>}
+                            {loggedIn && <Nav.Link href="/myprofile">Profile</Nav.Link>}
                             {loggedIn && <Nav.Link onClick={onLogoutClick}>Logout</Nav.Link>}
                         </Nav>
                     </Navbar.Collapse>
