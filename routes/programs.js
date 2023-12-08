@@ -226,11 +226,18 @@ router.post("/createApplication", async (req, res) => {
  *      * Insert 
  */
 router.post("/createProgram", async (req, res) => {
-    const program_name = req.body.program_name;
-    const program_description = req.body.program_description;
-    const active = true;
+    const programData = {};
 
-    pool.query(`INSERT INTO programs (program_name, program_description, active) VALUES ($1, $2, $3)`, [program_name, program_description, active], (err, result) => {
+    programData.program_name = req.body.program_name;
+    programData.program_description = req.body.program_description;
+    programData.active = true;
+
+    const isProgramDataValid = validateProgramInfo(programData)
+    if (isProgramDataValid != true) {
+        return res.status(201).json(isProgramDataValid);
+    }
+
+    pool.query(`INSERT INTO programs (program_name, program_description, active) VALUES ($1, $2, $3)`, [programData.program_name, programData.program_description, programData.active], (err, result) => {
         if (err) {
             console.log(err);
             res.status(400).json({ message: "Error creating program!" });
@@ -346,7 +353,7 @@ router.post("/deleteProgram", async (req, res) => {
  *    SQL:
  *      * Delete 
  */
-router.post("/deleteProgramTrack", async(req, res) => {
+router.post("/deleteProgramTrack", async (req, res) => {
     const program_num = req.body.program_num;
 
     pool.query(`DELETE FROM track WHERE program_num = ${program_num}`, (err, result) => {
@@ -364,7 +371,7 @@ router.post("/deleteProgramTrack", async(req, res) => {
  *    SQL:
  *      * Delete 
  */
-router.post("/deleteProgramApplications", async(req, res) => {
+router.post("/deleteProgramApplications", async (req, res) => {
     const program_num = req.body.program_num;
 
     pool.query(`DELETE FROM applications WHERE program_num = ${program_num}`, (err, result) => {

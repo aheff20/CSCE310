@@ -4,6 +4,7 @@ import { Button, Card } from "react-bootstrap";
 const ProgramCard = (props) => {
     const { isAdmin, programData, editProgramHandler, applyToProgram, accessProgramHandler, programDetailsHandler } = props;
     const accessButtonText = programData.active ? "Close Program" : "Reopen Program";
+    const isActive = programData.active;
 
     return (
         <div className="program-card">
@@ -21,7 +22,7 @@ const ProgramCard = (props) => {
 
                 <p>{programData.program_description}</p>
 
-                {isAdmin ? (
+                {isAdmin && (
                     <React.Fragment>
                         <Button
                             variant="primary"
@@ -44,15 +45,20 @@ const ProgramCard = (props) => {
                             {accessButtonText}
                         </Button>
                     </React.Fragment>
-
-                ) : (
-                    <Button
-                        variant="success"
-                        type="submit"
-                        onClick={() => applyToProgram(programData.program_num)}>
-                        Apply for Program!
-                    </Button>
                 )}
+
+                {(!isAdmin && !isActive) && <h3>This Program is closed.</h3>}
+
+                {(!isAdmin && isActive) && <Button
+                    variant="success"
+                    type="submit"
+                    onClick={() => applyToProgram(programData.program_num)}>
+                    Apply for Program!
+                </Button>
+                }
+
+
+
             </Card>
         </div>
     );
