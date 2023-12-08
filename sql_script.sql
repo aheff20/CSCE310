@@ -36,7 +36,7 @@ CREATE VIEW combined_users AS SELECT p.*, c.gender, c.hispanic_latino, c.race, c
  c.classification, c.student_type, c.phone FROM users p LEFT JOIN college_student c ON p.uin = c.uin;
 
 CREATE TABLE classes(
-    class_id INT,
+    class_id SERIAL,
     class_name VARCHAR,
     class_description VARCHAR,
     class_type VARCHAR,
@@ -62,7 +62,7 @@ CREATE INDEX class_idx ON class_enrollment(class_id);
 CREATE VIEW user_classes AS SELECT U.uin, C.* FROM users U JOIN class_enrollment UC ON U.uin = UC.uin JOIN classes C on C.class_id = UC.class_id;
 
 CREATE TABLE internship(
-    intern_id INT,
+    intern_id SERIAL,
     company_name VARCHAR,
     intern_description VARCHAR,
     is_gov BOOLEAN,
@@ -87,7 +87,7 @@ CREATE INDEX intern_idx ON intern_app(intern_id);
 CREATE VIEW user_internships AS SELECT U.uin, I.* FROM users U JOIN intern_app UI ON U.uin = UI.uin JOIN internship I on I.intern_id = UI.intern_id;
 
 CREATE TABLE certification(
-    cert_id INT,
+    cert_id SERIAL,
     cert_level VARCHAR,
     cert_name VARCHAR,
     cert_description VARCHAR,
