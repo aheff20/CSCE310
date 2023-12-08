@@ -59,7 +59,7 @@ CREATE TABLE class_enrollment(
             REFERENCES classes(class_id)
 );
 CREATE INDEX class_idx ON class_enrollment(class_id);
-CREATE VIEW user_classes AS SELECT U.uin, C.* FROM college_student U JOIN class_enrollment UC ON U.uin = UC.uin JOIN classes C on C.class_id = UC.class_id;
+CREATE VIEW user_classes AS SELECT U.uin U.first_name, U.m_initial, U.last_name, UC.ce_num, C.* FROM college_student U JOIN class_enrollment UC ON U.uin = UC.uin JOIN classes C on C.class_id = UC.class_id;
 
 CREATE TABLE internship(
     intern_id SERIAL,
@@ -84,7 +84,7 @@ CREATE TABLE intern_app(
             REFERENCES internship(intern_id)
 );
 CREATE INDEX intern_idx ON intern_app(intern_id);
-CREATE VIEW user_internships AS SELECT U.uin, I.* FROM college_student U JOIN intern_app UI ON U.uin = UI.uin JOIN internship I on I.intern_id = UI.intern_id;
+CREATE VIEW user_internships AS SELECT U.uin U.first_name, U.m_initial, U.last_name, UI.ia_num, I.* FROM college_student U JOIN intern_app UI ON U.uin = UI.uin JOIN internship I on I.intern_id = UI.intern_id;
 
 CREATE VIEW program_fed_intern_view AS 
 SELECT p.program_num, ia.*, i.is_gov, i.location
@@ -130,7 +130,7 @@ CREATE TABLE cert_enrollment(
                 REFERENCES programs(program_num)
 );
 CREATE INDEX cert_idx ON cert_enrollment(cert_id);
-CREATE VIEW user_certifications AS SELECT U.uin, C.* FROM college_student U JOIN cert_enrollment UC ON U.uin = UC.uin JOIN certification C on C.cert_id = UC.cert_id;
+CREATE VIEW user_certifications AS SELECT U.uin, U.first_name, U.m_initial, U.last_name, UC.certe_num, C.* FROM college_student U JOIN cert_enrollment UC ON U.uin = UC.uin JOIN certification C on C.cert_id = UC.cert_id;
 CREATE VIEW program_certifications AS SELECT P.program_num, C.* FROM programs P JOIN cert_enrollment PC ON P.program_num = PC.program_num JOIN certification C on C.cert_id = PC.cert_id;
 
 CREATE TABLE event(
