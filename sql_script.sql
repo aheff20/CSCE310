@@ -138,6 +138,10 @@ CREATE TABLE event(
                 REFERENCES programs(program_num)
 );
 
+CREATE INDEX event_id_idx ON event_tracking(event_id);
+
+CREATE VIEW attending_users AS SELECT E.event_id, U.* FROM event E JOIN event_tracking ET ON E.event_id = ET.event_ID JOIN users U on ET.uin = U.uin;
+
 CREATE TABLE event_tracking(
     et_num SERIAL,
     event_id INT,

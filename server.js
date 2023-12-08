@@ -4,6 +4,7 @@ const path = require("path");
 const users = require("./routes/users");
 const programs = require("./routes/programs");
 const events = require("./routes/events");
+const initiatives = require("./routes/initiatives");
 // const orders = require("./routes/orders");
 // const translator = require("./routes/translator");
 // const reports = require("./routes/reports");
@@ -29,6 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/users", users);
 app.use("/programs", programs);
 app.use("/events", events);
+app.use("/initiatives", initiatives);
 
 // Serve static assets from the build directory if in production
 app.use(express.static("client/build"));

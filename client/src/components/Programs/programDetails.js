@@ -101,6 +101,9 @@ function ProgramDetails(props) {
       })
   }, []);
 
+  /**
+   * Function for loading program metrics
+   */
   const getMetricData = (userData) => {
     let sc = userData.length;
     if (sc) {
@@ -125,17 +128,26 @@ function ProgramDetails(props) {
     }
   }
 
+  /**
+   * helper function to write ratios into percentile strings
+   */
   const toPerc = (val, tot) => {
     if (tot) return `(${(100*val/tot).toFixed(2)}%)`;
     else return "";
   }
 
+  /**
+   * Function handling open behavior of program modal
+   */
   const editProgramHandler = () => {
     setShowAccount(false);
     setShowStudent(false);
     setShowProgram(true);
   }
 
+  /**
+   * Function handling open behavior of account modal
+   */
   const editStudentHandler = (userUIN, userType) => {
     axios
       .get("/users/getUserData", {
@@ -183,12 +195,18 @@ function ProgramDetails(props) {
       })   
   }
 
+  /**
+   * Function handling close behavior of program modal
+   */
   const handleProgramClose = () => {
     setProgramName(programInfo.program_name);
     setProgramDesc(programInfo.program_description);
     setShowProgram(false);
   }
 
+  /**
+   * Function handling close behavior of account modal
+   */
   const handleAccountClose = () => {
     setUserType("");
     setUIN("");
@@ -218,6 +236,9 @@ function ProgramDetails(props) {
     setShowAccount(false);
   }
 
+  /**
+   * Function to update the program. Refresh page on complete
+   */
   const saveProgramHandler = () => {
     // update program
     console.log("save/update program handler");
@@ -241,6 +262,9 @@ function ProgramDetails(props) {
       })
   }
 
+  /**
+   * Function to open/close the program (change access). Refresh page on complete
+   */
   const accessProgramHandler = () => {
     let confirm = window.confirm(`Are you sure you want to ${programActive ? "close" : "open"} ${programInfo.program_name}?`);
     if (!confirm) {
@@ -264,6 +288,9 @@ function ProgramDetails(props) {
       })
   }
 
+  /**
+   * Function to deactivate a user account. Refresh page on complete
+   */
   const deactivateAccounthandler = () => {
     let confirm = window.confirm(`Are you sure you want to deactivate ${fname} ${lname}'s account?`);
     if (!confirm) {
@@ -272,6 +299,9 @@ function ProgramDetails(props) {
     console.log("deactivate program handler");
   }
 
+  /**
+   * Function to delete a program. Refresh page on complete
+   */
   const deleteProgramHandler = () => {
     let confirm = window.confirm(`Are you sure you want to delete ${programInfo.program_name}?\nThis action CANNOT be undone.`);
     if (!confirm) {
@@ -313,6 +343,9 @@ function ProgramDetails(props) {
       });
   }
 
+  /**
+   * Function to delete a user account. Refresh page on complete
+   */
   const deleteAccounthandler = () => {
     let confirm = window.confirm(`Are you sure you want to delete ${fname} ${lname}'s account?\nThis action CANNOT be undone.`);
     if (!confirm) {
@@ -321,7 +354,10 @@ function ProgramDetails(props) {
     console.log("deactivate program handler");
   }
 
-  const getTable = () => {
+  /**
+   * Function get table format for accounts
+   */
+  const getAccountTable = () => {
     const list = [];
     for(let k = 0; k < allUserData.length; k++) {
         
@@ -670,7 +706,7 @@ function ProgramDetails(props) {
                                       <th className="col-md-1">Edit</th>
                                   </tr>
                               </thead>
-                              <tbody>{getTable()}</tbody>
+                              <tbody>{getAccountTable()}</tbody>
                           </Table>
                           <br></br>
                   </div>
@@ -679,10 +715,12 @@ function ProgramDetails(props) {
             ) : (
                 // If the user is a student, they should have buttons to add new certifiates/classes/internships to the program
                 // Allow the user to see their progress in the program
-                <p>add tracking stuff here</p>
-
-
+                <React.Fragment>
+                <h2 className="display-5 text-center">Your Certificates</h2>
+                </React.Fragment>
             )}
+
+            <h2 className="display-5 text-center">Program Events</h2>
 
           </React.Fragment>
         )}

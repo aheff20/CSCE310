@@ -26,6 +26,12 @@ router.get("/getAllProgramData", async (req, res) => {
 
 });
 
+/** Check Program exists route created and implemented by:
+ *    Logan Carbo
+ * 
+ *    SQL:
+ *      * Select 
+ */
 router.get("/exists", async (req, res) => {
     const programNum = req.query.programNum;
 
@@ -61,7 +67,7 @@ router.get("/getProgramInfo", async (req, res) => {
 });
 
 /** Get Program Users route created and implemented by:
- *    
+ *    Logan Carbo
  * 
  *    SQL:
  *      * Select 
@@ -71,6 +77,26 @@ router.get("/getProgramUsers", async (req, res) => {
     //console.log(`getting users for ${programNum}`)
 
     pool.query(`SELECT C.* FROM programs P JOIN track T ON T.program_num = P.program_num JOIN college_student C ON T.uin = C.uin WHERE P.program_num = ${programNum}`, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.status(400).json({ message: "Error getting program users!" })
+        }
+        //console.log(result);
+        res.status(200).json(result.rows)
+    })
+})
+
+/** Get Program Events route created and implemented by:
+ *    Logan Carbo
+ * 
+ *    SQL:
+ *      * Select 
+ */
+router.get("/getProgramEvents", async (req, res) => {
+    const programNum = req.query.programNum;
+    //console.log(`getting users for ${programNum}`)
+
+    pool.query(`SELECT * FROM event WHERE program_num = ${programNum}`, (err, result) => {
         if (err) {
             console.log(err);
             res.status(400).json({ message: "Error getting program users!" })
@@ -314,7 +340,13 @@ router.post("/deleteProgram", async (req, res) => {
     })
 });
 
-router.post("/deleteProgramTrack", async (req, res) => {
+/** Delete Program track route created and implemented by:
+ *    Logan Carbo
+ * 
+ *    SQL:
+ *      * Delete 
+ */
+router.post("/deleteProgramTrack", async(req, res) => {
     const program_num = req.body.program_num;
 
     pool.query(`DELETE FROM track WHERE program_num = ${program_num}`, (err, result) => {
@@ -326,7 +358,13 @@ router.post("/deleteProgramTrack", async (req, res) => {
     })
 })
 
-router.post("/deleteProgramApplications", async (req, res) => {
+/** Delete Program applications route created and implemented by:
+ *    Logan Carbo
+ * 
+ *    SQL:
+ *      * Delete 
+ */
+router.post("/deleteProgramApplications", async(req, res) => {
     const program_num = req.body.program_num;
 
     pool.query(`DELETE FROM applications WHERE program_num = ${program_num}`, (err, result) => {
