@@ -446,6 +446,138 @@ router.post("/deleteProgramApplications", async (req, res) => {
     })
 })
 
+/** Get Program Students' Pursusing Federal Internships route created and implemented by:
+ *    Lucas Wilber
+ * 
+ *    SQL:
+ *      * Select 
+ */
+router.get("/getNumStudentsPursuingFederalInternships", async (req, res) => {
+    const programNum = req.query.programNum;
+
+    const query = `
+        SELECT COUNT(DISTINCT uin) AS numStudentsPursuingFederalInternships
+        FROM program_fed_intern_view
+        WHERE program_num = $1 AND is_gov = true AND intern_status != 'Denied';
+    `;
+
+    try {
+        const result = await pool.query(query, [programNum]);
+        const { numStudentsPursuingFederalInternships } = result.rows[0];
+        res.status(200).json({ numStudentsPursuingFederalInternships });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error fetching the number of students pursuing federal internships." });
+    }
+});
+
+/** Get Program Students' Internship Locations route created and implemented by:
+ *    Lucas Wilber
+ * 
+ *    SQL:
+ *      * Select 
+ */
+router.get("/getInternshipLocations", async (req, res) => {
+    const programNum = req.query.programNum;
+
+    const query = `
+        SELECT DISTINCT location FROM program_fed_intern_view WHERE program_num = $1`;
+
+    try {
+        const result = await pool.query(query, [programNum]);
+        const internshipLocations = result.rows;
+        res.status(200).json(internshipLocations);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error fetching internship locations." });
+    }
+});
+
+/** Get Program Students' Class Types route created and implemented by:
+ *    Lucas Wilber
+ * 
+ *    SQL:
+ *      * Select 
+ */
+router.get("/programs/getClassTypeCounts", async (req, res) => {
+    const programNum = req.query.programNum;
+
+    const query = `
+      SELECT c.class_type, c.class_status, COUNT(DISTINCT ia.uin) AS stuCount
+      FROM classes c
+      JOIN class_enrollment ce ON c.class_id = ce.class_id
+      JOIN intern_app ia ON ce.uin = ia.uin
+      JOIN applications a ON ia.uin = a.uin
+      WHERE a.program_num = $1
+      GROUP BY c.class_type, c.class_status;
+    `;
+
+    try {
+        const result = await pool.query(query, [programNum]);
+        const courseTypeCounts = result.rows;
+        res.status(200).json({ courseTypeCounts });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error fetching course type counts." });
+    }
+});
+
+/** Get Program Students' DoD Class Completion route created and implemented by:
+ *    Lucas Wilber
+ * 
+ *    SQL:
+ *      * Select 
+ */
+router.get("/programs/getDodClassComp", async (req, res) => {
+    const programNum = req.query.programNum;
+
+    const query = `
+      SELECT COUNT(DISTINCT ia.uin) AS stuCount
+      FROM classes c
+      JOIN class_enrollment ce ON c.class_id = ce.class_id
+      JOIN intern_app ia ON ce.uin = ia.uin
+      JOIN applications a ON ia.uin = a.uin
+      WHERE a.program_num = $1 AND c.class_type = 'DoD 8570.01M' AND ce.class_status = 'completed'
+    `;
+
+    try {
+        const result = await pool.query(query, [programNum]);
+        const count = result.rows;
+        res.status(200).json({ count });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error fetching course type counts." });
+    }
+});
+
+/** Get Program Students' DoD Certification Completion route created and implemented by:
+ *    Lucas Wilber
+ * 
+ *    SQL:
+ *      * Select 
+ */
+router.get("/programs/getDodClassComp", async (req, res) => {
+    const programNum = req.query.programNum;
+
+    const query = `
+      SELECT COUNT(DISTINCT ia.uin) AS stuCount
+      FROM certification c
+      JOIN cert_enrollment ce ON c.cert_id = ce.cert_id
+      JOIN intern_app ia ON ce.uin = ia.uin
+      JOIN applications a ON ia.uin = a.uin
+      WHERE a.program_num = $1 AND ce.training_status = 'completed'
+    `;
+
+    try {
+        const result = await pool.query(query, [programNum]);
+        const count = result.rows;
+        res.status(200).json({ count });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error fetching course type counts." });
+    }
+});
+
 const validateProgramInfo = (programData) => {
     if (programData.program_name == "") {
         return { program_name: "Please enter a name!" }

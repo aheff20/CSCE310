@@ -86,6 +86,13 @@ CREATE TABLE intern_app(
 CREATE INDEX intern_idx ON intern_app(intern_id);
 CREATE VIEW user_internships AS SELECT U.uin, I.* FROM college_student U JOIN intern_app UI ON U.uin = UI.uin JOIN internship I on I.intern_id = UI.intern_id;
 
+CREATE VIEW program_fed_intern_view AS 
+SELECT p.program_num, ia.*, i.is_gov, i.location
+FROM programs p
+JOIN applications a ON p.program_num = a.program_num
+JOIN intern_app ia ON a.uin = ia.uin
+JOIN internship i ON ia.intern_id = i.intern_id;
+
 CREATE TABLE certification(
     cert_id SERIAL,
     cert_level VARCHAR,
