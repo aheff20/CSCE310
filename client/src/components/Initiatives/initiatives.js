@@ -276,6 +276,79 @@ function Initiatives(props) {
           }
         })
       }
+      // internship
+      if (initiativeType === "Internship") {
+        console.log(initiativeName, initiativeDesc, internshipIsGov, location);
+        axios.post("initiatives/createInternship", {
+          name : initiativeName,
+          description : initiativeDesc,
+          isGov : internshipIsGov,
+          location : 'temp'
+        })
+        .then((res) => {
+          if (isApplying) {
+            console.log("created initiative");
+            axios.get("initiatives/lastInternshipMatch", {
+              params: {
+                  internship_name: initiativeName
+              }}).then((res) => {
+                let initID = res.data.intern_id;
+                console.log(initID);
+                //
+                axios.post("initiatives/createInternshipApplication", {
+                  uin : props.auth.user.user_type === "Admin" ? UIN : props.auth.user.uin,
+                  intern_id : initID,
+                  intern_status : appStatus,
+                  year: appYear
+                }).then((res) => {
+                  history.go(0);
+                  setLoading(true);
+                })
+                //
+              })
+          } else {
+            history.go(0);
+            setLoading(true);
+          }
+        })
+      }
+      // certificate
+      if (initiativeType === "Certificate") {
+        axios.post("initiatives/createCertification", {
+          name : initiativeName,
+          description : initiativeDesc,
+          certLevel : certLevel
+        })
+        .then((res) => {
+          if (isApplying) {
+            console.log("created initiative");
+            axios.get("initiatives/lastCertificateMatch", {
+              params: {
+                  cert_name: initiativeName
+              }}).then((res) => {
+                let initID = res.data.cert_id;
+                console.log(initID);
+                //
+                axios.post("initiatives/createCertificationEnrollment", {
+                  uin : props.auth.user.user_type === "Admin" ? UIN : props.auth.user.uin,
+                  cert_id : initID,
+                  cert_status : appStatus,
+                  training_status : certAppTraining,
+                  program_num : certAppProgramNum,
+                  semester : appSemester,
+                  year: appYear
+                }).then((res) => {
+                  history.go(0);
+                  setLoading(true);
+                })
+                //
+              })
+          } else {
+            history.go(0);
+            setLoading(true);
+          }
+        })
+      }
     } else if (isApplying) {
       // class
       if (initiativeType === "Class") {
@@ -283,6 +356,34 @@ function Initiatives(props) {
           uin : props.auth.user.user_type === "Admin" ? UIN : props.auth.user.uin,
           class_id : initiativeNum,
           class_status : appStatus,
+          semester : appSemester,
+          year: appYear
+        }).then((res) => {
+          history.go(0);
+          setLoading(true);
+        })
+      }
+      // internship
+      if (initiativeType === "Internship") {
+        axios.post("initiatives/createInternshipApplication", {
+          uin : props.auth.user.user_type === "Admin" ? UIN : props.auth.user.uin,
+          intern_id : initiativeNum,
+          intern_status : appStatus,
+          year: appYear
+        }).then((res) => {
+          history.go(0);
+          setLoading(true);
+        })
+      }
+      // certification
+      if (initiativeType === "Certificate") {
+        console.log(props.auth.user.uin, initiativeNum, appStatus, certAppTraining, certAppProgramNum, appYear);
+        axios.post("initiatives/createCertificationEnrollment", {
+          uin : props.auth.user.user_type === "Admin" ? UIN : props.auth.user.uin,
+          cert_id : initiativeNum,
+          cert_status : appStatus,
+          training_status : certAppTraining,
+          program_num : certAppProgramNum,
           semester : appSemester,
           year: appYear
         }).then((res) => {
@@ -553,7 +654,7 @@ function Initiatives(props) {
                         value={certLevel}
                         isInvalid={!!error.certLevel}
                         onChange={(e) => {
-                          setClassType(e.target.value);
+                          setCertLevel(e.target.value);
                         }}
                         id="Certificate Level"
                         type="text"

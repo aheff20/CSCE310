@@ -163,10 +163,11 @@ router.post("/createClassEnrollment", async(req, res) => {
  *  SQL: insert
  */
 router.post("/createInternship", async(req, res) => {
-    let name = req.query.name;
-    let description = req.query.description;
-    let isGov = req.query.isGov;
-    let location = req.query.location;
+    let name = req.body.name;
+    let description = req.body.description;
+    let isGov = req.body.isGov === "Yes";
+    let location = req.body.location;
+    console.log(name, description, isGov, location);
 
     pool.query(`INSERT INTO internship(company_name, intern_description, is_gov, location) VALUES ('${name}','${description}',${isGov},'${location}')`, (err, result) => {
         if(err) {
@@ -184,8 +185,8 @@ router.post("/createInternship", async(req, res) => {
  */
 router.post("/createInternshipApplication", async(req, res) => {
     let uin = req.body.uin;
-    let intern_id = req.body.class_id;
-    let intern_status = req.body.class_status;
+    let intern_id = req.body.intern_id;
+    let intern_status = req.body.intern_status;
     let year = req.body.year;
     // uin | intern_id | intern_status | yr
     console.log(uin, intern_id, intern_status, year);
@@ -224,16 +225,17 @@ router.post("/createCertification", async(req, res) => {
  *  SQL: insert
  */
 router.post("/createCertificationEnrollment", async(req, res) => {
+    //123456789 '1' 'testing' 'testing' '12' 2023
     let uin = req.body.uin;
-    let cert_id = req.body.class_id;
-    let cert_status = req.body.class_status;
+    let cert_id = req.body.cert_id;
+    let cert_status = req.body.cert_status;
     let training_status = req.body.training_status;
     let program_num = req.body.program_num;
+    let semester = req.body.semester;
     let year = req.body.year;
     // uin | cert_id | cert_status | training_status | program_num | semester | yr
-    console.log(uin, cert_id, cert_status, training_status, program_num, semester, year);
 
-    pool.query(`INSERT INTO cert_enrollment(uin, cert_id, cert_status, training_status, program_num, semester, yr) VALUES (${uin},${cert_id},'${cert_status}','${training_status}',${program_num},${year})`, (err, result) => {
+    pool.query(`INSERT INTO cert_enrollment(uin, cert_id, cert_status, training_status, program_num, semester, yr) VALUES (${uin}, ${cert_id},'${cert_status}','${training_status}', ${program_num}, '${semester}', ${year})`, (err, result) => {
         if(err) {
             console.log(err);
             res.status(400).json({message: "Error creating class!"});
