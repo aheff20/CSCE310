@@ -42,6 +42,7 @@ CREATE TABLE classes(
     class_type VARCHAR,
     PRIMARY KEY(class_id)
 );
+CREATE INDEX class_idx ON classes(class_id);
 
 CREATE TABLE class_enrollment(
     ce_num SERIAL,
@@ -58,6 +59,7 @@ CREATE TABLE class_enrollment(
         FOREIGN KEY(class_id)
             REFERENCES classes(class_id)
 );
+CREATE VIEW user_classes AS SELECT U.uin, C.* FROM users U JOIN class_enrollment UC ON U.uin = UC.uin JOIN classes C on C.class_id = UC.class_id;
 
 CREATE TABLE internship(
     intern_id INT,
@@ -66,6 +68,7 @@ CREATE TABLE internship(
     is_gov BOOLEAN,
     PRIMARY KEY(intern_id)
 );
+CREATE INDEX intern_idx ON internship(intern_id);
 
 CREATE TABLE intern_app(
     ia_num SERIAL,
@@ -81,6 +84,7 @@ CREATE TABLE intern_app(
         FOREIGN KEY(intern_id)
             REFERENCES internship(intern_id)
 );
+CREATE VIEW user_internships AS SELECT U.uin, I.* FROM users U JOIN intern_app UI ON U.uin = UI.uin JOIN internship I on I.intern_id = UI.intern_id;
 
 CREATE TABLE certification(
     cert_id INT,
@@ -89,6 +93,7 @@ CREATE TABLE certification(
     cert_description VARCHAR,
     PRIMARY KEY(cert_id)
 );
+CREATE INDEX cert_idx ON certification(cert_id);
 
 CREATE TABLE programs(
     program_num SERIAL,
@@ -118,6 +123,7 @@ CREATE TABLE cert_enrollment(
             FOREIGN KEY(program_num)
                 REFERENCES programs(program_num)
 );
+CREATE VIEW user_classes AS SELECT U.uin, C.* FROM users U JOIN cert_enrollment UC ON U.uin = UC.uin JOIN certification C on C.cert_id = UC.cert_id;
 
 CREATE TABLE event(
     event_id SERIAL,
