@@ -6,7 +6,7 @@ import { Form, Button, Container, Table, Spinner, Row, Col, CardGroup, Modal } f
 import classnames from "classnames";
 import axios from "axios";
 import React from "react";
-import ProgramCard from './programCard';
+import eventCard from "../Events/eventCard";
 
 function ProgramDetails(props) {
   const history = useHistory();
@@ -66,7 +66,7 @@ function ProgramDetails(props) {
       }})
       .then((res) => {
         if (!res.data.valid) {
-          history.replace("/programs/");;
+          history.replace("/programs/");
         }
 
         axios.get("/programs/getProgramInfo", {
@@ -623,21 +623,21 @@ function ProgramDetails(props) {
             <br/>
             <h2 className="display-5 text-center">{programInfo.program_name}</h2>
             <p className="text-center">{programInfo.program_description}</p>
-            <div className="col d-flex justify-content-center align-items-center">
-              <Button variant="primary" onClick={() => editProgramHandler()}>Edit Program</Button>
-            </div>
-            <div className="col d-flex justify-content-center align-items-center">
-              <Button variant="warning" onClick={() => accessProgramHandler()}>
-                {programActive ? "Close Program" : "Reopen Program"}
-              </Button>
-              <Button variant="danger" onClick={() => deleteProgramHandler()}>Delete Program</Button>
-            </div>
-            <br/>
 
             {props.auth.user.user_type == "Admin" ? (
                 // Return a table with all students information who are in this program (programNum)
                 // Each row in the table should be able to view more details in a modal to see more details/edit students
                 <React.Fragment>
+                  <div className="col d-flex justify-content-center align-items-center">
+                    <Button variant="primary" onClick={() => editProgramHandler()}>Edit Program</Button>
+                  </div>
+                  <div className="col d-flex justify-content-center align-items-center">
+                    <Button variant="warning" onClick={() => accessProgramHandler()}>
+                      {programActive ? "Close Program" : "Reopen Program"}
+                    </Button>
+                    <Button variant="danger" onClick={() => deleteProgramHandler()}>Delete Program</Button>
+                  </div>
+                  <br/>
                   <p>Number of Enrolled Students: {studentCount}</p>
                   {studentCount ? (
                     <React.Fragment>
