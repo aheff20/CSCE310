@@ -15,9 +15,9 @@ function Programs(props) {
   const [currentProgramNum, setCurrentProgramNum] = useState([]);
   const [currentProgramName, setCurrentProgramName] = useState([]);
   const [currentProgramDescription, setCurrentProgramDescription] = useState([]);
-  const [currentAppUncomcert, setCurrentAppUncomcert] = useState([]);
-  const [currentAppCert, setCurrentAppCert] = useState([]);
-  const [currentAppPurpose, setCurrentAppPurpose] = useState([]);
+  const [currentAppUncomcert, setCurrentAppUncomcert] = useState("");
+  const [currentAppCert, setCurrentAppCert] = useState("");
+  const [currentAppPurpose, setCurrentAppPurpose] = useState("");
   const [deleteConfirmation, setDeleteConfirmation] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
@@ -100,7 +100,18 @@ function Programs(props) {
   }
   const handleConfirmApplication = () => {
     console.log(`Confirmed application to program ${currentProgramNum}`);
-    handleClose();
+    axios
+      .post("programs/createApplication", {
+        program_num: currentProgramNum,
+        uin: props.auth.user.uin,
+        uncom_cert: currentAppUncomcert,
+        com_cert: currentAppCert,
+        purpose: currentAppPurpose
+      })
+      .then((res) => {
+        history.go(0);
+        setShowApply(false);
+      })
   }
 
   const accessProgramHandler = (programNum, isActive) => {
@@ -137,28 +148,28 @@ function Programs(props) {
           return;
         }
 
-    axios
-      .post("/programs/deleteProgramApplications", { program_num: currentProgramNum })
-      .then((res) => {
-        if (res.status === 201) {
-          console.log(res.data);
-          setError(res.data);
-          return;
-        }
+        axios
+          .post("/programs/deleteProgramApplications", { program_num: currentProgramNum })
+          .then((res) => {
+            if (res.status === 201) {
+              console.log(res.data);
+              setError(res.data);
+              return;
+            }
 
-    axios
-      .post("/programs/deleteProgram", { program_num: currentProgramNum })
-      .then((res) => {
-        if (res.status === 201) {
-          console.log(res.data);
-          setError(res.data);
-        } else {
-          history.go(0);
-          handleClose();
-          setDeleteConfirmation(false);
-        }
-      });
-      });
+            axios
+              .post("/programs/deleteProgram", { program_num: currentProgramNum })
+              .then((res) => {
+                if (res.status === 201) {
+                  console.log(res.data);
+                  setError(res.data);
+                } else {
+                  history.go(0);
+                  handleClose();
+                  setDeleteConfirmation(false);
+                }
+              });
+          });
       });
   };
 
@@ -363,7 +374,7 @@ function Programs(props) {
           </Row>
           <Row>
             <Col sm={6}>
-              <b>Program Cert: </b>
+              <b>Have you completed any cybersecurity industry certifications via the Cybersecurity Center? </b>
             </Col>
             <Col>
               <Form.Control
@@ -393,7 +404,7 @@ function Programs(props) {
           </Row>
           <br></br>
           <Row>
-          <b>Document Upload: </b>
+            <b>Document Upload: </b>
           </Row>
           <br></br>
           <Row hidden={numDocuments <= 0}>
@@ -403,11 +414,12 @@ function Programs(props) {
             <Col>
               <Form.Group>
                 <Form.Control
-                    onChange={(e) => {
-                      setDocType1(e.target.value);}}
-                    value={doc_type1}
-                    id="fileType"
-                    type="text"
+                  onChange={(e) => {
+                    setDocType1(e.target.value);
+                  }}
+                  value={doc_type1}
+                  id="fileType"
+                  type="text"
                 />
               </Form.Group>
             </Col>
@@ -420,11 +432,12 @@ function Programs(props) {
             <Col>
               <Form.Group>
                 <Form.Control
-                    onChange={(e) => {
-                      setLink1(e.target.value);}}
-                    value={link1}
-                    id="fileUpload"
-                    type="text"
+                  onChange={(e) => {
+                    setLink1(e.target.value);
+                  }}
+                  value={link1}
+                  id="fileUpload"
+                  type="text"
                 />
               </Form.Group>
             </Col>
@@ -439,11 +452,12 @@ function Programs(props) {
             <Col>
               <Form.Group>
                 <Form.Control
-                    onChange={(e) => {
-                      setDocType2(e.target.value);}}
-                    value={doc_type2}
-                    id="fileType"
-                    type="text"
+                  onChange={(e) => {
+                    setDocType2(e.target.value);
+                  }}
+                  value={doc_type2}
+                  id="fileType"
+                  type="text"
                 />
               </Form.Group>
             </Col>
@@ -456,11 +470,12 @@ function Programs(props) {
             <Col>
               <Form.Group>
                 <Form.Control
-                    onChange={(e) => {
-                      setLink2(e.target.value);}}
-                    value={link2}
-                    id="fileUpload"
-                    type="text"
+                  onChange={(e) => {
+                    setLink2(e.target.value);
+                  }}
+                  value={link2}
+                  id="fileUpload"
+                  type="text"
                 />
               </Form.Group>
             </Col>
@@ -475,11 +490,12 @@ function Programs(props) {
             <Col>
               <Form.Group>
                 <Form.Control
-                    onChange={(e) => {
-                      setDocType3(e.target.value);}}
-                    value={doc_type3}
-                    id="fileType"
-                    type="text"
+                  onChange={(e) => {
+                    setDocType3(e.target.value);
+                  }}
+                  value={doc_type3}
+                  id="fileType"
+                  type="text"
                 />
               </Form.Group>
             </Col>
@@ -492,11 +508,12 @@ function Programs(props) {
             <Col>
               <Form.Group>
                 <Form.Control
-                    onChange={(e) => {
-                      setLink3(e.target.value);}}
-                    value={link3}
-                    id="fileUpload"
-                    type="text"
+                  onChange={(e) => {
+                    setLink3(e.target.value);
+                  }}
+                  value={link3}
+                  id="fileUpload"
+                  type="text"
                 />
               </Form.Group>
             </Col>
@@ -511,11 +528,12 @@ function Programs(props) {
             <Col>
               <Form.Group>
                 <Form.Control
-                    onChange={(e) => {
-                      setDocType4(e.target.value);}}
-                    value={doc_type4}
-                    id="fileType"
-                    type="text"
+                  onChange={(e) => {
+                    setDocType4(e.target.value);
+                  }}
+                  value={doc_type4}
+                  id="fileType"
+                  type="text"
                 />
               </Form.Group>
             </Col>
@@ -528,18 +546,19 @@ function Programs(props) {
             <Col>
               <Form.Group>
                 <Form.Control
-                    onChange={(e) => {
-                      setLink4(e.target.value);}}
-                    value={link4}
-                    id="fileUpload"
-                    type="text"
+                  onChange={(e) => {
+                    setLink4(e.target.value);
+                  }}
+                  value={link4}
+                  id="fileUpload"
+                  type="text"
                 />
               </Form.Group>
             </Col>
           </Row>
 
           <br hidden={numDocuments <= 4}></br>
-          
+
           <Row hidden={numDocuments <= 4}>
             <Col sm={6}>
               <b>Enter Document Type: </b>
@@ -547,11 +566,12 @@ function Programs(props) {
             <Col>
               <Form.Group>
                 <Form.Control
-                    onChange={(e) => {
-                      setDocType5(e.target.value);}}
-                    value={doc_type5}
-                    id="fileType"
-                    type="text"
+                  onChange={(e) => {
+                    setDocType5(e.target.value);
+                  }}
+                  value={doc_type5}
+                  id="fileType"
+                  type="text"
                 />
               </Form.Group>
             </Col>
@@ -564,11 +584,12 @@ function Programs(props) {
             <Col>
               <Form.Group>
                 <Form.Control
-                    onChange={(e) => {
-                      setLink5(e.target.value);}}
-                    value={link5}
-                    id="fileUpload"
-                    type="text"
+                  onChange={(e) => {
+                    setLink5(e.target.value);
+                  }}
+                  value={link5}
+                  id="fileUpload"
+                  type="text"
                 />
               </Form.Group>
             </Col>
