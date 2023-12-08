@@ -12,13 +12,13 @@ import setAuthToken from "../../utils/setAuthToken";
 
 function Initiatives(props) {
   const history = useHistory();
-  const [allClassData, setClassData] = useState({});
-  const [allInternshipData, setInternshipData] = useState({});
-  const [allCertificateData, setCertificateData] = useState({});
-  const [allUserClassData, setUserClassData] = useState({});
-  const [allUserInternshipData, setUserInternshipData] = useState({});
-  const [allUserCertificateData, setUserCertificateData] = useState({});
-  const [allProgramData, setProgramData] = useState({});
+  const [allClassData, setClassData] = useState([]);
+  const [allInternshipData, setInternshipData] = useState([]);
+  const [allCertificateData, setCertificateData] = useState([]);
+  const [allUserClassData, setUserClassData] = useState([]);
+  const [allUserInternshipData, setUserInternshipData] = useState([]);
+  const [allUserCertificateData, setUserCertificateData] = useState([]);
+  const [allProgramData, setProgramData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // modal info
@@ -71,7 +71,7 @@ function Initiatives(props) {
         setInternshipData(res.data);
         //console.log(res.data);
     
-    axios.get("/initiatives/getAllUserClassData")
+    axios.get("/initiatives/getAllUserInternshipData")
       .then((res) => {
         setUserInternshipData(res.data);
         //console.log(res.data);
@@ -465,6 +465,84 @@ function Initiatives(props) {
                           <td>{Class.class_status}</td>
                           <td>{Class.semester}</td>
                           <td>{Class.yr}</td>
+                        </React.Fragment>
+                      }
+                      <td>
+                        <Button variant="success btn-sm" onClick={() => {}}>
+                          Edit
+                        </Button>
+                      </td>
+                   </tr>
+      list.push(temp);
+    }
+    return list;
+  }
+
+  const getInternshipTable = (data, showUser, showEnroll) => {
+    const list = [];
+    for(let k = 0; k < data.length; k++) {
+      let Internship = data[k];
+
+      const temp = <tr key={k}>
+                      {showUser && 
+                        <React.Fragment>
+                          <td>{Internship.uin}</td>
+                          <td>{Internship.first_name} {Internship.m_initial} {Internship.last_name}</td>
+                        </React.Fragment>
+                      }
+                      <td>{Internship.company_name}</td>
+                      <td>{Internship.intern_description}</td>
+                      <td>{Internship.is_gov ? "Yes" : "No"}</td>
+                      <td>{Internship.location}</td>
+                      {showEnroll &&
+                        <React.Fragment>
+                          <td>{Internship.intern_status}</td>
+                          <td>{Internship.yr}</td>
+                        </React.Fragment>
+                      }
+                      <td>
+                        <Button variant="success btn-sm" onClick={() => {}}>
+                          Edit
+                        </Button>
+                      </td>
+                   </tr>
+      list.push(temp);
+    }
+    return list;
+  }
+
+  const getCertificationTable = (data, showUser, showEnroll) => {
+    //cert_level |    cert_name     | cert_description
+    //cert_status | training_status | program_num | semester | yr
+    const list = [];
+    for(let k = 0; k < data.length; k++) {
+      let Cert = data[k];
+      // class_status   | semester |  yr
+      //console.log("Filtered...");
+      let progName = allProgramData.filter((Program) => (Program.program_num === Cert.program_num))[0];
+      if (progName === undefined) {
+        progName = Cert.program_num;
+      }
+      else progName = progName.program_name;
+      //console.log(progName);
+
+      const temp = <tr key={k}>
+                      {showUser && 
+                        <React.Fragment>
+                          <td>{Cert.uin}</td>
+                          <td>{Cert.first_name} {Cert.m_initial} {Cert.last_name}</td>
+                        </React.Fragment>
+                      }
+                      <td>{Cert.cert_name}</td>
+                      <td>{Cert.cert_description}</td>
+                      <td>{Cert.cert_level}</td>
+                      {showEnroll &&
+                        <React.Fragment>
+                          <td>{Cert.cert_status}</td>
+                          <td>{Cert.training_status}</td>
+                          <td>{progName}</td>
+                          <td>{Cert.semester}</td>
+                          <td>{Cert.yr}</td>
                         </React.Fragment>
                       }
                       <td>
@@ -889,6 +967,7 @@ function Initiatives(props) {
                 Create Initiative
               </Button>
             </div>
+            <br/>
             {props.auth.user.user_type == "Admin" ? (
               <React.Fragment>
                 <h2 className="display-5 text-center">Classes</h2>
@@ -912,16 +991,79 @@ function Initiatives(props) {
                       <th className="col-md-1">Class</th>
                       <th className="col-md-1">Description</th>
                       <th className="col-md-1">Class Type</th>
-                      <th classname="col-md-1">Class Status</th>
-                      <th classname="col-md-1">Semester</th>
-                      <th classname="col-md-1">Year</th>
+                      <th className="col-md-1">Class Status</th>
+                      <th className="col-md-1">Semester</th>
+                      <th className="col-md-1">Year</th>
                       <th className="col-md-1">Edit</th>
                     </tr>
                   </thead>
                   <tbody>{getClassTable(allUserClassData, true, true)}</tbody>
                 </Table>
+                <br/>
+
                 <h2 className="display-5 text-center">Internships</h2>
+                <Table stiped bordered hover className="text-center">
+                  <thead>
+                    <tr>
+                      <th className="col-md-1">Company</th>
+                      <th className="col-md-1">Description</th>
+                      <th className="col-md-1">Is Gov</th>
+                      <th className="col-md-1">Location</th>
+                      <th className="col-md-1">Edit</th>
+                    </tr>
+                  </thead>
+                  <tbody>{getInternshipTable(allUserInternshipData, false, false)}</tbody>
+                </Table>
+                <h2 className="display-5 text-center">Internship Applications</h2>
+                <Table stiped bordered hover className="text-center">
+                  <thead>
+                    <tr>
+                      <th className="col-md-1">UIN</th>
+                      <th className="col-md-1">Name</th>
+                      <th className="col-md-1">Company</th>
+                      <th className="col-md-1">Description</th>
+                      <th className="col-md-1">Is Gov</th>
+                      <th className="col-md-1">Location</th>
+                      <th className="col-md-1">Status</th>
+                      <th className="col-md-1">Year</th>
+                      <th className="col-md-1">Edit</th>
+                    </tr>
+                  </thead>
+                  <tbody>{getInternshipTable(allUserInternshipData, true, true)}</tbody>
+                </Table>
+                <br/>
+
                 <h2 className="display-5 text-center">Certificates</h2>
+                <Table stiped bordered hover className="text-center">
+                  <thead>
+                    <tr>
+                      <th className="col-md-1">Certificate</th>
+                      <th className="col-md-1">Description</th>
+                      <th className="col-md-1">Level</th>
+                      <th className="col-md-1">Edit</th>
+                    </tr>
+                  </thead>
+                  <tbody>{getCertificationTable(allUserCertificateData, false, false)}</tbody>
+                </Table>
+                <h2 className="display-5 text-center">Certificate Enrollments</h2>
+                <Table stiped bordered hover className="text-center">
+                  <thead>
+                    <tr>
+                      <th className="col-md-1">UIN</th>
+                      <th className="col-md-1">Name</th>
+                      <th className="col-md-1">Certificate</th>
+                      <th className="col-md-1">Description</th>
+                      <th className="col-md-1">Level</th>
+                      <th className="col-md-1">Status</th>
+                      <th className="col-md-1">Training Status</th>
+                      <th className="col-md-1">Program</th>
+                      <th className="col-md-1">Semester</th>
+                      <th className="col-md-1">Year</th>
+                      <th className="col-md-1">Edit</th>
+                    </tr>
+                  </thead>
+                  <tbody>{getCertificationTable(allUserCertificateData, true, true)}</tbody>
+                </Table>
               </React.Fragment>
             ):(
               <React.Fragment>
@@ -932,16 +1074,49 @@ function Initiatives(props) {
                       <th className="col-md-1">Class</th>
                       <th className="col-md-1">Description</th>
                       <th className="col-md-1">Class Type</th>
-                      <th classname="col-md-1">Class Status</th>
-                      <th classname="col-md-1">Semester</th>
-                      <th classname="col-md-1">Year</th>
+                      <th className="col-md-1">Class Status</th>
+                      <th className="col-md-1">Semester</th>
+                      <th className="col-md-1">Year</th>
                       <th className="col-md-1">Edit</th>
                     </tr>
                   </thead>
                   <tbody>{getClassTable(allUserClassData.filter((Class) => (Class.uin===props.auth.user.uin)), false, true)}</tbody>
                 </Table>
+
                 <h2 className="display-5 text-center">My Internships</h2>
+                <Table stiped bordered hover className="text-center">
+                  <thead>
+                    <tr>
+                      <th className="col-md-1">Company</th>
+                      <th className="col-md-1">Description</th>
+                      <th className="col-md-1">Is Gov</th>
+                      <th className="col-md-1">Location</th>
+                      <th className="col-md-1">Status</th>
+                      <th className="col-md-1">Year</th>
+                      <th className="col-md-1">Edit</th>
+                    </tr>
+                  </thead>
+                  <tbody>{getInternshipTable(allUserInternshipData.filter((Internship) => (Internship.uin===props.auth.user.uin)), false, true)}</tbody>
+                </Table>
+
                 <h2 className="display-5 text-center">My Certificates</h2>
+                <Table stiped bordered hover className="text-center">
+                  <thead>
+                    <tr>
+                      <th className="col-md-1">Certificate</th>
+                      <th className="col-md-1">Description</th>
+                      <th className="col-md-1">Level</th>
+                      <th className="col-md-1">Status</th>
+                      <th className="col-md-1">Training Status</th>
+                      <th className="col-md-1">Program</th>
+                      <th className="col-md-1">Semester</th>
+                      <th className="col-md-1">Year</th>
+                      <th className="col-md-1">Edit</th>
+                    </tr>
+                  </thead>
+                  <tbody>{getCertificationTable(allUserCertificateData.filter((Cert) => (Cert.uin===props.auth.user.uin)), false, true)}</tbody>
+                </Table>
+
               </React.Fragment>
             )}
         </React.Fragment>
