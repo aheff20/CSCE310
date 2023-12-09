@@ -181,8 +181,9 @@ function Programs(props) {
   const confirmDeleteApplication = () => {
     console.log(`Deleting application ${currentAppNum}`);
     Promise.all([
-      axios.post("programs/deleteDocumentsOfApplication", { app_num: currentAppNum }),
-      axios.post("programs/deleteApplication", {app_num: currentAppNum}),
+      axios.post("programs/deleteDocumentsOfApplication", { app_num: currentAppNum }).then((res) =>{
+        axios.post("programs/deleteApplication", {app_num: currentAppNum});
+      })
     ])
       .then((res) => {
         if (res.status === 201) {
