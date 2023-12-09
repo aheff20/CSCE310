@@ -406,6 +406,274 @@ router.post("/createCertificationEnrollment", async(req, res) => {
 /////
 //update
 
+/** Update Class route created and implemented by:
+ *    Logan Carbo
+ * 
+ *    SQL: update 
+ */
+router.post("/updateClass", async (req, res) => {
+
+    let ID = req.body.ID;
+    let name = req.body.name;
+    let description = req.body.description;
+    let classType = req.body.classType;
+    //class_name | class_description |    class_type
+
+    pool.query(`UPDATE classes SET class_name='${name}', class_description='${description}', class_type='${classType}' WHERE class_id=${ID}`, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.status(400).json({ message: "Error updating program!" })
+        }
+        const payload = {
+            class_id: ID,
+            class_name: name,
+            class_description: description,
+            class_type: classType
+        };
+
+        // Sign token
+        jwt.sign(
+            payload,
+            keys.secretOrKey,
+            {
+                expiresIn: 604800, // 7 days in seconds
+            },
+            (err, token) => {
+                res.status(200).json({
+                    success: true,
+                    token: "Bearer " + token,
+                });
+            }
+        );
+    })
+});
+
+/** Update Internship route created and implemented by:
+ *    Logan Carbo
+ * 
+ *    SQL: update 
+ */
+router.post("/updateInternship", async (req, res) => {
+
+    let ID = req.body.ID;
+    let name = req.body.name;
+    let description = req.body.description;
+    let isGov = (req.body.isGov === "Yes");
+    let location = req.body.location;
+    //intern_id | company_name | intern_description | is_gov |  location
+
+    pool.query(`UPDATE internship SET company_name='${name}', intern_description='${description}', is_gov=${isGov}, location='${location}' WHERE intern_id=${ID}`, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.status(400).json({ message: "Error updating program!" })
+        }
+        const payload = {
+            intern_id: ID,
+            company_name: name,
+            intern_description: description,
+            is_gov: classType,
+            location: location
+        };
+
+        // Sign token
+        jwt.sign(
+            payload,
+            keys.secretOrKey,
+            {
+                expiresIn: 604800, // 7 days in seconds
+            },
+            (err, token) => {
+                res.status(200).json({
+                    success: true,
+                    token: "Bearer " + token,
+                });
+            }
+        );
+    })
+});
+
+/** Update Certification route created and implemented by:
+ *    Logan Carbo
+ * 
+ *    SQL: update 
+ */
+router.post("/updateCertification", async (req, res) => {
+
+    let ID = req.body.ID;
+    let name = req.body.name;
+    let description = req.body.description;
+    let certLevel = req.body.certLevel;
+    // cert_id | cert_level |    cert_name     | cert_description
+
+    pool.query(`UPDATE certification SET cert_name='${name}', cert_description='${description}', cert_level='${certLevel}' WHERE class_id=${ID}`, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.status(400).json({ message: "Error updating program!" })
+        }
+        const payload = {
+            cert_id: ID,
+            cert_name: name,
+            cert_description: description,
+            cert_level: certLevel
+        };
+
+        // Sign token
+        jwt.sign(
+            payload,
+            keys.secretOrKey,
+            {
+                expiresIn: 604800, // 7 days in seconds
+            },
+            (err, token) => {
+                res.status(200).json({
+                    success: true,
+                    token: "Bearer " + token,
+                });
+            }
+        );
+    })
+});
+
+/** Update Class Enrollment route created and implemented by:
+ *    Logan Carbo
+ * 
+ *    SQL: update 
+ */
+router.post("/updateClassEnrollment", async (req, res) => {
+
+    let ce_num = req.body.ce_num;
+    let uin = req.body.uin;
+    let class_id = req.body.uin;
+    let status = req.body.status;
+    let semester = req.body.semester;
+    let year = req.body.year
+    // ce_num |    uin    | class_id |  class_status   | semester |  yr
+
+    pool.query(`UPDATE class_enrollment SET uin='${uin}', class_id='${class_id}', class_status='${status}', semester='${semester}', yr=${year} WHERE ce_num=${ce_num}`, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.status(400).json({ message: "Error updating program!" })
+        }
+        const payload = {
+            ce_num: ce_num,
+            uin: uin,
+            class_id: class_id,
+            class_status: status,
+            semester: semester,
+            yr: year
+        };
+
+        // Sign token
+        jwt.sign(
+            payload,
+            keys.secretOrKey,
+            {
+                expiresIn: 604800, // 7 days in seconds
+            },
+            (err, token) => {
+                res.status(200).json({
+                    success: true,
+                    token: "Bearer " + token,
+                });
+            }
+        );
+    })
+});
+
+/** Update Internship Application route created and implemented by:
+ *    Logan Carbo
+ * 
+ *    SQL: update 
+ */
+router.post("/updateInternshipApplication", async (req, res) => {
+
+    let ia_num = req.body.ia_num;
+    let uin = req.body.uin;
+    let intern_id = req.body.uin;
+    let status = req.body.status;
+    let year = req.body.year
+    // ia_num |    uin    | intern_id | intern_status |  yr
+
+    pool.query(`UPDATE intern_app SET uin='${uin}', intern_id='${intern_id}', intern_status='${status}', yr=${year} WHERE ia_num=${ia_num}`, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.status(400).json({ message: "Error updating program!" })
+        }
+        const payload = {
+            ia_num: ia_num,
+            uin: uin,
+            intern_id: intern_id,
+            intern_status: status,
+            yr: year
+        };
+
+        // Sign token
+        jwt.sign(
+            payload,
+            keys.secretOrKey,
+            {
+                expiresIn: 604800, // 7 days in seconds
+            },
+            (err, token) => {
+                res.status(200).json({
+                    success: true,
+                    token: "Bearer " + token,
+                });
+            }
+        );
+    })
+});
+
+/** Update Certification Enrollment route created and implemented by:
+ *    Logan Carbo
+ * 
+ *    SQL: update 
+ */
+router.post("/updateCertificationEnrollment", async (req, res) => {
+
+    let certe_num = req.body.certe_num;
+    let uin = req.body.uin;
+    let cert_id = req.body.intern_id;
+    let status = req.body.status;
+    let training_status = req.body.training_status;
+    let program_num = req.body.program_num;
+    let semester = req.body.semester;
+    let year = req.body.year
+    //  certe_num |    uin    | cert_id | cert_status | training_status | program_num | semester |  yr
+
+    pool.query(`UPDATE cert_enrollment SET uin='${uin}', cert_id='${cert_id}', cert_status='${status}', training_status='${training_status}', program_num=${program_num}, semester='${semester}', yr=${year} WHERE ce_num=${ce_num}`, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.status(400).json({ message: "Error updating program!" })
+        }
+        const payload = {
+            certe_num: certe_num,
+            uin: uin,
+            cert_id: class_id,
+            cert_status: status,
+            training_status: training_status,
+            program_num: program_num,
+            semester: semester,
+            yr: year
+        };
+
+        // Sign token
+        jwt.sign(
+            payload,
+            keys.secretOrKey,
+            {
+                expiresIn: 604800, // 7 days in seconds
+            },
+            (err, token) => {
+                res.status(200).json({
+                    success: true,
+                    token: "Bearer " + token,
+                });
+            }
+        );
+    })
+});
+
 /////
 //delete
 
