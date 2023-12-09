@@ -83,7 +83,7 @@ function Initiatives(props) {
     axios.get("/initiatives/getAllCertificateData")
       .then((res) => {
         setCertificateData(res.data);
-        console.log(res.data);
+        //console.log(res.data);
         setLoading(false);
     
     axios.get("/initiatives/getAllUserCertificateData")
@@ -445,6 +445,9 @@ function Initiatives(props) {
 
   }
 
+  /**
+   * Function to setup class information editing
+   */
   const editClassHandler = (ID, applyStatus) => {
     //console.log(ID);
     setInitiativeType("Class");
@@ -480,6 +483,9 @@ function Initiatives(props) {
     }
   }
 
+  /**
+   * Function to setup internship information editing
+   */
   const editInternshipHandler = (ID, applyStatus) => {
     //console.log(ID);
     setInitiativeType("Internship");
@@ -514,6 +520,9 @@ function Initiatives(props) {
     }
   }
 
+  /**
+   * Function to setup certification information editing
+   */
   const editCertificateHandler = (ID, applyStatus) => {
     ///
     //console.log(ID);
@@ -552,15 +561,134 @@ function Initiatives(props) {
     }
   }
 
-  const deleteClassHandler = () => {
-
+  /**
+   * Function to handle updating initiative data
+   */
+  const confirmEditHandler = () => {
+    if (isApplying) {
+      // apps/enrollments
+      if (initiativeType==="Class") {
+        axios.post("/initiatives/updateClassEnrollment", {
+          ce_num: appNum,
+          uin: UIN,
+          class_id: initiativeID,
+          status: appStatus,
+          semester: appSemester,
+          year: appYear
+        }).then((res) => {
+          if (res.status === 201) {
+            console.log(res.data);
+            setError(res.data);
+          } else {
+            setShowEdit(false);
+            setLoading(true);
+            history.go(0);
+          }
+        })
+      }
+      if (initiativeType==="Internship") {
+        //console.log(appNum, UIN, initiativeID, appStatus, appYear);
+        axios.post("/initiatives/updateInternshipApplication", {
+          ia_num: appNum,
+          uin: UIN,
+          intern_id: initiativeID,
+          status: appStatus,
+          year: appYear
+        }).then((res) => {
+          if (res.status === 201) {
+            console.log(res.data);
+            setError(res.data);
+          } else {
+            setShowEdit(false);
+            setLoading(true);
+            history.go(0);
+          }
+        })
+      }
+      if (initiativeType==="Certificate") {
+        axios.post("/initiatives/updateCertificationEnrollment", {
+          certe_num: appNum,
+          uin: UIN,
+          cert_id: initiativeID,
+          status: appStatus,
+          training_status: certAppTraining,
+          program_num: certAppProgramNum,
+          semester: appSemester,
+          year: appYear
+        }).then((res) => {
+          if (res.status === 201) {
+            console.log(res.data);
+            setError(res.data);
+          } else {
+            setShowEdit(false);
+            setLoading(true);
+            history.go(0);
+          }
+        })
+      }
+    } else {
+      // main objects
+      if (initiativeType==="Class") {
+        //console.log(initiativeID, initiativeName, initiativeDesc, classType);
+        axios.post("/initiatives/updateClass", {
+          ID: initiativeID,
+          name: initiativeName,
+          description: initiativeDesc,
+          classType: classType
+        }).then((res) => {
+          if (res.status === 201) {
+            console.log(res.data);
+            setError(res.data);
+          } else {
+            setShowEdit(false);
+            setLoading(true);
+            history.go(0);
+          }
+        })
+      }
+      if (initiativeType==="Internship") {
+        //console.log(initiativeID, initiativeName, initiativeDesc, internshipIsGov, internshipLocation);
+        axios.post("/initiatives/updateInternship", {
+          ID: initiativeID,
+          name: initiativeName,
+          description: initiativeDesc,
+          isGov: internshipIsGov,
+          location: internshipLocation
+        }).then((res) => {
+          if (res.status === 201) {
+            console.log(res.data);
+            setError(res.data);
+          } else {
+            setShowEdit(false);
+            setLoading(true);
+            history.go(0);
+          }
+        })
+      }
+      if (initiativeType==="Certificate") {
+        axios.post("/initiatives/updateCertification", {
+          ID: initiativeID,
+          name: initiativeName,
+          description: initiativeDesc,
+          certLevel: certLevel
+        }).then((res) => {
+          if (res.status === 201) {
+            console.log(res.data);
+            setError(res.data);
+          } else {
+            setShowEdit(false);
+            setLoading(true);
+            history.go(0);
+          }
+        })
+      }
+    }
   }
 
-  const deleteInternshipHandler = () => {
-
-  }
-
-  const deleteCertificateHandler = () => {
+  /**
+   * Function to remove initiative data
+   */
+  const deletionHandler = () => {
 
   }
 
@@ -1378,10 +1506,10 @@ function Initiatives(props) {
           <Button variant="secondary" onClick={resetModalValues}>
             Cancel
           </Button>
-          <Button variant="danger" onClick={() => {}}>
+          <Button variant="danger" onClick={deletionHandler}>
             Delete
           </Button>
-          <Button variant="primary" onClick={createInitiativeHandler}>
+          <Button variant="primary" onClick={confirmEditHandler}>
             Confirm
           </Button>
         </Modal.Footer>
