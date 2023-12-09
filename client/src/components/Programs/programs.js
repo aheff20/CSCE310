@@ -344,6 +344,10 @@ function Programs(props) {
     setLink5("");
   }
 
+  /**
+    Implemented by: Billy Harkins
+    changes state of document info to be current with user edits
+  */
   const allDocumentInfo = (app_num) => {
     axios
       .get("/programs/getUploadedDocuments", {
@@ -375,6 +379,10 @@ function Programs(props) {
       });
   }
 
+  /**
+    Implemented by: Billy Harkins
+    edits database to reflect user changes to document links and types
+  */
   const allProgramDataEdit = (app_num) => {
     axios
     .get("/programs/getUploadedDocuments", {
