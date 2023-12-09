@@ -49,7 +49,7 @@ router.get("/getEventInfo", async(req, res) => {
 router.get("/getAttendingUsers", async(req, res) => {
     const event_id = req.query.event_id;
 
-    pool.query(`SELECT U.* FROM event E JOIN event_tracking ET ON E.event_id = ET.event_ID JOIN users U on ET.uin = U.uin WHERE E.event_id = ${event_id}`, (err, result) => {
+    pool.query(`SELECT uin, first_name, last_name, m_initial, email, discord, username, pass, user_type FROM attending_users WHERE event_id = ${event_id}`, (err, result) => {
         if(err){
             console.log(err);
             res.status(400).json({message: "Error getting attending user details!"})

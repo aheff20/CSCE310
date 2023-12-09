@@ -138,6 +138,7 @@ function Programs(props) {
     setCurrentAppCert(application.com_cert);
     setCurrentAppUncomcert(application.uncom_cert);
     setCurrentAppPurpose(application.purpose_statement);
+    allDocumentInfo(application.app_num);
     setShowEditApplication(true);
   };
 
@@ -152,6 +153,22 @@ function Programs(props) {
         purpose: currentAppPurpose
       })
       .then((res) => {
+        if(numDocuments > 0){
+          axios.post("programs/createDocument", {app_num: res.data.app_num, link: link1,doc_type: doc_type1,})
+        }
+        if(numDocuments > 1){
+          axios.post("programs/createDocument", {app_num: res.data.app_num, link: link2,doc_type: doc_type2,})
+        }
+        if(numDocuments > 2){
+          axios.post("programs/createDocument", {app_num: res.data.app_num, link: link3,doc_type: doc_type3,})
+        }
+        if(numDocuments > 3){
+          axios.post("programs/createDocument", {app_num: res.data.app_num, link: link4,doc_type: doc_type4,})
+        }
+        if(numDocuments > 4){
+          axios.post("programs/createDocument", {app_num: res.data.app_num, link: link5,doc_type: doc_type5,})
+        }
+    
         history.go(0);
         setShowApply(false);
       })
@@ -163,8 +180,10 @@ function Programs(props) {
 
   const confirmDeleteApplication = () => {
     console.log(`Deleting application ${currentAppNum}`);
-    axios
-      .post("/programs/deleteApplicationsWithDocument", { app_num: currentAppNum })
+    Promise.all([
+      axios.post("programs/deleteDocumentsOfApplication", { app_num: currentAppNum }),
+      axios.post("programs/deleteApplication", {app_num: currentAppNum}),
+    ])
       .then((res) => {
         if (res.status === 201) {
           console.log(res.data);
@@ -291,8 +310,8 @@ function Programs(props) {
           console.log(res.data)
           setError(res.data);
         } else {
-          history.go(0);
-          setShowEditProgram(false);
+          allProgramDataEdit(currentAppNum);
+          handleClose();
         }
       })
   }
@@ -311,6 +330,103 @@ function Programs(props) {
     setShowCreate(false);
     setShowApply(false);
     setShowEditApplication(false);
+
+    setNumDocuments(1);
+    setDocType1("");
+    setLink1("");
+    setDocType2("");
+    setLink2("");
+    setDocType3("");
+    setLink3("");
+    setDocType4("");
+    setLink4("");
+    setDocType5("");
+    setLink5("");
+  }
+
+  const allDocumentInfo = (app_num) => {
+    axios
+      .get("/programs/getUploadedDocuments", {
+        params: {
+          app_num: app_num,
+        }
+      })
+      .then((res) => {
+        if(res.data.length > 0){
+          setLink1(res.data[0].link);
+          setDocType1(res.data[0].doc_type);
+        }
+        if(res.data.length > 1){
+          setLink2(res.data[1].link);
+          setDocType2(res.data[1].doc_type);
+        }
+        if(res.data.length > 2){
+          setLink3(res.data[2].link);
+          setDocType3(res.data[2].doc_type);
+        }
+        if(res.data.length > 3){
+          setLink4(res.data[3].link);
+          setDocType4(res.data[3].doc_type);
+        }
+        if(res.data.length > 4){
+          setLink5(res.data[4].link);
+          setDocType5(res.data[4].doc_type);
+        }
+      });
+  }
+
+  const allProgramDataEdit = (app_num) => {
+    axios
+    .get("/programs/getUploadedDocuments", {
+      params: {
+        app_num: app_num,
+      }
+    })
+    .then((res) => {
+      console.log(res);
+      if(res.data.length > 0){
+        console.log(link1, doc_type1);
+        axios
+        .post("/programs/updateDocument", {
+          doc_num: res.data[0].doc_num,
+          link: link1,
+          doc_type: doc_type1
+        })
+      }
+      if(res.data.length > 1){
+        console.log(link2, doc_type2);
+        axios
+        .post("/programs/updateDocument", {
+          doc_num: res.data[1].doc_num,
+          link: link2,
+          doc_type: doc_type2
+        })
+      }
+      if(res.data.length > 2){
+        axios
+        .post("/programs/updateDocument", {
+          doc_num: res.data[2].doc_num,
+          link: link3,
+          doc_type: doc_type3
+        })
+      }
+      if(res.data.length > 3){
+        axios
+        .post("/programs/updateDocument", {
+          doc_num: res.data[3].doc_num,
+          link: link4,
+          doc_type: doc_type4
+        })
+      }
+      if(res.data.length > 4){
+        axios
+        .post("/programs/updateDocument", {
+          doc_num: res.data[4].doc_num,
+          link: link5,
+          doc_type: doc_type5
+        })
+      }
+    })
   }
 
   const programsForUser = allProgramData.map((program) => {
@@ -786,12 +902,9 @@ function Programs(props) {
             <Col>
               <b>Uploaded Documents: </b>
             </Col>
-            <Col>
-              <p>list documents</p>
-            </Col>
           </Row>
           <br></br>
-          <Row hidden={numDocuments <= 0}>
+          <Row>
             <Col sm={6}>
               <b>Enter Document Type: </b>
             </Col>
@@ -809,7 +922,7 @@ function Programs(props) {
             </Col>
           </Row>
 
-          <Row hidden={numDocuments <= 0}>
+          <Row>
             <Col sm={6}>
               <b>Enter Link: </b>
             </Col>
@@ -827,9 +940,9 @@ function Programs(props) {
             </Col>
           </Row>
 
-          <br hidden={numDocuments <= 1}></br>
+          <br></br>
 
-          <Row hidden={numDocuments <= 1}>
+          <Row>
             <Col sm={6}>
               <b>Enter Document Type: </b>
             </Col>
@@ -847,7 +960,7 @@ function Programs(props) {
             </Col>
           </Row>
 
-          <Row hidden={numDocuments <= 1}>
+          <Row>
             <Col sm={6}>
               <b>Enter Link: </b>
             </Col>
@@ -865,9 +978,9 @@ function Programs(props) {
             </Col>
           </Row>
 
-          <br hidden={numDocuments <= 2}></br>
+          <br></br>
 
-          <Row hidden={numDocuments <= 2}>
+          <Row>
             <Col sm={6}>
               <b>Enter Document Type: </b>
             </Col>
@@ -885,7 +998,7 @@ function Programs(props) {
             </Col>
           </Row>
 
-          <Row hidden={numDocuments <= 2}>
+          <Row>
             <Col sm={6}>
               <b>Enter Link: </b>
             </Col>
@@ -903,9 +1016,9 @@ function Programs(props) {
             </Col>
           </Row>
 
-          <br hidden={numDocuments <= 3}></br>
+          <br></br>
 
-          <Row hidden={numDocuments <= 3}>
+          <Row>
             <Col sm={6}>
               <b>Enter Document Type: </b>
             </Col>
@@ -923,7 +1036,7 @@ function Programs(props) {
             </Col>
           </Row>
 
-          <Row hidden={numDocuments <= 3}>
+          <Row>
             <Col sm={6}>
               <b>Enter Link: </b>
             </Col>
@@ -941,9 +1054,9 @@ function Programs(props) {
             </Col>
           </Row>
 
-          <br hidden={numDocuments <= 4}></br>
+          <br></br>
 
-          <Row hidden={numDocuments <= 4}>
+          <Row>
             <Col sm={6}>
               <b>Enter Document Type: </b>
             </Col>
@@ -961,7 +1074,7 @@ function Programs(props) {
             </Col>
           </Row>
 
-          <Row hidden={numDocuments <= 4}>
+          <Row>
             <Col sm={6}>
               <b>Enter Link: </b>
             </Col>
@@ -979,13 +1092,13 @@ function Programs(props) {
             </Col>
           </Row>
 
-          <Row hidden={numDocuments <= 4}>
+          <Row hidden={true}>
             <b>Can not add any more documents</b>
           </Row>
 
           <Row>
             <Col>
-              <Button hidden={numDocuments > 4} variant="success" onClick={() => setNumDocuments(numDocuments + 1)}>
+              <Button hidden={true} variant="success" onClick={() => setNumDocuments(numDocuments + 1)}>
                 Add New Document
               </Button>
             </Col>

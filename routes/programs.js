@@ -170,11 +170,10 @@ router.post("/createDocument", async (req, res) => {
  */
 router.post("/updateDocument", async (req, res) => {
     const doc_num = req.body.doc_num;
-    const app_num = req.body.app_num;
     const link = req.body.link;
     const doc_type = req.body.doc_type;
 
-    pool.query(`UPDATE documentation SET app_num = ${app_num}, link = '${link}', doc_type = '${doc_type}' WHERE doc_num = ${doc_num}`, (err, result) => {
+    pool.query(`UPDATE documentation SET link = '${link}', doc_type = '${doc_type}' WHERE doc_num = ${doc_num}`, (err, result) => {
         if (err) {
             console.log(err);
             res.status(400).json({ message: "Error editing document!" });
@@ -217,6 +216,23 @@ router.post("/deleteDocumentsOfApplication", async (req, res) => {
     })
 });
 
+/** Delete Application route created and implemented by:
+ *  Billy Harkins
+ *  
+ *  SQL: DELETE
+ */
+router.post("/deleteApplication", async (req, res) => {
+    const app_num = req.body.app_num;
+
+    pool.query(`DELETE FROM applications WHERE app_num = ${app_num}`, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.status(400).json({ message: "Error application!" });
+        }
+        res.status(200).json({ message: "Success!" });
+    })
+});
+
 /** Create Application route created and implemented by:
  *    Lucas Wilber
  * 
@@ -230,12 +246,12 @@ router.post("/createApplication", async (req, res) => {
     const com_cert = req.body.com_cert;
     const purpose_statement = req.body.purpose;
 
-    pool.query(`INSERT INTO applications (program_num, uin, uncom_cert, com_cert, purpose_statement) VALUES ($1, $2, $3, $4, $5)`, [program_num, uin, uncom_cert, com_cert, purpose_statement], (err, result) => {
+    pool.query(`INSERT INTO applications (program_num, uin, uncom_cert, com_cert, purpose_statement) VALUES ($1, $2, $3, $4, $5) RETURNING *`, [program_num, uin, uncom_cert, com_cert, purpose_statement], (err, result) => {
         if (err) {
             console.log(err);
             res.status(400).json({ message: "Error creating application!" });
         }
-        res.status(200).json({ message: "Success!" });
+        res.status(200).json(result.rows[0]);
     })
 });
 
