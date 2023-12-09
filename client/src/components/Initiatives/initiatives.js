@@ -49,6 +49,10 @@ function Initiatives(props) {
   const [certAppProgramNum, setCertAppProgramNum] = useState(-1);
   const [certProgramOptions, setCertProgramOptions] = useState([<option value={-1}>Choose Option</option>]);
   
+  // edit modal specifics???
+  const [showEdit, setShowEdit] = useState(false);
+  const [appNum, setAppNum] = useState(-1);
+
 
   useEffect(() => {
     /*
@@ -79,7 +83,7 @@ function Initiatives(props) {
     axios.get("/initiatives/getAllCertificateData")
       .then((res) => {
         setCertificateData(res.data);
-        //console.log(res.data);
+        console.log(res.data);
         setLoading(false);
     
     axios.get("/initiatives/getAllUserCertificateData")
@@ -100,6 +104,9 @@ function Initiatives(props) {
 
   }, []);
 
+  /**
+   * Function open the main initiative modal
+   */
   const openInitiativeHandler = (applyStatus) => {
     setIsApplying(applyStatus);
     if (!applyStatus) {
@@ -108,6 +115,9 @@ function Initiatives(props) {
     setShowInitiative(true);
   }
 
+  /**
+   * Function get reset initiative values (mainly for closing modals)
+   */
   const resetModalValues = () => {
     setInitiativeType("Choose Type");
     setIsNew("Select Option");
@@ -132,9 +142,15 @@ function Initiatives(props) {
     setCertAppTraining("");
     setCertAppProgramNum(-1);
 
+    setAppNum(-1);
+
     setShowInitiative(false);
+    setShowEdit(false);
   }
 
+  /**
+   * Function to handle behavior when changing the type of the initiative (in creation)
+   */
   const changeInitiativeTypeHandler = (type) => {
     setInitiativeType(type);
     let opts = [];
@@ -155,6 +171,9 @@ function Initiatives(props) {
     setInitiativeOptions(opts);
   }
 
+  /**
+   * Function to load the options for program options (for certification)
+   */
   const updateProgramOptionsHandler = (data) => {
     let dataf = data.filter((program) => (program.active));
     setProgramData(dataf);
@@ -170,6 +189,9 @@ function Initiatives(props) {
     setCertProgramOptions(opts);
   }
 
+  /**
+   * Function automatically fill in info when bringing in an existing initiative
+   */
   const updateSelectionHandler = (id) => {
     setSelectOption(id);
     setInitiativeNum(id);
@@ -215,6 +237,9 @@ function Initiatives(props) {
     
   }
 
+  /**
+   * Function for creating an initiative (and application) [on button submission]
+   */
   const createInitiativeHandler = () => {
     //changeInitiativeTypeHandler("Choose Type");
     if (initiativeType === "Choose Type") {
@@ -420,16 +445,111 @@ function Initiatives(props) {
 
   }
 
-  const editClassHandler = () => {
-
+  const editClassHandler = (ID, applyStatus) => {
+    //console.log(ID);
+    setInitiativeType("Class");
+    setIsApplying(applyStatus);
+    if(applyStatus) {
+      setAppNum(ID);
+      axios.get("/initiatives/getClassEnrollment", {
+        params: {
+          ce_num : ID
+        }
+      }).then((res) => {
+        console.log(res.data);
+        setInitiativeID(res.data.class_id);
+        setUIN(res.data.uin);
+        setAppStatus(res.data.class_status);
+        setAppYear(res.data.yr);
+        setAppSemester(res.data.semester);
+        setShowEdit(true);
+      })
+    } else {
+      setInitiativeID(ID);
+      axios.get("/initiatives/getClass", {
+        params: {
+          class_id : ID
+        }
+      }).then((res) => {
+        //console.log(res.data);
+        setInitiativeName(res.data.class_name);
+        setInitiativeDesc(res.data.class_description);
+        setClassType(res.data.class_type);
+        setShowEdit(true);
+      })
+    }
   }
 
-  const editInternshipHandler = () => {
-
+  const editInternshipHandler = (ID, applyStatus) => {
+    //console.log(ID);
+    setInitiativeType("Internship");
+    setIsApplying(applyStatus);
+    if(applyStatus) {
+      setAppNum(ID);
+      axios.get("/initiatives/getInternshipApplication", {
+        params: {
+          ia_num : ID
+        }
+      }).then((res) => {
+        setInitiativeID(res.data.intern_id);
+        setUIN(res.data.uin);
+        setAppStatus(res.data.intern_status);
+        setAppYear(res.data.yr);
+        setShowEdit(true);
+      })
+    } else {
+      setInitiativeID(ID);
+      axios.get("/initiatives/getInternship", {
+        params: {
+          intern_id : ID
+        }
+      }).then((res) => {
+        //console.log(res.data);
+        setInitiativeName(res.data.company_name);
+        setInitiativeDesc(res.data.intern_description);
+        setIsGov(res.data.is_gov);
+        setLocation(res.data.location);
+        setShowEdit(true);
+      })
+    }
   }
 
-  const editCertificateHandler = () => {
-
+  const editCertificateHandler = (ID, applyStatus) => {
+    ///
+    //console.log(ID);
+    setInitiativeType("Certificate");
+    setIsApplying(applyStatus);
+    if(applyStatus) {
+      setAppNum(ID);
+      axios.get("/initiatives/getCertificationEnrollment", {
+        params: {
+          certe_num : ID
+        }
+      }).then((res) => {
+        console.log(res.data);
+        setInitiativeID(res.data.cert_id);
+        setUIN(res.data.uin);
+        setAppStatus(res.data.cert_status);
+        setCertAppTraining(res.data.training_status);
+        setCertAppProgramNum(res.data.program_num);
+        setAppSemester(res.data.semester);
+        setAppYear(res.data.yr);
+        setShowEdit(true);
+      })
+    } else {
+      setInitiativeID(ID);
+      axios.get("/initiatives/getCertification", {
+        params: {
+          cert_id : ID
+        }
+      }).then((res) => {
+        //console.log(res.data);
+        setInitiativeName(res.data.cert_name);
+        setInitiativeDesc(res.data.cert_description);
+        setCertLevel(res.data.cert_level);
+        setShowEdit(true);
+      })
+    }
   }
 
   const deleteClassHandler = () => {
@@ -444,6 +564,9 @@ function Initiatives(props) {
 
   }
 
+  /**
+   * Function get table formats for classes
+   */
   const getClassTable = (data, showUser, showEnroll) => {
     const list = [];
     for(let k = 0; k < data.length; k++) {
@@ -468,7 +591,7 @@ function Initiatives(props) {
                         </React.Fragment>
                       }
                       <td>
-                        <Button variant="success btn-sm" onClick={() => {}}>
+                        <Button variant="success btn-sm" onClick={() => {editClassHandler(showEnroll ? Class.ce_num : Class.class_id, showEnroll)}}>
                           Edit
                         </Button>
                       </td>
@@ -478,6 +601,9 @@ function Initiatives(props) {
     return list;
   }
 
+  /**
+   * Function get table formats for internships
+   */
   const getInternshipTable = (data, showUser, showEnroll) => {
     const list = [];
     for(let k = 0; k < data.length; k++) {
@@ -501,7 +627,7 @@ function Initiatives(props) {
                         </React.Fragment>
                       }
                       <td>
-                        <Button variant="success btn-sm" onClick={() => {}}>
+                        <Button variant="success btn-sm" onClick={() => {editInternshipHandler(showEnroll ? Internship.ia_num : Internship.intern_id, showEnroll)}}>
                           Edit
                         </Button>
                       </td>
@@ -511,6 +637,9 @@ function Initiatives(props) {
     return list;
   }
 
+  /**
+   * Function get table formats for certifications
+   */
   const getCertificationTable = (data, showUser, showEnroll) => {
     //cert_level |    cert_name     | cert_description
     //cert_status | training_status | program_num | semester | yr
@@ -546,7 +675,7 @@ function Initiatives(props) {
                         </React.Fragment>
                       }
                       <td>
-                        <Button variant="success btn-sm" onClick={() => {}}>
+                        <Button variant="success btn-sm" onClick={() => {editCertificateHandler(showEnroll ? Cert.certe_num : Cert.cert_id, showEnroll)}}>
                           Edit
                         </Button>
                       </td>
@@ -558,6 +687,11 @@ function Initiatives(props) {
 
   return (
     <div className="Profile">
+      {
+        /*
+         * CREATION MODAL
+         */
+      }
       <Modal show={showInitiative} onHide={resetModalValues}>
         <Modal.Header closeButton>
           <Modal.Title>
@@ -952,6 +1086,306 @@ function Initiatives(props) {
           </Button>
         </Modal.Footer>
       </Modal>
+      {
+        /*
+         * EDITING MODAL
+         */
+      }
+      <Modal show={showEdit} onHide={resetModalValues}>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            Editing Initiative
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {isApplying ? (
+            <React.Fragment>
+              {props.auth.user.user_type === "Admin" && 
+                <Row>
+                  <Col sm={4}>
+                    <b>Student UIN: </b>
+                  </Col>
+                  <Col>
+                    <Form.Group className="mb-3">
+                      <Form.Control
+                      value={UIN}
+                      isInvalid={!!error.UIN}
+                      onChange={(e) => {
+                        setUIN(e.target.value);
+                      }}
+                      required
+                      id="Student UIN"
+                      type="number"
+                      min="0"
+                      >
+                      </Form.Control>
+                    </Form.Group>
+                  </Col>
+                </Row>
+              }
+              <Row>
+                    <Col sm={4}>
+                      <b>Application Status: </b>
+                    </Col>
+                    <Col>
+                      <Form.Group className="mb-3">
+                        <Form.Control
+                        value={appStatus}
+                        isInvalid={!!error.appStatus}
+                        onChange={(e) => {
+                          setAppStatus(e.target.value);
+                        }}
+                        required
+                        id="Application Status"
+                        type="text"
+                        >
+                        </Form.Control>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col sm={4}>
+                      <b>Application Year: </b>
+                    </Col>
+                    <Col>
+                      <Form.Group className="mb-3">
+                        <Form.Control
+                        value={appYear}
+                        isInvalid={!!error.appStatus}
+                        onChange={(e) => {
+                          setAppYear(e.target.value);
+                        }}
+                        required
+                        id="Application Year"
+                        type="number"
+                        min="0"
+                        >
+                        </Form.Control>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  {(initiativeType==="Class" || initiativeType=="Certificate") && 
+                    <React.Fragment>
+                      <Row>
+                        <Col sm={4}>
+                          <b>Semester: </b>
+                        </Col>
+                        <Col>
+                          <Form.Group className="mb-3">
+                            <Form.Select
+                            aria-label="Application Semester"
+                            value={appSemester}
+                            isInvalid={!!error.appSemester}
+                            onChange={(e) => {
+                              setAppSemester(e.target.value);
+                            }}
+                            >
+                              <option>Select Option</option>
+                              <option>Spring</option>
+                              <option>Summer</option>
+                              <option>Fall</option>
+                            </Form.Select>
+                          </Form.Group>
+                        </Col>
+                      </Row>
+                    </React.Fragment>
+                  }
+                  {initiativeType=="Certificate" &&
+                    <React.Fragment>
+                      <Row>
+                        <Col sm={4}>
+                          <b>Training Status: </b>
+                        </Col>
+                        <Col>
+                          <Form.Group className="mb-3">
+                            <Form.Control
+                            value={certAppTraining}
+                            isInvalid={!!error.certAppTraining}
+                            onChange={(e) => {
+                              setCertAppTraining(e.target.value);
+                            }}
+                            required
+                            id="Certification Training Status"
+                            type="text"
+                            >
+                            </Form.Control>
+                          </Form.Group>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col sm={4}>
+                          <b>Program: </b>
+                        </Col>
+                        <Col>
+                          <Form.Group className="mb-3">
+                            <Form.Select
+                            aria-label="Program Options"
+                            value={certAppProgramNum}
+                            isInvalid={!!error.certAppProgramNum}
+                            onChange={(e) => {
+                              setCertAppProgramNum(e.target.value);
+                            }}
+                            >
+                              {certProgramOptions}
+                            </Form.Select>
+                          </Form.Group>
+                        </Col>
+                      </Row>
+                    </React.Fragment>
+                  }
+            </React.Fragment>
+          ):(
+            <React.Fragment>
+              <Row>
+                <Col sm={4}>
+                  <b>Name: </b>
+                </Col>
+                <Col>
+                  <Form.Group className="mb-3">
+                    <Form.Control
+                    value={initiativeName}
+                    isInvalid={!!error.initiativeName}
+                    onChange={(e) => {
+                      setInitiativeName(e.target.value);
+                    }}
+                    required
+                    id="Initiative Name"
+                    type="text"
+                    disabled = {isNew === "Select Existing"}
+                    >
+                    </Form.Control>
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Row>
+                <Col sm={4}>
+                  <b>Description: </b>
+                </Col>
+                <Col>
+                  <Form.Group className="mb-3">
+                    <Form.Control
+                    value={initiativeDesc}
+                    isInvalid={!!error.initiativeDesc}
+                    onChange={(e) => {
+                      setInitiativeDesc(e.target.value);
+                    }}
+                    id="Initiative Description"
+                    type="text"
+                    disabled = {isNew === "Select Existing"}
+                    >
+                    </Form.Control>
+                  </Form.Group>
+                </Col>
+              </Row>
+              {initiativeType==="Class" &&
+                <React.Fragment>
+                  <Row>
+                    <Col sm={4}>
+                      <b>Class Type: </b>
+                    </Col>
+                    <Col>
+                      <Form.Group className="mb-3">
+                        <Form.Control
+                        value={classType}
+                        isInvalid={!!error.classType}
+                        onChange={(e) => {
+                          setClassType(e.target.value);
+                        }}
+                        id="Class Type"
+                        type="text"
+                        disabled = {isNew === "Select Existing"}
+                        >
+                        </Form.Control>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                </React.Fragment>
+              }
+              {initiativeType==="Internship" &&
+                <React.Fragment>
+                  <Row>
+                    <Col sm={4}>
+                      <b>Is Gov: </b>
+                    </Col>
+                    <Col>
+                      <Form.Group className="mb-3">
+                        <Form.Select
+                        aria-label="Is Gov"
+                        value={internshipIsGov}
+                        isInvalid={!!error.internshipIsGov}
+                        disabled = {isNew === "Select Existing"}
+                        onChange={(e) => {
+                          setIsGov(e.target.value);
+                        }}
+                        >
+                          <option>Select Option</option>
+                          <option>Yes</option>
+                          <option>No</option>
+                        </Form.Select>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col sm={4}>
+                      <b>Location: </b>
+                    </Col>
+                    <Col>
+                      <Form.Group className="mb-3">
+                        <Form.Control
+                        value={internshipLocation}
+                        isInvalid={!!error.internshipLocation}
+                        onChange={(e) => {
+                          setLocation(e.target.value);
+                        }}
+                        id="Internship Location"
+                        type="text"
+                        disabled = {isNew === "Select Existing"}
+                        >
+                        </Form.Control>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                </React.Fragment>
+              }
+              {initiativeType==="Certificate" &&
+                <React.Fragment>
+                  <Row>
+                    <Col sm={4}>
+                      <b>Certificate Level: </b>
+                    </Col>
+                    <Col>
+                      <Form.Group className="mb-3">
+                        <Form.Control
+                        value={certLevel}
+                        isInvalid={!!error.certLevel}
+                        onChange={(e) => {
+                          setCertLevel(e.target.value);
+                        }}
+                        id="Certificate Level"
+                        type="text"
+                        disabled = {isNew === "Select Existing"}
+                        >
+                        </Form.Control>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                </React.Fragment>
+              }
+            </React.Fragment>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={resetModalValues}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={() => {}}>
+            Delete
+          </Button>
+          <Button variant="primary" onClick={createInitiativeHandler}>
+            Confirm
+          </Button>
+        </Modal.Footer>
+      </Modal>
       <Container>
         {loading ? (
             <center>
@@ -1012,7 +1446,7 @@ function Initiatives(props) {
                       <th className="col-md-1">Edit</th>
                     </tr>
                   </thead>
-                  <tbody>{getInternshipTable(allUserInternshipData, false, false)}</tbody>
+                  <tbody>{getInternshipTable(allInternshipData, false, false)}</tbody>
                 </Table>
                 <h2 className="display-5 text-center">Internship Applications</h2>
                 <Table stiped bordered hover className="text-center">
@@ -1043,7 +1477,7 @@ function Initiatives(props) {
                       <th className="col-md-1">Edit</th>
                     </tr>
                   </thead>
-                  <tbody>{getCertificationTable(allUserCertificateData, false, false)}</tbody>
+                  <tbody>{getCertificationTable(allCertificateData, false, false)}</tbody>
                 </Table>
                 <h2 className="display-5 text-center">Certificate Enrollments</h2>
                 <Table stiped bordered hover className="text-center">

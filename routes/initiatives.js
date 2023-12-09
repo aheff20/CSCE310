@@ -61,6 +61,114 @@ router.get("/getAllCertificateData", async(req, res) => {
     
 });
 
+/** Get single Class route created and implemented by:
+ *    Logan Carbo
+ * 
+ *    SQL: select
+ */
+router.get("/getClass", async(req, res) => {
+
+    const class_id = req.query.class_id;
+    pool.query(`SELECT * FROM classes WHERE class_id=${class_id}`, (err, result) => {
+        if(err){
+            console.log(err);
+            res.status(400).json("Error getting all event information");
+        }
+        res.status(200).json(result.rows[0]);
+    })
+    
+});
+
+/** Get single Internship route created and implemented by:
+ *    Logan Carbo
+ * 
+ *    SQL: select
+ */
+router.get("/getInternship", async(req, res) => {
+
+    const intern_id = req.query.intern_id;
+    pool.query(`SELECT * FROM internship WHERE intern_id=${intern_id}`, (err, result) => {
+        if(err){
+            console.log(err);
+            res.status(400).json("Error getting all event information");
+        }
+        res.status(200).json(result.rows[0]);
+    })
+    
+});
+
+/** Get single Certification route created and implemented by:
+ *    Logan Carbo
+ * 
+ *    SQL: select
+ */
+router.get("/getCertification", async(req, res) => {
+
+    const cert_id = req.query.cert_id;
+    pool.query(`SELECT * FROM certification WHERE cert_id=${cert_id}`, (err, result) => {
+        if(err){
+            console.log(err);
+            res.status(400).json("Error getting all event information");
+        }
+        res.status(200).json(result.rows[0]);
+    })
+    
+});
+
+/** Get single Class Enrollment route created and implemented by:
+ *    Logan Carbo
+ * 
+ *    SQL: select
+ */
+router.get("/getClassEnrollment", async(req, res) => {
+
+    const ce_num = req.query.ce_num;
+    pool.query(`SELECT * FROM class_enrollment WHERE ce_num=${ce_num}`, (err, result) => {
+        if(err){
+            console.log(err);
+            res.status(400).json("Error getting all event information");
+        }
+        res.status(200).json(result.rows[0]);
+    })
+    
+});
+
+/** Get single Internship Application route created and implemented by:
+ *    Logan Carbo
+ * 
+ *    SQL: select
+ */
+router.get("/getInternshipApplication", async(req, res) => {
+
+    const ia_num = req.query.ia_num;
+    pool.query(`SELECT * FROM intern_app WHERE ia_num=${ia_num}`, (err, result) => {
+        if(err){
+            console.log(err);
+            res.status(400).json("Error getting all event information");
+        }
+        res.status(200).json(result.rows[0]);
+    })
+    
+});
+
+/** Get single Certification Enrollment route created and implemented by:
+ *    Logan Carbo
+ * 
+ *    SQL: select
+ */
+router.get("/getCertificationEnrollment", async(req, res) => {
+
+    const certe_num = req.query.certe_num;
+    pool.query(`SELECT * FROM cert_enrollment WHERE certe_num=${certe_num}`, (err, result) => {
+        if(err){
+            console.log(err);
+            res.status(400).json("Error getting all event information");
+        }
+        res.status(200).json(result.rows[0]);
+    })
+    
+});
+
 /** Get all user_class data route created and implemented by:
  *    Logan Carbo
  * 
