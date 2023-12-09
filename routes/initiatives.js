@@ -681,11 +681,10 @@ router.post("/updateCertificationEnrollment", async (req, res) => {
 /////
 //delete
 
-/** Delete Program route created and implemented by:
- *    Lucas Wilber
+/** Delete Class route created and implemented by:
+ *    Logan Carbo
  * 
- *    SQL:
- *      * Delete 
+ *    SQL: delete 
  */
 router.post("/deleteClass", async (req, res) => {
     const ID = req.body.ID;
@@ -714,6 +713,129 @@ router.post("/deleteClassEnrollments", async (req, res) => {
         }
         res.status(200).json({ message: "Success!" });
     })
-})
+});
+
+/** Delete Class Enrollment (single) route created and implemented by:
+ *    Logan Carbo
+ * 
+ *    SQL: delete 
+ */
+router.post("/deleteClassEnrollment", async (req, res) => {
+    const num = req.body.num;
+
+    pool.query(`DELETE FROM class_enrollment WHERE ce_num = ${num}`, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.status(400).json({ message: "Error deleting event from track table!" });
+        }
+        res.status(200).json({ message: "Success!" });
+    })
+});
+
+///// internship
+
+/** Delete Internship route created and implemented by:
+ *    Logan Carbo
+ * 
+ *    SQL: delete 
+ */
+router.post("/deleteInternship", async (req, res) => {
+    const ID = req.body.ID;
+    
+    pool.query(`DELETE FROM internship WHERE intern_id=${ID}`, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.status(400).json({ message: "Error deleting Program!" })
+        }
+        res.status(200).json({ message: "Success!" })
+    })
+});
+
+/** Delete Internship Applications (all) route created and implemented by:
+ *    Logan Carbo
+ * 
+ *    SQL: delete 
+ */
+router.post("/deleteInternshipApps", async (req, res) => {
+    const ID = req.body.ID;
+
+    pool.query(`DELETE FROM intern_app WHERE intern_id = ${ID}`, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.status(400).json({ message: "Error deleting event from track table!" });
+        }
+        res.status(200).json({ message: "Success!" });
+    })
+});
+
+/** Delete Internship Application (single) route created and implemented by:
+ *    Logan Carbo
+ * 
+ *    SQL: delete 
+ */
+router.post("/deleteInternshipApp", async (req, res) => {
+    const num = req.body.num;
+
+    pool.query(`DELETE FROM intern_app WHERE ia_num = ${num}`, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.status(400).json({ message: "Error deleting event from track table!" });
+        }
+        res.status(200).json({ message: "Success!" });
+    })
+});
+
+///// certification
+
+/** Delete Class route created and implemented by:
+ *    Logan Carbo
+ * 
+ *    SQL: delete 
+ */
+router.post("/deleteCertification", async (req, res) => {
+    const ID = req.body.ID;
+    
+    pool.query(`DELETE FROM certification WHERE cert_id=${ID}`, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.status(400).json({ message: "Error deleting Program!" })
+        }
+        res.status(200).json({ message: "Success!" })
+    })
+});
+
+/** Delete Class Enrollments (all) route created and implemented by:
+ *    Logan Carbo
+ * 
+ *    SQL: delete 
+ */
+router.post("/deleteCertificationEnrollments", async (req, res) => {
+    const ID = req.body.ID;
+
+    pool.query(`DELETE FROM cert_enrollment WHERE cert_id = ${ID}`, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.status(400).json({ message: "Error deleting event from track table!" });
+        }
+        res.status(200).json({ message: "Success!" });
+    })
+});
+
+/** Delete Class Enrollment (single) route created and implemented by:
+ *    Logan Carbo
+ * 
+ *    SQL: delete 
+ */
+router.post("/deleteCertificationEnrollment", async (req, res) => {
+    const num = req.body.num;
+
+    pool.query(`DELETE FROM cert_enrollment WHERE certe_num = ${num}`, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.status(400).json({ message: "Error deleting event from track table!" });
+        }
+        res.status(200).json({ message: "Success!" });
+    })
+});
 
 module.exports = router;

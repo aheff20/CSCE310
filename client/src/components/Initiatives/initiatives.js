@@ -689,7 +689,121 @@ function Initiatives(props) {
    * Function to remove initiative data
    */
   const deletionHandler = () => {
+    let confirm = window.confirm(`Are you sure you want to delete this initiative?\nThis action CANNOT be undone.`);
+    if (!confirm) {
+      return;
+    }
 
+    if (isApplying) {
+      // apps/enrollments
+      if (initiativeType==="Class") [
+        axios.post("/initiatives/deleteClassEnrollment", {num : appNum})
+          .then((res) => {
+            if (res.status === 201) {
+              console.log(res.data);
+              setError(res.data);
+            } else {
+              history.go(0);
+              setShowEdit(false);
+              setLoading(true);
+            }
+          })
+      ]
+      if (initiativeType==="Internship") {
+        axios.post("/initiatives/deleteInternshipApp", {num : appNum})
+          .then((res) => {
+            if (res.status === 201) {
+              console.log(res.data);
+              setError(res.data);
+            } else {
+              history.go(0);
+              setShowEdit(false);
+              setLoading(true);
+            }
+          })
+      }
+      if (initiativeType==="Certificate") {
+        axios.post("/initiatives/deleteCertificationEnrollment", {num : appNum})
+          .then((res) => {
+            if (res.status === 201) {
+              console.log(res.data);
+              setError(res.data);
+            } else {
+              history.go(0);
+              setShowEdit(false);
+              setLoading(true);
+            }
+          })
+      }
+    } else {
+      // main objects
+      if (initiativeType==="Class") [
+        axios.post("/initiatives/deleteClassEnrollments", {ID : initiativeID})
+          .then((res) => {
+            if (res.status === 201) {
+              console.log(res.data);
+              setError(res.data);
+              return;
+            } else {
+              axios.post("/initiatives/deleteClass", {ID : initiativeID})
+                .then((res) => {
+                  if (res.status === 201) {
+                    console.log(res.data);
+                    setError(res.data);
+                  } else {
+                    history.go(0);
+                    setLoading(true);
+                    setShowEdit(false);
+                  }
+                })
+            }
+          })
+      ]
+      if (initiativeType==="Internship") {
+        axios.post("/initiatives/deleteInternshipApps", {ID : initiativeID})
+          .then((res) => {
+            if (res.status === 201) {
+              console.log(res.data);
+              setError(res.data);
+              return;
+            } else {
+              axios.post("/initiatives/deleteInternship", {ID : initiativeID})
+                .then((res) => {
+                  if (res.status === 201) {
+                    console.log(res.data);
+                    setError(res.data);
+                  } else {
+                    history.go(0);
+                    setLoading(true);
+                    setShowEdit(false);
+                  }
+                })
+            }
+          })
+      }
+      if (initiativeType==="Certificate") {
+        axios.post("/initiatives/deleteCertificationEnrollments", {ID : initiativeID})
+          .then((res) => {
+            if (res.status === 201) {
+              console.log(res.data);
+              setError(res.data);
+              return;
+            } else {
+              axios.post("/initiatives/deleteCertification", {ID : initiativeID})
+                .then((res) => {
+                  if (res.status === 201) {
+                    console.log(res.data);
+                    setError(res.data);
+                  } else {
+                    history.go(0);
+                    setLoading(true);
+                    setShowEdit(false);
+                  }
+                })
+            }
+          })
+      }
+    }
   }
 
   /**
