@@ -12,13 +12,13 @@ import setAuthToken from "../../utils/setAuthToken";
 
 function Initiatives(props) {
   const history = useHistory();
-  const [allClassData, setClassData] = useState({});
-  const [allInternshipData, setInternshipData] = useState({});
-  const [allCertificateData, setCertificateData] = useState({});
-  const [allUserClassData, setUserClassData] = useState({});
-  const [allUserInternshipData, setUserInternshipData] = useState({});
-  const [allUserCertificateData, setUserCertificateData] = useState({});
-  const [allProgramData, setProgramData] = useState({});
+  const [allClassData, setClassData] = useState([]);
+  const [allInternshipData, setInternshipData] = useState([]);
+  const [allCertificateData, setCertificateData] = useState([]);
+  const [allUserClassData, setUserClassData] = useState([]);
+  const [allUserInternshipData, setUserInternshipData] = useState([]);
+  const [allUserCertificateData, setUserCertificateData] = useState([]);
+  const [allProgramData, setProgramData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // modal info
@@ -49,6 +49,10 @@ function Initiatives(props) {
   const [certAppProgramNum, setCertAppProgramNum] = useState(-1);
   const [certProgramOptions, setCertProgramOptions] = useState([<option value={-1}>Choose Option</option>]);
   
+  // edit modal specifics???
+  const [showEdit, setShowEdit] = useState(false);
+  const [appNum, setAppNum] = useState(-1);
+
 
   useEffect(() => {
     /*
@@ -71,7 +75,7 @@ function Initiatives(props) {
         setInternshipData(res.data);
         //console.log(res.data);
     
-    axios.get("/initiatives/getAllUserClassData")
+    axios.get("/initiatives/getAllUserInternshipData")
       .then((res) => {
         setUserInternshipData(res.data);
         //console.log(res.data);
@@ -100,6 +104,9 @@ function Initiatives(props) {
 
   }, []);
 
+  /**
+   * Function open the main initiative modal
+   */
   const openInitiativeHandler = (applyStatus) => {
     setIsApplying(applyStatus);
     if (!applyStatus) {
@@ -108,6 +115,9 @@ function Initiatives(props) {
     setShowInitiative(true);
   }
 
+  /**
+   * Function get reset initiative values (mainly for closing modals)
+   */
   const resetModalValues = () => {
     setInitiativeType("Choose Type");
     setIsNew("Select Option");
@@ -132,9 +142,15 @@ function Initiatives(props) {
     setCertAppTraining("");
     setCertAppProgramNum(-1);
 
+    setAppNum(-1);
+
     setShowInitiative(false);
+    setShowEdit(false);
   }
 
+  /**
+   * Function to handle behavior when changing the type of the initiative (in creation)
+   */
   const changeInitiativeTypeHandler = (type) => {
     setInitiativeType(type);
     let opts = [];
@@ -155,6 +171,9 @@ function Initiatives(props) {
     setInitiativeOptions(opts);
   }
 
+  /**
+   * Function to load the options for program options (for certification)
+   */
   const updateProgramOptionsHandler = (data) => {
     let dataf = data.filter((program) => (program.active));
     setProgramData(dataf);
@@ -170,6 +189,9 @@ function Initiatives(props) {
     setCertProgramOptions(opts);
   }
 
+  /**
+   * Function automatically fill in info when bringing in an existing initiative
+   */
   const updateSelectionHandler = (id) => {
     setSelectOption(id);
     setInitiativeNum(id);
@@ -215,6 +237,9 @@ function Initiatives(props) {
     
   }
 
+  /**
+   * Function for creating an initiative (and application) [on button submission]
+   */
   const createInitiativeHandler = () => {
     //changeInitiativeTypeHandler("Choose Type");
     if (initiativeType === "Choose Type") {
@@ -420,30 +445,370 @@ function Initiatives(props) {
 
   }
 
-  const editClassHandler = () => {
-
+  /**
+   * Function to setup class information editing
+   */
+  const editClassHandler = (ID, applyStatus) => {
+    //console.log(ID);
+    setInitiativeType("Class");
+    setIsApplying(applyStatus);
+    if(applyStatus) {
+      setAppNum(ID);
+      axios.get("/initiatives/getClassEnrollment", {
+        params: {
+          ce_num : ID
+        }
+      }).then((res) => {
+        console.log(res.data);
+        setInitiativeID(res.data.class_id);
+        setUIN(res.data.uin);
+        setAppStatus(res.data.class_status);
+        setAppYear(res.data.yr);
+        setAppSemester(res.data.semester);
+        setShowEdit(true);
+      })
+    } else {
+      setInitiativeID(ID);
+      axios.get("/initiatives/getClass", {
+        params: {
+          class_id : ID
+        }
+      }).then((res) => {
+        //console.log(res.data);
+        setInitiativeName(res.data.class_name);
+        setInitiativeDesc(res.data.class_description);
+        setClassType(res.data.class_type);
+        setShowEdit(true);
+      })
+    }
   }
 
-  const editInternshipHandler = () => {
-
+  /**
+   * Function to setup internship information editing
+   */
+  const editInternshipHandler = (ID, applyStatus) => {
+    //console.log(ID);
+    setInitiativeType("Internship");
+    setIsApplying(applyStatus);
+    if(applyStatus) {
+      setAppNum(ID);
+      axios.get("/initiatives/getInternshipApplication", {
+        params: {
+          ia_num : ID
+        }
+      }).then((res) => {
+        setInitiativeID(res.data.intern_id);
+        setUIN(res.data.uin);
+        setAppStatus(res.data.intern_status);
+        setAppYear(res.data.yr);
+        setShowEdit(true);
+      })
+    } else {
+      setInitiativeID(ID);
+      axios.get("/initiatives/getInternship", {
+        params: {
+          intern_id : ID
+        }
+      }).then((res) => {
+        //console.log(res.data);
+        setInitiativeName(res.data.company_name);
+        setInitiativeDesc(res.data.intern_description);
+        setIsGov(res.data.is_gov);
+        setLocation(res.data.location);
+        setShowEdit(true);
+      })
+    }
   }
 
-  const editCertificateHandler = () => {
-
+  /**
+   * Function to setup certification information editing
+   */
+  const editCertificateHandler = (ID, applyStatus) => {
+    ///
+    //console.log(ID);
+    setInitiativeType("Certificate");
+    setIsApplying(applyStatus);
+    if(applyStatus) {
+      setAppNum(ID);
+      axios.get("/initiatives/getCertificationEnrollment", {
+        params: {
+          certe_num : ID
+        }
+      }).then((res) => {
+        console.log(res.data);
+        setInitiativeID(res.data.cert_id);
+        setUIN(res.data.uin);
+        setAppStatus(res.data.cert_status);
+        setCertAppTraining(res.data.training_status);
+        setCertAppProgramNum(res.data.program_num);
+        setAppSemester(res.data.semester);
+        setAppYear(res.data.yr);
+        setShowEdit(true);
+      })
+    } else {
+      setInitiativeID(ID);
+      axios.get("/initiatives/getCertification", {
+        params: {
+          cert_id : ID
+        }
+      }).then((res) => {
+        //console.log(res.data);
+        setInitiativeName(res.data.cert_name);
+        setInitiativeDesc(res.data.cert_description);
+        setCertLevel(res.data.cert_level);
+        setShowEdit(true);
+      })
+    }
   }
 
-  const deleteClassHandler = () => {
-
+  /**
+   * Function to handle updating initiative data
+   */
+  const confirmEditHandler = () => {
+    if (isApplying) {
+      // apps/enrollments
+      if (initiativeType==="Class") {
+        axios.post("/initiatives/updateClassEnrollment", {
+          ce_num: appNum,
+          uin: UIN,
+          class_id: initiativeID,
+          status: appStatus,
+          semester: appSemester,
+          year: appYear
+        }).then((res) => {
+          if (res.status === 201) {
+            console.log(res.data);
+            setError(res.data);
+          } else {
+            setShowEdit(false);
+            setLoading(true);
+            history.go(0);
+          }
+        })
+      }
+      if (initiativeType==="Internship") {
+        //console.log(appNum, UIN, initiativeID, appStatus, appYear);
+        axios.post("/initiatives/updateInternshipApplication", {
+          ia_num: appNum,
+          uin: UIN,
+          intern_id: initiativeID,
+          status: appStatus,
+          year: appYear
+        }).then((res) => {
+          if (res.status === 201) {
+            console.log(res.data);
+            setError(res.data);
+          } else {
+            setShowEdit(false);
+            setLoading(true);
+            history.go(0);
+          }
+        })
+      }
+      if (initiativeType==="Certificate") {
+        axios.post("/initiatives/updateCertificationEnrollment", {
+          certe_num: appNum,
+          uin: UIN,
+          cert_id: initiativeID,
+          status: appStatus,
+          training_status: certAppTraining,
+          program_num: certAppProgramNum,
+          semester: appSemester,
+          year: appYear
+        }).then((res) => {
+          if (res.status === 201) {
+            console.log(res.data);
+            setError(res.data);
+          } else {
+            setShowEdit(false);
+            setLoading(true);
+            history.go(0);
+          }
+        })
+      }
+    } else {
+      // main objects
+      if (initiativeType==="Class") {
+        //console.log(initiativeID, initiativeName, initiativeDesc, classType);
+        axios.post("/initiatives/updateClass", {
+          ID: initiativeID,
+          name: initiativeName,
+          description: initiativeDesc,
+          classType: classType
+        }).then((res) => {
+          if (res.status === 201) {
+            console.log(res.data);
+            setError(res.data);
+          } else {
+            setShowEdit(false);
+            setLoading(true);
+            history.go(0);
+          }
+        })
+      }
+      if (initiativeType==="Internship") {
+        //console.log(initiativeID, initiativeName, initiativeDesc, internshipIsGov, internshipLocation);
+        axios.post("/initiatives/updateInternship", {
+          ID: initiativeID,
+          name: initiativeName,
+          description: initiativeDesc,
+          isGov: internshipIsGov,
+          location: internshipLocation
+        }).then((res) => {
+          if (res.status === 201) {
+            console.log(res.data);
+            setError(res.data);
+          } else {
+            setShowEdit(false);
+            setLoading(true);
+            history.go(0);
+          }
+        })
+      }
+      if (initiativeType==="Certificate") {
+        axios.post("/initiatives/updateCertification", {
+          ID: initiativeID,
+          name: initiativeName,
+          description: initiativeDesc,
+          certLevel: certLevel
+        }).then((res) => {
+          if (res.status === 201) {
+            console.log(res.data);
+            setError(res.data);
+          } else {
+            setShowEdit(false);
+            setLoading(true);
+            history.go(0);
+          }
+        })
+      }
+    }
   }
 
-  const deleteInternshipHandler = () => {
+  /**
+   * Function to remove initiative data
+   */
+  const deletionHandler = () => {
+    let confirm = window.confirm(`Are you sure you want to delete this initiative?\nThis action CANNOT be undone.`);
+    if (!confirm) {
+      return;
+    }
 
+    if (isApplying) {
+      // apps/enrollments
+      if (initiativeType==="Class") [
+        axios.post("/initiatives/deleteClassEnrollment", {num : appNum})
+          .then((res) => {
+            if (res.status === 201) {
+              console.log(res.data);
+              setError(res.data);
+            } else {
+              history.go(0);
+              setShowEdit(false);
+              setLoading(true);
+            }
+          })
+      ]
+      if (initiativeType==="Internship") {
+        axios.post("/initiatives/deleteInternshipApp", {num : appNum})
+          .then((res) => {
+            if (res.status === 201) {
+              console.log(res.data);
+              setError(res.data);
+            } else {
+              history.go(0);
+              setShowEdit(false);
+              setLoading(true);
+            }
+          })
+      }
+      if (initiativeType==="Certificate") {
+        axios.post("/initiatives/deleteCertificationEnrollment", {num : appNum})
+          .then((res) => {
+            if (res.status === 201) {
+              console.log(res.data);
+              setError(res.data);
+            } else {
+              history.go(0);
+              setShowEdit(false);
+              setLoading(true);
+            }
+          })
+      }
+    } else {
+      // main objects
+      if (initiativeType==="Class") [
+        axios.post("/initiatives/deleteClassEnrollments", {ID : initiativeID})
+          .then((res) => {
+            if (res.status === 201) {
+              console.log(res.data);
+              setError(res.data);
+              return;
+            } else {
+              axios.post("/initiatives/deleteClass", {ID : initiativeID})
+                .then((res) => {
+                  if (res.status === 201) {
+                    console.log(res.data);
+                    setError(res.data);
+                  } else {
+                    history.go(0);
+                    setLoading(true);
+                    setShowEdit(false);
+                  }
+                })
+            }
+          })
+      ]
+      if (initiativeType==="Internship") {
+        axios.post("/initiatives/deleteInternshipApps", {ID : initiativeID})
+          .then((res) => {
+            if (res.status === 201) {
+              console.log(res.data);
+              setError(res.data);
+              return;
+            } else {
+              axios.post("/initiatives/deleteInternship", {ID : initiativeID})
+                .then((res) => {
+                  if (res.status === 201) {
+                    console.log(res.data);
+                    setError(res.data);
+                  } else {
+                    history.go(0);
+                    setLoading(true);
+                    setShowEdit(false);
+                  }
+                })
+            }
+          })
+      }
+      if (initiativeType==="Certificate") {
+        axios.post("/initiatives/deleteCertificationEnrollments", {ID : initiativeID})
+          .then((res) => {
+            if (res.status === 201) {
+              console.log(res.data);
+              setError(res.data);
+              return;
+            } else {
+              axios.post("/initiatives/deleteCertification", {ID : initiativeID})
+                .then((res) => {
+                  if (res.status === 201) {
+                    console.log(res.data);
+                    setError(res.data);
+                  } else {
+                    history.go(0);
+                    setLoading(true);
+                    setShowEdit(false);
+                  }
+                })
+            }
+          })
+      }
+    }
   }
 
-  const deleteCertificateHandler = () => {
-
-  }
-
+  /**
+   * Function get table formats for classes
+   */
   const getClassTable = (data, showUser, showEnroll) => {
     const list = [];
     for(let k = 0; k < data.length; k++) {
@@ -468,7 +833,91 @@ function Initiatives(props) {
                         </React.Fragment>
                       }
                       <td>
-                        <Button variant="success btn-sm" onClick={() => {}}>
+                        <Button variant="success btn-sm" onClick={() => {editClassHandler(showEnroll ? Class.ce_num : Class.class_id, showEnroll)}}>
+                          Edit
+                        </Button>
+                      </td>
+                   </tr>
+      list.push(temp);
+    }
+    return list;
+  }
+
+  /**
+   * Function get table formats for internships
+   */
+  const getInternshipTable = (data, showUser, showEnroll) => {
+    const list = [];
+    for(let k = 0; k < data.length; k++) {
+      let Internship = data[k];
+
+      const temp = <tr key={k}>
+                      {showUser && 
+                        <React.Fragment>
+                          <td>{Internship.uin}</td>
+                          <td>{Internship.first_name} {Internship.m_initial} {Internship.last_name}</td>
+                        </React.Fragment>
+                      }
+                      <td>{Internship.company_name}</td>
+                      <td>{Internship.intern_description}</td>
+                      <td>{Internship.is_gov ? "Yes" : "No"}</td>
+                      <td>{Internship.location}</td>
+                      {showEnroll &&
+                        <React.Fragment>
+                          <td>{Internship.intern_status}</td>
+                          <td>{Internship.yr}</td>
+                        </React.Fragment>
+                      }
+                      <td>
+                        <Button variant="success btn-sm" onClick={() => {editInternshipHandler(showEnroll ? Internship.ia_num : Internship.intern_id, showEnroll)}}>
+                          Edit
+                        </Button>
+                      </td>
+                   </tr>
+      list.push(temp);
+    }
+    return list;
+  }
+
+  /**
+   * Function get table formats for certifications
+   */
+  const getCertificationTable = (data, showUser, showEnroll) => {
+    //cert_level |    cert_name     | cert_description
+    //cert_status | training_status | program_num | semester | yr
+    const list = [];
+    for(let k = 0; k < data.length; k++) {
+      let Cert = data[k];
+      // class_status   | semester |  yr
+      //console.log("Filtered...");
+      let progName = allProgramData.filter((Program) => (Program.program_num === Cert.program_num))[0];
+      if (progName === undefined) {
+        progName = Cert.program_num;
+      }
+      else progName = progName.program_name;
+      //console.log(progName);
+
+      const temp = <tr key={k}>
+                      {showUser && 
+                        <React.Fragment>
+                          <td>{Cert.uin}</td>
+                          <td>{Cert.first_name} {Cert.m_initial} {Cert.last_name}</td>
+                        </React.Fragment>
+                      }
+                      <td>{Cert.cert_name}</td>
+                      <td>{Cert.cert_description}</td>
+                      <td>{Cert.cert_level}</td>
+                      {showEnroll &&
+                        <React.Fragment>
+                          <td>{Cert.cert_status}</td>
+                          <td>{Cert.training_status}</td>
+                          <td>{progName}</td>
+                          <td>{Cert.semester}</td>
+                          <td>{Cert.yr}</td>
+                        </React.Fragment>
+                      }
+                      <td>
+                        <Button variant="success btn-sm" onClick={() => {editCertificateHandler(showEnroll ? Cert.certe_num : Cert.cert_id, showEnroll)}}>
                           Edit
                         </Button>
                       </td>
@@ -480,6 +929,11 @@ function Initiatives(props) {
 
   return (
     <div className="Profile">
+      {
+        /*
+         * CREATION MODAL
+         */
+      }
       <Modal show={showInitiative} onHide={resetModalValues}>
         <Modal.Header closeButton>
           <Modal.Title>
@@ -874,6 +1328,306 @@ function Initiatives(props) {
           </Button>
         </Modal.Footer>
       </Modal>
+      {
+        /*
+         * EDITING MODAL
+         */
+      }
+      <Modal show={showEdit} onHide={resetModalValues}>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            Editing Initiative
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {isApplying ? (
+            <React.Fragment>
+              {props.auth.user.user_type === "Admin" && 
+                <Row>
+                  <Col sm={4}>
+                    <b>Student UIN: </b>
+                  </Col>
+                  <Col>
+                    <Form.Group className="mb-3">
+                      <Form.Control
+                      value={UIN}
+                      isInvalid={!!error.UIN}
+                      onChange={(e) => {
+                        setUIN(e.target.value);
+                      }}
+                      required
+                      id="Student UIN"
+                      type="number"
+                      min="0"
+                      >
+                      </Form.Control>
+                    </Form.Group>
+                  </Col>
+                </Row>
+              }
+              <Row>
+                    <Col sm={4}>
+                      <b>Application Status: </b>
+                    </Col>
+                    <Col>
+                      <Form.Group className="mb-3">
+                        <Form.Control
+                        value={appStatus}
+                        isInvalid={!!error.appStatus}
+                        onChange={(e) => {
+                          setAppStatus(e.target.value);
+                        }}
+                        required
+                        id="Application Status"
+                        type="text"
+                        >
+                        </Form.Control>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col sm={4}>
+                      <b>Application Year: </b>
+                    </Col>
+                    <Col>
+                      <Form.Group className="mb-3">
+                        <Form.Control
+                        value={appYear}
+                        isInvalid={!!error.appStatus}
+                        onChange={(e) => {
+                          setAppYear(e.target.value);
+                        }}
+                        required
+                        id="Application Year"
+                        type="number"
+                        min="0"
+                        >
+                        </Form.Control>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  {(initiativeType==="Class" || initiativeType=="Certificate") && 
+                    <React.Fragment>
+                      <Row>
+                        <Col sm={4}>
+                          <b>Semester: </b>
+                        </Col>
+                        <Col>
+                          <Form.Group className="mb-3">
+                            <Form.Select
+                            aria-label="Application Semester"
+                            value={appSemester}
+                            isInvalid={!!error.appSemester}
+                            onChange={(e) => {
+                              setAppSemester(e.target.value);
+                            }}
+                            >
+                              <option>Select Option</option>
+                              <option>Spring</option>
+                              <option>Summer</option>
+                              <option>Fall</option>
+                            </Form.Select>
+                          </Form.Group>
+                        </Col>
+                      </Row>
+                    </React.Fragment>
+                  }
+                  {initiativeType=="Certificate" &&
+                    <React.Fragment>
+                      <Row>
+                        <Col sm={4}>
+                          <b>Training Status: </b>
+                        </Col>
+                        <Col>
+                          <Form.Group className="mb-3">
+                            <Form.Control
+                            value={certAppTraining}
+                            isInvalid={!!error.certAppTraining}
+                            onChange={(e) => {
+                              setCertAppTraining(e.target.value);
+                            }}
+                            required
+                            id="Certification Training Status"
+                            type="text"
+                            >
+                            </Form.Control>
+                          </Form.Group>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col sm={4}>
+                          <b>Program: </b>
+                        </Col>
+                        <Col>
+                          <Form.Group className="mb-3">
+                            <Form.Select
+                            aria-label="Program Options"
+                            value={certAppProgramNum}
+                            isInvalid={!!error.certAppProgramNum}
+                            onChange={(e) => {
+                              setCertAppProgramNum(e.target.value);
+                            }}
+                            >
+                              {certProgramOptions}
+                            </Form.Select>
+                          </Form.Group>
+                        </Col>
+                      </Row>
+                    </React.Fragment>
+                  }
+            </React.Fragment>
+          ):(
+            <React.Fragment>
+              <Row>
+                <Col sm={4}>
+                  <b>Name: </b>
+                </Col>
+                <Col>
+                  <Form.Group className="mb-3">
+                    <Form.Control
+                    value={initiativeName}
+                    isInvalid={!!error.initiativeName}
+                    onChange={(e) => {
+                      setInitiativeName(e.target.value);
+                    }}
+                    required
+                    id="Initiative Name"
+                    type="text"
+                    disabled = {isNew === "Select Existing"}
+                    >
+                    </Form.Control>
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Row>
+                <Col sm={4}>
+                  <b>Description: </b>
+                </Col>
+                <Col>
+                  <Form.Group className="mb-3">
+                    <Form.Control
+                    value={initiativeDesc}
+                    isInvalid={!!error.initiativeDesc}
+                    onChange={(e) => {
+                      setInitiativeDesc(e.target.value);
+                    }}
+                    id="Initiative Description"
+                    type="text"
+                    disabled = {isNew === "Select Existing"}
+                    >
+                    </Form.Control>
+                  </Form.Group>
+                </Col>
+              </Row>
+              {initiativeType==="Class" &&
+                <React.Fragment>
+                  <Row>
+                    <Col sm={4}>
+                      <b>Class Type: </b>
+                    </Col>
+                    <Col>
+                      <Form.Group className="mb-3">
+                        <Form.Control
+                        value={classType}
+                        isInvalid={!!error.classType}
+                        onChange={(e) => {
+                          setClassType(e.target.value);
+                        }}
+                        id="Class Type"
+                        type="text"
+                        disabled = {isNew === "Select Existing"}
+                        >
+                        </Form.Control>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                </React.Fragment>
+              }
+              {initiativeType==="Internship" &&
+                <React.Fragment>
+                  <Row>
+                    <Col sm={4}>
+                      <b>Is Gov: </b>
+                    </Col>
+                    <Col>
+                      <Form.Group className="mb-3">
+                        <Form.Select
+                        aria-label="Is Gov"
+                        value={internshipIsGov}
+                        isInvalid={!!error.internshipIsGov}
+                        disabled = {isNew === "Select Existing"}
+                        onChange={(e) => {
+                          setIsGov(e.target.value);
+                        }}
+                        >
+                          <option>Select Option</option>
+                          <option>Yes</option>
+                          <option>No</option>
+                        </Form.Select>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col sm={4}>
+                      <b>Location: </b>
+                    </Col>
+                    <Col>
+                      <Form.Group className="mb-3">
+                        <Form.Control
+                        value={internshipLocation}
+                        isInvalid={!!error.internshipLocation}
+                        onChange={(e) => {
+                          setLocation(e.target.value);
+                        }}
+                        id="Internship Location"
+                        type="text"
+                        disabled = {isNew === "Select Existing"}
+                        >
+                        </Form.Control>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                </React.Fragment>
+              }
+              {initiativeType==="Certificate" &&
+                <React.Fragment>
+                  <Row>
+                    <Col sm={4}>
+                      <b>Certificate Level: </b>
+                    </Col>
+                    <Col>
+                      <Form.Group className="mb-3">
+                        <Form.Control
+                        value={certLevel}
+                        isInvalid={!!error.certLevel}
+                        onChange={(e) => {
+                          setCertLevel(e.target.value);
+                        }}
+                        id="Certificate Level"
+                        type="text"
+                        disabled = {isNew === "Select Existing"}
+                        >
+                        </Form.Control>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                </React.Fragment>
+              }
+            </React.Fragment>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={resetModalValues}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={deletionHandler}>
+            Delete
+          </Button>
+          <Button variant="primary" onClick={confirmEditHandler}>
+            Confirm
+          </Button>
+        </Modal.Footer>
+      </Modal>
       <Container>
         {loading ? (
             <center>
@@ -889,6 +1643,7 @@ function Initiatives(props) {
                 Create Initiative
               </Button>
             </div>
+            <br/>
             {props.auth.user.user_type == "Admin" ? (
               <React.Fragment>
                 <h2 className="display-5 text-center">Classes</h2>
@@ -912,16 +1667,79 @@ function Initiatives(props) {
                       <th className="col-md-1">Class</th>
                       <th className="col-md-1">Description</th>
                       <th className="col-md-1">Class Type</th>
-                      <th classname="col-md-1">Class Status</th>
-                      <th classname="col-md-1">Semester</th>
-                      <th classname="col-md-1">Year</th>
+                      <th className="col-md-1">Class Status</th>
+                      <th className="col-md-1">Semester</th>
+                      <th className="col-md-1">Year</th>
                       <th className="col-md-1">Edit</th>
                     </tr>
                   </thead>
                   <tbody>{getClassTable(allUserClassData, true, true)}</tbody>
                 </Table>
+                <br/>
+
                 <h2 className="display-5 text-center">Internships</h2>
+                <Table stiped bordered hover className="text-center">
+                  <thead>
+                    <tr>
+                      <th className="col-md-1">Company</th>
+                      <th className="col-md-1">Description</th>
+                      <th className="col-md-1">Is Gov</th>
+                      <th className="col-md-1">Location</th>
+                      <th className="col-md-1">Edit</th>
+                    </tr>
+                  </thead>
+                  <tbody>{getInternshipTable(allInternshipData, false, false)}</tbody>
+                </Table>
+                <h2 className="display-5 text-center">Internship Applications</h2>
+                <Table stiped bordered hover className="text-center">
+                  <thead>
+                    <tr>
+                      <th className="col-md-1">UIN</th>
+                      <th className="col-md-1">Name</th>
+                      <th className="col-md-1">Company</th>
+                      <th className="col-md-1">Description</th>
+                      <th className="col-md-1">Is Gov</th>
+                      <th className="col-md-1">Location</th>
+                      <th className="col-md-1">Status</th>
+                      <th className="col-md-1">Year</th>
+                      <th className="col-md-1">Edit</th>
+                    </tr>
+                  </thead>
+                  <tbody>{getInternshipTable(allUserInternshipData, true, true)}</tbody>
+                </Table>
+                <br/>
+
                 <h2 className="display-5 text-center">Certificates</h2>
+                <Table stiped bordered hover className="text-center">
+                  <thead>
+                    <tr>
+                      <th className="col-md-1">Certificate</th>
+                      <th className="col-md-1">Description</th>
+                      <th className="col-md-1">Level</th>
+                      <th className="col-md-1">Edit</th>
+                    </tr>
+                  </thead>
+                  <tbody>{getCertificationTable(allCertificateData, false, false)}</tbody>
+                </Table>
+                <h2 className="display-5 text-center">Certificate Enrollments</h2>
+                <Table stiped bordered hover className="text-center">
+                  <thead>
+                    <tr>
+                      <th className="col-md-1">UIN</th>
+                      <th className="col-md-1">Name</th>
+                      <th className="col-md-1">Certificate</th>
+                      <th className="col-md-1">Description</th>
+                      <th className="col-md-1">Level</th>
+                      <th className="col-md-1">Status</th>
+                      <th className="col-md-1">Training Status</th>
+                      <th className="col-md-1">Program</th>
+                      <th className="col-md-1">Semester</th>
+                      <th className="col-md-1">Year</th>
+                      <th className="col-md-1">Edit</th>
+                    </tr>
+                  </thead>
+                  <tbody>{getCertificationTable(allUserCertificateData, true, true)}</tbody>
+                </Table>
               </React.Fragment>
             ):(
               <React.Fragment>
@@ -932,16 +1750,49 @@ function Initiatives(props) {
                       <th className="col-md-1">Class</th>
                       <th className="col-md-1">Description</th>
                       <th className="col-md-1">Class Type</th>
-                      <th classname="col-md-1">Class Status</th>
-                      <th classname="col-md-1">Semester</th>
-                      <th classname="col-md-1">Year</th>
+                      <th className="col-md-1">Class Status</th>
+                      <th className="col-md-1">Semester</th>
+                      <th className="col-md-1">Year</th>
                       <th className="col-md-1">Edit</th>
                     </tr>
                   </thead>
                   <tbody>{getClassTable(allUserClassData.filter((Class) => (Class.uin===props.auth.user.uin)), false, true)}</tbody>
                 </Table>
+
                 <h2 className="display-5 text-center">My Internships</h2>
+                <Table stiped bordered hover className="text-center">
+                  <thead>
+                    <tr>
+                      <th className="col-md-1">Company</th>
+                      <th className="col-md-1">Description</th>
+                      <th className="col-md-1">Is Gov</th>
+                      <th className="col-md-1">Location</th>
+                      <th className="col-md-1">Status</th>
+                      <th className="col-md-1">Year</th>
+                      <th className="col-md-1">Edit</th>
+                    </tr>
+                  </thead>
+                  <tbody>{getInternshipTable(allUserInternshipData.filter((Internship) => (Internship.uin===props.auth.user.uin)), false, true)}</tbody>
+                </Table>
+
                 <h2 className="display-5 text-center">My Certificates</h2>
+                <Table stiped bordered hover className="text-center">
+                  <thead>
+                    <tr>
+                      <th className="col-md-1">Certificate</th>
+                      <th className="col-md-1">Description</th>
+                      <th className="col-md-1">Level</th>
+                      <th className="col-md-1">Status</th>
+                      <th className="col-md-1">Training Status</th>
+                      <th className="col-md-1">Program</th>
+                      <th className="col-md-1">Semester</th>
+                      <th className="col-md-1">Year</th>
+                      <th className="col-md-1">Edit</th>
+                    </tr>
+                  </thead>
+                  <tbody>{getCertificationTable(allUserCertificateData.filter((Cert) => (Cert.uin===props.auth.user.uin)), false, true)}</tbody>
+                </Table>
+
               </React.Fragment>
             )}
         </React.Fragment>
